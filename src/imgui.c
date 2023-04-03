@@ -124,18 +124,18 @@ static struct {
         {"Brown", "Red", "Orange", "White", 1} // 填充
 },
 
-  gs_menu_color =
-      {
-          "Blue", "Blue", "Red", "Red", 0, // 不填充
-},
+  gs_menu_color = {"Light Gray", "Blue", "Blue", "White", 1},
+  //      {
+  //          "Blue", "Blue", "Red", "Red", 0, // 不填充
+  //},
 
-  gs_button_color =
-      {
-          "Blue", "Blue", "Red", "Red", 0, // 不填充
-},
+    gs_button_color = {"Light Gray", "Blue", "Blue", "White", 1},
+  //        {
+  //            "Blue", "Blue", "Red", "Red", 0, // 不填充
+  //},
 
-  gs_textbox_color = {
-      "Blue", "Blue", "Red", "Red", 0, // 不填充
+    gs_textbox_color = {
+        "Blue", "Blue", "Red", "Red", 0, // 不填充
 };
 
 void setButtonColors(char *frame, char *label, char *hotFrame, char *hotLabel,

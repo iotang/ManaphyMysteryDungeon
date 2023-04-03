@@ -8,14 +8,14 @@
 
 #include "controller.h"
 #include "statemanager.h"
-#include "menu.h"
+#include "pages.h"
 
 extern AppState MainMenu;
 
 void Main() {
   SetWindowSize(WindowWidthInch, WindowHeightInch);
 
-  // InitConsole();
+  InitConsole();
 
   InitGraphics();
   InitGUI();
