@@ -151,6 +151,14 @@ void setButtonColors(char *frame, char *label, char *hotFrame, char *hotLabel,
   gs_button_color.fillflag = fillflag;
 }
 
+void resetButtonColors() {
+  strcpy(gs_button_color.frame, "Light Gray");
+  strcpy(gs_button_color.label, "Blue");
+  strcpy(gs_button_color.hotFrame, "Blue");
+  strcpy(gs_button_color.hotLabel, "White");
+  gs_button_color.fillflag = 1;
+}
+
 void setMenuColors(char *frame, char *label, char *hotFrame, char *hotLabel,
                    int fillflag) {
   if (frame)
@@ -599,6 +607,24 @@ void drawBox(double x, double y, double w, double h, int fillflag, char *label,
   double fa = GetFontAscent();
   // rect
   drawRectangle(x, y, w, h, fillflag);
+  // text
+  if (label && strlen(label) > 0) {
+    mySetPenColor(labelColor);
+    if (labelAlignment == 'L')
+      MovePen(x + fa / 2, y + h / 2 - fa / 2);
+    else if (labelAlignment == 'R')
+      MovePen(x + w - fa / 2 - TextStringWidth(label), y + h / 2 - fa / 2);
+    else // if( labelAlignment=='C'
+      MovePen(x + (w - TextStringWidth(label)) / 2, y + h / 2 - fa / 2);
+    DrawTextString(label);
+  }
+}
+
+void drawBoxWithoutBorder(double x, double y, double w, double h, int fillflag,
+                          char *label, char labelAlignment, char *labelColor) {
+  double fa = GetFontAscent();
+  // rect
+  // drawRectangle(x, y, w, h, fillflag);
   // text
   if (label && strlen(label) > 0) {
     mySetPenColor(labelColor);

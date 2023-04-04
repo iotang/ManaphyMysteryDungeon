@@ -210,5 +210,7 @@ void drawRectangle(double x, double y, double w, double h, int fillflag);
  */
 void drawBox(double x, double y, double w, double h, int fillflag, char *label,
              char xalignment, char *labelColor);
+void drawBoxWithoutBorder(double x, double y, double w, double h, int fillflag,
+                          char *label, char xalignment, char *labelColor);
 
-#endif  // define ____ui_button_h______
+#endif // define ____ui_button_h______

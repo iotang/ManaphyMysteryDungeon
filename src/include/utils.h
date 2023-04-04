@@ -4,7 +4,10 @@
 
 #define FrameLength (16)
 
-#define WindowWidthInch (12.00)
+#define WindowWidthInch (16.00)
+#define Window43Gap (2.00)
+#define Window43Left (2.00)
+#define Window43Right (14.00)
 #define WindowHeightInch (9.00)
 #define MaxMoveCount (4)
 
