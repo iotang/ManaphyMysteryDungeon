@@ -15,6 +15,7 @@
 #include "confirmdialog.h"
 #include "getfilenamedialog.h"
 #include "editpage.h"
+#include "explorer.h"
 
 #include "globalvalue.h"
 
@@ -29,7 +30,8 @@ void drawToolsBar() {
 
   SetPointSize(16);
   static char *menuListEdit[] = {"Edit",          "New",        "Open",
-                                 "Save | Ctrl-S", "Save as...", "Exit"};
+                                 "Save | Ctrl-S", "Save as...", "Randomize",
+                                 "Exit"};
 
   double fontHeight = GetFontHeight();
   double x = 0, y = WindowHeightInch;
@@ -40,7 +42,7 @@ void drawToolsBar() {
 
   selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListEdit,
                        sizeof(menuListEdit) / sizeof(menuListEdit[0]) -
-                           (isDungeonOpened ? 0 : 3));
+                           (isDungeonOpened ? 0 : 4));
 
   if (selection == 1) {
     gotoNewPage();
@@ -54,6 +56,9 @@ void drawToolsBar() {
   } else if (selection == 4) {
     gotoSaveAsPage();
   } else if (selection == 5) {
+    randomizeDungeon(&editDungeon);
+    modifiedSinceLastSave = 1;
+  } else if (selection == 6) {
     if (modifiedSinceLastSave) {
       setConfirmDialog3(&confirmedForceExit, "Warning", "Are you sure to exit?",
                         "All unsaved changes will be lost!");
@@ -72,6 +77,15 @@ void drawToolsBar() {
 
     selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
                          sizeof(menuListRun) / sizeof(menuListRun[0]));
+
+    if (selection == 1) {
+      if (saveDungeonEditPage() < 0) {
+        setAlertDialog2("Error!", "Save failed");
+        gotoAlertDialog();
+      } else {
+        gotoExplorer();
+      }
+    }
   }
 
   static char *menuListAbout[] = {"About", "Help", "About"};

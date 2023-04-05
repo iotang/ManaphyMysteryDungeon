@@ -7,6 +7,7 @@
 #include "appstate.h"
 #include "statemanager.h"
 #include "utils.h"
+#include "pokemon.h"
 #include "dungeon.h"
 #include "drawdungeon.h"
 #include "controller.h"
@@ -16,6 +17,7 @@
 
 #include "globalvalue.h"
 
+int editHasReadDungeon;
 Dungeon editDungeon;
 char editDungeonFileName[MaxFileNameLength + 1];
 
@@ -71,11 +73,12 @@ int saveDungeonEditPage() {
   modifiedSinceLastSave = 0;
 }
 
-int saveDungeonEditPageAs() {}
-
 void initEditPage() {
   editCellSize = 1;
-  editDungeon = currentDungeon;
+  if (!editHasReadDungeon) {
+    editDungeon = currentDungeon;
+    editHasReadDungeon = 1;
+  }
   editCursor.x = editCursor.y = 0;
   int gotEnd = 0;
   for (int x = 0; x < editDungeon.width; x++) {
@@ -103,7 +106,17 @@ void initEditPage() {
 }
 
 void drawEditPage() {
-  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize);
+  if (editCursor.x < 0)
+    editCursor.x = 0;
+  if (editCursor.x >= editDungeon.width)
+    editCursor.x = editDungeon.width - 1;
+
+  if (editCursor.y < 0)
+    editCursor.y = 0;
+  if (editCursor.y >= editDungeon.height)
+    editCursor.y = editDungeon.height - 1;
+
+  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 1);
   drawDungeonCell(&editDungeon, editCursor.x, editCursor.y, editCellSize,
                   editMouseX, editMouseY);
 
@@ -117,6 +130,65 @@ void drawEditPage() {
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
   // width height adj
+
+  char __buf[99];
+  sprintf(__buf, "%d", editDungeon.width);
+  drawBoxWithoutBorder(Window43Gap * 0.4, WindowHeightInch * 0.23,
+                       Window43Gap * 0.2, WindowHeightInch * 0.03, 1, "Width",
+                       'C', "Black");
+  SetPenColor("White");
+  drawBox(Window43Gap * 0.4, WindowHeightInch * 0.19, Window43Gap * 0.2,
+          WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
+  setButtonColors("White", "Blue", "Blue", "White", 1);
+  if (button(GenUIID(0), Window43Gap * 0.64, WindowHeightInch * 0.19,
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "+")) {
+    setDungeonSize(&editDungeon, editDungeon.width + 1, editDungeon.height);
+    modifiedSinceLastSave = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.78, WindowHeightInch * 0.19,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "+10")) {
+    setDungeonSize(&editDungeon, editDungeon.width + 10, editDungeon.height);
+    modifiedSinceLastSave = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.26, WindowHeightInch * 0.19,
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "-")) {
+    setDungeonSize(&editDungeon, editDungeon.width - 1, editDungeon.height);
+    modifiedSinceLastSave = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.19,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "-10")) {
+    setDungeonSize(&editDungeon, editDungeon.width - 10, editDungeon.height);
+    modifiedSinceLastSave = 1;
+  }
+
+  sprintf(__buf, "%d", editDungeon.height);
+  drawBoxWithoutBorder(Window43Gap * 0.4, WindowHeightInch * 0.14,
+                       Window43Gap * 0.2, WindowHeightInch * 0.03, 1, "Height",
+                       'C', "Black");
+  SetPenColor("White");
+  drawBox(Window43Gap * 0.4, WindowHeightInch * 0.1, Window43Gap * 0.2,
+          WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
+  setButtonColors("White", "Blue", "Blue", "White", 1);
+  if (button(GenUIID(0), Window43Gap * 0.64, WindowHeightInch * 0.1,
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "+")) {
+    setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height + 1);
+    modifiedSinceLastSave = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.78, WindowHeightInch * 0.1,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "+10")) {
+    setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height + 10);
+    modifiedSinceLastSave = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.26, WindowHeightInch * 0.1,
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "-")) {
+    setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height - 1);
+    modifiedSinceLastSave = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.1,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "-10")) {
+    setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height - 10);
+    modifiedSinceLastSave = 1;
+  }
 
   // edit mode
 
@@ -182,8 +254,10 @@ void uiEditPageGetKeyboard(int key, int event) {
 }
 
 void uiEditPageGetMouse(int x, int y, int button, int event) {
-  editMouseX = ScaleXInches(x);
-  editMouseY = ScaleYInches(y);
+  if (event != ROLL_DOWN && event != ROLL_UP) {
+    editMouseX = ScaleXInches(x);
+    editMouseY = ScaleYInches(y);
+  }
 
   int mx, my;
   getCellLocation(&editDungeon, editCursor.x, editCursor.y, editCellSize,
@@ -231,7 +305,7 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
   } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
     isJumpedEditPage = 0;
   } else if (event == ROLL_DOWN) {
-    if (editCellSize > 0.50) {
+    if (editCellSize > 0.30) {
       editCellSize -= 0.10;
     }
   } else if (event == ROLL_UP) {
@@ -247,7 +321,10 @@ AppState EditPage = {idEditPage,        initEditPage,          drawEditPage,
                      stopEditPage,      uiEditPageGetKeyboard, uiGetChar,
                      uiEditPageGetMouse};
 
-void gotoEditPage() { smPushState(&EditPage); }
+void gotoEditPage() {
+  editHasReadDungeon = 0;
+  smPushState(&EditPage);
+}
 
 int isSaveAsPageFileExist;
 

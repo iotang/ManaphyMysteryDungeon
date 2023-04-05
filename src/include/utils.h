@@ -9,31 +9,8 @@
 #define Window43Left (2.00)
 #define Window43Right (14.00)
 #define WindowHeightInch (9.00)
-#define MaxMoveCount (4)
 
 #define MaxFileNameLength (20)
-
-typedef enum { Player, Enemy } Role;
-
-typedef struct Move {
-  char *name;
-  int effect;
-} Move;
-
-typedef struct Pokemon {
-  Role role;
-
-  char *name;
-  int species;
-  int lv, exp;
-
-  int hp;
-  int atk, def;
-
-  Move *move[MaxMoveCount];
-
-  int x, y;
-} Pokemon;
 
 typedef struct Item {
   char *name;
@@ -51,5 +28,6 @@ typedef enum {
   idNewPage,
   idOpenPage,
   idSaveAsPage,
-  idEditPage
+  idEditPage,
+  idExplorer
 } AppStateID;

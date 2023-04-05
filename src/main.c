@@ -13,6 +13,8 @@
 extern AppState MainMenu;
 
 void Main() {
+  Randomize();
+
   SetWindowSize(WindowWidthInch, WindowHeightInch);
 
   InitConsole();
