@@ -39,6 +39,7 @@ void callProc(AppState *now) {
   if (now->proc != NULL)
     now->proc();
 }
+
 void callDtor(AppState *now) {
   if (now->dtor != NULL)
     now->dtor();
@@ -86,15 +87,14 @@ void smPopStateUntil(int target) {
     return;
 
   smTopChanging();
-  do {
+  while (!smIsStateEmpty()) {
     AppState *now = smStateTop();
-    int las = now->uid;
-    if (las == target)
+    if (now->uid == target)
       break;
 
     callDtor(now);
     stateStack.stk[--stateStack.top] = NULL;
-  } while (!smIsStateEmpty());
+  }
 
   smRebuildTop();
 }

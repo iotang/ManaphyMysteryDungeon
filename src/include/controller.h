@@ -27,7 +27,7 @@ typedef enum TimeEvent {
 int timerStarted[99] = {0};
 
 void ScreenRender() {
-  printf("State Stack Size: %llu\n", stateStack.top);
+  printf("sm: %llu\n", stateStack.top);
 
   DisplayClear();
   if (currentStateProc != NULL) {

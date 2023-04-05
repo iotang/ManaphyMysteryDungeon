@@ -29,8 +29,6 @@ typedef struct Dungeon {
   LandEvent *event[MaxDungeonWidth][MaxDungeonHeight];
 } Dungeon;
 
-Dungeon currentDungeon;
-
 int isInDungeon(Dungeon *dungeon, int x, int y) {
   return (x >= 0 && x < dungeon->width && y >= 0 && y < dungeon->height);
 }
@@ -47,6 +45,22 @@ void deleteDungeonCellEvent(Dungeon *dungeon, int x, int y) {
   }
 
   dungeon->event[x][y] = NULL;
+}
+
+void setDefaultDungeon(Dungeon *dungeon) {
+  dungeon->width = MaxDungeonWidth;
+  dungeon->height = MaxDungeonHeight;
+
+  for (int i = 0; i < MaxDungeonWidth; i++) {
+    for (int j = 0; j < MaxDungeonHeight; j++) {
+      dungeon->mp[i][j] = Plain;
+      deleteDungeonCellEvent(dungeon, i, j);
+    }
+  }
+
+  dungeon->width = dungeon->height = 2;
+  setDungeonStart(dungeon, 0, 0);
+  setDungeonEnd(dungeon, 1, 1);
 }
 
 void loadDungeon(Dungeon *dungeon, FILE *file) {
@@ -84,6 +98,8 @@ void loadDungeon(Dungeon *dungeon, FILE *file) {
       dungeon->event[i][j] = hed;
     }
   }
+
+  fclose(file);
 }
 
 void saveDungeon(Dungeon *dungeon, FILE *file) {
@@ -95,11 +111,13 @@ void saveDungeon(Dungeon *dungeon, FILE *file) {
       int cnt = 0;
       for (LandEvent *x = dungeon->event[i][j]; x; x = x->nex)
         cnt++;
-      printf("%d", cnt);
+      fprintf(file, "%d", cnt);
       for (LandEvent *x = dungeon->event[i][j]; x; x = x->nex) {
-        printf(" %d %d", x->type, x->arg);
+        fprintf(file, " %d %d", x->type, x->arg);
       }
-      puts("");
+      fprintf(file, "\n");
     }
   }
+
+  fclose(file);
 }

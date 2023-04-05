@@ -47,8 +47,8 @@
 
 /* 鼠标和空间状态 */
 typedef struct {
-  double mousex;
-  double mousey;
+  double editMouseX;
+  double editMouseY;
   int mousedown;
   int clickedItem;  // item that was clicked
   int actingMenu;   // acting menu list
@@ -214,8 +214,8 @@ void InitGUI() { memset(&gs_UIState, 0, sizeof(gs_UIState)); }
 
 /* 调用该函数,得到鼠标的状态 */
 void uiGetMouse(int x, int y, int button, int event) {
-  gs_UIState.mousex = ScaleXInches(x); /*pixels --> inches*/
-  gs_UIState.mousey = ScaleYInches(y); /*pixels --> inches*/
+  gs_UIState.editMouseX = ScaleXInches(x); /*pixels --> inches*/
+  gs_UIState.editMouseY = ScaleYInches(y); /*pixels --> inches*/
 
   switch (event) {
   case BUTTON_DOWN:
@@ -283,8 +283,8 @@ int button(int id, double x, double y, double w, double h, char *label) {
   double sinkx = 0, sinky = 0;
   // int isHotItem = 0;
 
-  if (notInMenu(gs_UIState.mousex, gs_UIState.mousey) &&
-      inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
+  if (notInMenu(gs_UIState.editMouseX, gs_UIState.editMouseY) &&
+      inBox(gs_UIState.editMouseX, gs_UIState.editMouseY, x, x + w, y, y + h)) {
     static int timesss = 0;
     timesss++;
     printf("%d not in %f %f %f %f\n", timesss, gs_menuRect[0], gs_menuRect[1],
@@ -360,7 +360,7 @@ static int menuItem(int id, double x, double y, double w, double h,
                     char *label) {
   char *frameColor = gs_menu_color.frame;
   char *labelColor = gs_menu_color.label;
-  if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
+  if (inBox(gs_UIState.editMouseX, gs_UIState.editMouseY, x, x + w, y, y + h)) {
     frameColor = gs_menu_color.hotFrame;
     labelColor = gs_menu_color.hotLabel;
     // if (gs_UIState.mousedown) {
@@ -450,7 +450,7 @@ int menuList(int id, double x, double y, double w, double wlist, double h,
 
   // 处理鼠标
 
-  if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h))
+  if (inBox(gs_UIState.editMouseX, gs_UIState.editMouseY, x, x + w, y, y + h))
     gs_UIState.actingMenu = id;
 
   if (menuItem(id, x, y, w, h, labels[0]))
@@ -506,8 +506,8 @@ int textbox(int id, double x, double y, double w, double h, char textbuf[],
   double indent = GetFontAscent() / 2;
   double textPosY = y + h / 2 - GetFontAscent() / 2;
 
-  if (notInMenu(gs_UIState.mousex, gs_UIState.mousey) &&
-      inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
+  if (notInMenu(gs_UIState.editMouseX, gs_UIState.editMouseY) &&
+      inBox(gs_UIState.editMouseX, gs_UIState.editMouseY, x, x + w, y, y + h)) {
     frameColor = gs_textbox_color.hotFrame;
     labelColor = gs_textbox_color.hotLabel;
     gs_UIState.actingMenu = 0; // menu lose focus

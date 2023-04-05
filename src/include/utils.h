@@ -11,6 +11,8 @@
 #define WindowHeightInch (9.00)
 #define MaxMoveCount (4)
 
+#define MaxFileNameLength (20)
+
 typedef enum { Player, Enemy } Role;
 
 typedef struct Move {
@@ -41,3 +43,13 @@ typedef struct Item {
   int d_hp, d_atk, d_def;
   int d_move;
 } Item;
+
+typedef enum {
+  idMainMenu,
+  idAlertDialog,
+  idConfirmDialog,
+  idNewPage,
+  idOpenPage,
+  idSaveAsPage,
+  idEditPage
+} AppStateID;
