@@ -13,7 +13,7 @@
 #include "hintvalue.h"
 #include "utils.h"
 
-#define MOVEGAP (333)
+#define MOVEGAP (150)
 
 extern void (*currentStateProc)(void);
 

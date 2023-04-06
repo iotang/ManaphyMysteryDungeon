@@ -81,14 +81,14 @@ void drawToolsBar() {
   }
 
   if (isDungeonOpened) {
-
     static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Find Solution"};
     x += w;
     w = TextStringWidth(menuListRun[0]) * 1.5;
     wlist = TextStringWidth(menuListRun[1]) + 0.2;
 
     selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
-                         sizeof(menuListRun) / sizeof(menuListRun[0]));
+                         sizeof(menuListRun) / sizeof(menuListRun[0]) -
+                             isDungeonRunning);
 
     if (selection == 1) {
       if (saveDungeonEditPage() < 0) {
@@ -98,6 +98,8 @@ void drawToolsBar() {
         smPopStateUntil(idEditPage);
         gotoExplorer();
       }
+    } else if (selection == 2) {
+      editGetSolution();
     }
   }
 

@@ -6,9 +6,11 @@
 
 #include "utils.h"
 #include "dungeon.h"
+#include "solvemodel.h"
 
 void drawDungeon(Dungeon *dungeon, int basex, int basey, double size, int dir,
-                 int showTag) {
+                 int showTag, DungeonSolution *solution, int enableSolution) {
+  static char *dirTag[5] = {">", "^", "<", "v", "x"};
   for (int x = 0; x < dungeon->width; x++) {
     double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
     if (xloc + size < Window43Left || xloc > Window43Right)
@@ -35,6 +37,13 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size, int dir,
         isfill = 1;
       }
 
+      if (enableSolution) {
+        if (dungeon->mp[x][y] == Plain && solution->mp[x][y]) {
+          SetPenColor("Yellow");
+          isfill = 1;
+        }
+      }
+
       drawRectangle(xloc + 0.05 * size, yloc + 0.05 * size, 0.9 * size,
                     0.9 * size, isfill);
 
@@ -44,14 +53,54 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size, int dir,
         sprintf(locationTag, "(%d, %d)", x, y);
         drawLabel(xloc + 0.1 * size, yloc + 0.1 * size, locationTag);
       }
-
-      if (x == basex && y == basey) {
-        SetPenColor("Black");
-        static char *dirTag[5] = {">", "^", "<", "v", "x"};
-        drawBox(WindowWidthInch / 2 - size / 4, WindowHeightInch / 2 - size / 4,
-                size / 2, size / 2, 0, dirTag[dir], 'C', "Blue");
-      }
     }
+  }
+
+  if (enableSolution) {
+    if (solution->routeValid) {
+      int _pointSize = GetPointSize();
+      SetPointSize(28);
+      RouteNode *now = solution->route;
+      int lasx = -1, lasy = -1, dir;
+      while (now) {
+        int x = now->x, y = now->y;
+        if (lasx + 1 == x && lasy == y) {
+          dir = RIGHT;
+        } else if (lasx == x && lasy + 1 == y) {
+          dir = UP;
+        } else if (lasx - 1 == x && lasy == y) {
+          dir = LEFT;
+        } else if (lasx == x && lasy - 1 == y) {
+          dir = DOWN;
+        } else {
+          dir = 4;
+        }
+
+        if (lasx >= 0 && lasy >= 0) {
+          double xloc =
+              size * (lasx - basex) + (WindowWidthInch / 2 - size / 2);
+          double yloc =
+              size * (lasy - basey) + (WindowHeightInch / 2 - size / 2);
+          if (xloc + size >= Window43Left && xloc <= Window43Right &&
+              yloc + size >= 0 && yloc <= WindowHeightInch) {
+            SetPenColor("Red");
+            drawBox(xloc + 0.05 * size, yloc + 0.05 * size, 0.9 * size,
+                    0.9 * size, 0, dirTag[dir], 'C', "Red");
+          }
+        }
+
+        now = now->nex;
+        lasx = x;
+        lasy = y;
+      }
+      SetPointSize(_pointSize);
+    }
+  }
+
+  if (dir < 4) {
+    SetPenColor("Black");
+    drawBox(WindowWidthInch / 2 - size / 4, WindowHeightInch / 2 - size / 4,
+            size / 2, size / 2, 0, dirTag[dir], 'C', "Blue");
   }
 }
 

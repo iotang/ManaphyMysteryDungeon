@@ -119,6 +119,8 @@ double calcDamage(int lv, double effect, double atk, double def) {
 }
 
 double calcExp(int aLv, int bLv) {
+  aLv += 10;
+  bLv += 10;
   return 1.00 * bLv * bLv / (aLv * aLv * aLv);
 }
 

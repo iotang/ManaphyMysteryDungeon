@@ -139,7 +139,7 @@ void initExplorer() {
 
 void drawExplorer() {
   drawDungeon(&editDungeon, manaphy.x, manaphy.y, runCellSize,
-              manaphy.direction, 0);
+              manaphy.direction, 0, NULL, 0);
 
   // title
 

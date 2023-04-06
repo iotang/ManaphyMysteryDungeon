@@ -10,6 +10,7 @@
 #include "pokemon.h"
 #include "dungeon.h"
 #include "drawdungeon.h"
+#include "solvemodel.h"
 #include "controller.h"
 
 #include "alertdialog.h"
@@ -20,6 +21,9 @@
 int editHasReadDungeon;
 Dungeon editDungeon;
 char editDungeonFileName[MaxFileNameLength + 1];
+
+int editHasSolution;
+DungeonSolution editDungeonSolution;
 
 double editCellSize;
 Pokemon editCursor;
@@ -70,6 +74,8 @@ int saveDungeonEditPage() {
 
   currentDungeon = editDungeon;
   saveDungeon(&currentDungeon, file);
+  if (modifiedSinceLastSave)
+    editHasSolution = 0;
   modifiedSinceLastSave = 0;
 }
 
@@ -106,6 +112,26 @@ void initEditPage() {
   bindPlayerMove(playerMoveEditPage);
 }
 
+void editGetSolution() {
+  if (saveDungeonEditPage() < 0) {
+    setAlertDialog2("Error!", "Save failed");
+    gotoAlertDialog();
+    return;
+  }
+
+  int ret = getDungeonSolution(&editDungeon, &editDungeonSolution);
+  if (ret < 0) {
+    setAlertDialog2("Error!", "Dungeon is invalid");
+    gotoAlertDialog();
+  } else if (ret == 0) {
+    editHasSolution = 1;
+    setAlertDialog2("Warning", "Destination is unreachable");
+    gotoAlertDialog();
+  } else {
+    editHasSolution = 1;
+  }
+}
+
 void drawEditPage() {
   if (editCursor.x < 0)
     editCursor.x = 0;
@@ -117,7 +143,8 @@ void drawEditPage() {
   if (editCursor.y >= editDungeon.height)
     editCursor.y = editDungeon.height - 1;
 
-  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 4, 1);
+  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 4, 1,
+              &editDungeonSolution, editHasSolution && !modifiedSinceLastSave);
   drawDungeonCell(&editDungeon, editCursor.x, editCursor.y, editCellSize,
                   editMouseX, editMouseY);
 
@@ -329,6 +356,7 @@ AppState EditPage = {idEditPage,        initEditPage,          drawEditPage,
 
 void gotoEditPage() {
   editHasReadDungeon = 0;
+  editHasSolution = 0;
   smPushState(&EditPage);
 }
 
@@ -366,6 +394,8 @@ void drawSaveAsPage() {
       currentDungeon = editDungeon;
       saveDungeon(&currentDungeon, file);
       strcpy(editDungeonFileName, dialogFileName);
+      if (modifiedSinceLastSave)
+        editHasSolution = 0;
       modifiedSinceLastSave = 0;
     }
   }
