@@ -17,6 +17,9 @@ void Main() {
 
   SetWindowSize(WindowWidthInch, WindowHeightInch);
 
+  initPokedex();
+  initMovedex();
+
   InitConsole();
 
   InitGraphics();

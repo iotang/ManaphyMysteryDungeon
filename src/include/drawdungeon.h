@@ -46,6 +46,7 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
       }
 
       if (x == basex && y == basey) {
+        SetPenColor("Black");
         drawBox(WindowWidthInch / 2 - size / 4, WindowHeightInch / 2 - size / 4,
                 size / 2, size / 2, 0, "You", 'C', "Blue");
       }

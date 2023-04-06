@@ -4,8 +4,8 @@
 #include "utils.h"
 
 #define MaxMoveCount (5)
-#define MaxPokemonNameLength (20)
-#define MaxMoveNameLength (20)
+#define MaxPokemonNameLength (16)
+#define MaxMoveNameLength (16)
 
 #define PokemonSpeciesNumber (1011)
 #define NKate (0)
@@ -173,9 +173,17 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species) {
                              pokedex[species].defGrowth);
   memset(pokemon->move, 0, sizeof(pokemon->move));
   memset(pokemon->pp, 0, sizeof(pokemon->pp));
-  pokemon->moveCount = 1;
+  pokemon->moveCount = 5;
   pokemon->move[0] = MTackle;
   pokemon->pp[0] = movedex[MTackle].pp;
+  pokemon->move[1] = MWaterGun;
+  pokemon->pp[1] = movedex[MWaterGun].pp;
+  pokemon->move[2] = MBubbleBeam;
+  pokemon->pp[2] = movedex[MBubbleBeam].pp;
+  pokemon->move[3] = MSurf;
+  pokemon->pp[3] = movedex[MSurf].pp;
+  pokemon->move[4] = MHydroPump;
+  pokemon->pp[4] = movedex[MHydroPump].pp;
 
   pokemon->x = pokemon->y = -1;
   pokemon->direction = RIGHT;

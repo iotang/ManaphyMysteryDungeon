@@ -294,8 +294,8 @@ int button(int id, double x, double y, double w, double h, char *label) {
     gs_UIState.actingMenu = 0; // menu lose focus
     if (gs_UIState.mousedown) {
       gs_UIState.clickedItem = id;
-      sinkx = movement;
-      sinky = -movement;
+      sinkx = 0.1 * w;
+      sinky = 0.1 * h;
     }
   } else {
     if (gs_UIState.clickedItem == id)
@@ -320,18 +320,17 @@ int button(int id, double x, double y, double w, double h, char *label) {
 
   // draw the button
   mySetPenColor(frameColor);
-  drawBox(x + sinkx, y + sinky, w, h, gs_button_color.fillflag, label, 'C',
-          labelColor);
+  drawBox(x - sinkx / 2, y - sinky / 2, w + sinkx, h + sinky,
+          gs_button_color.fillflag, label, 'C', labelColor);
   if (gs_button_color.fillflag) {
     mySetPenColor(labelColor);
-    drawRectangle(x + sinkx, y + sinky, w, h, 0);
+    drawRectangle(x - sinkx / 2, y - sinky / 2, w + sinkx, h + sinky, 0);
   }
 
   // 画键盘提示, show a small ractangle frane
   if (gs_UIState.kbdItem == id) {
     mySetPenColor(labelColor);
-    drawRectangle(x + sinkx + shrink, y + sinky + shrink, w - 2 * shrink,
-                  h - 2 * shrink, 0);
+    drawRectangle(x + shrink, y + shrink, w - 2 * shrink, h - 2 * shrink, 0);
   }
 
   if (gs_UIState.clickedItem == id && // must be clicked before
@@ -629,9 +628,9 @@ void drawBoxWithoutBorder(double x, double y, double w, double h, int fillflag,
   if (label && strlen(label) > 0) {
     mySetPenColor(labelColor);
     if (labelAlignment == 'L')
-      MovePen(x + fa / 2, y + h / 2 - fa / 2);
+      MovePen(x + fa / 4, y + h / 2 - fa / 2);
     else if (labelAlignment == 'R')
-      MovePen(x + w - fa / 2 - TextStringWidth(label), y + h / 2 - fa / 2);
+      MovePen(x + w - fa / 4 - TextStringWidth(label), y + h / 2 - fa / 2);
     else // if( labelAlignment=='C'
       MovePen(x + (w - TextStringWidth(label)) / 2, y + h / 2 - fa / 2);
     DrawTextString(label);

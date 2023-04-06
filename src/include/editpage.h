@@ -121,6 +121,11 @@ void drawEditPage() {
                   editMouseX, editMouseY);
 
   // title
+  /*
+  SetPenColor("White");
+  drawBox(Window43Left, WindowHeightInch * 0.97, Window43Right - Window43Left,
+          WindowHeightInch * 0.03, 1, NULL, 'L', "Black");
+  */
 
   SetPenColor(modifiedSinceLastSave ? "Yellow" : "White");
   drawBox(Window43Left, 0, Window43Right - Window43Left,

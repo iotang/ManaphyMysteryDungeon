@@ -40,31 +40,43 @@ void drawToolsBar() {
   double wlist = TextStringWidth(menuListEdit[3]) * 1.2;
   int selection;
 
-  selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListEdit,
-                       sizeof(menuListEdit) / sizeof(menuListEdit[0]) -
-                           (isDungeonOpened ? 0 : 4));
+  if (!isDungeonRunning) {
+    selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListEdit,
+                         sizeof(menuListEdit) / sizeof(menuListEdit[0]) -
+                             (isDungeonOpened ? 0 : 4));
 
-  if (selection == 1) {
-    gotoNewPage();
-  } else if (selection == 2) {
-    gotoOpenPage();
-  } else if (selection == 3) {
-    if (saveDungeonEditPage() < 0) {
-      setAlertDialog2("Error!", "Save failed");
-      gotoAlertDialog();
+    if (selection == 1) {
+      gotoNewPage();
+    } else if (selection == 2) {
+      gotoOpenPage();
+    } else if (selection == 3) {
+      if (saveDungeonEditPage() < 0) {
+        setAlertDialog2("Error!", "Save failed");
+        gotoAlertDialog();
+      }
+    } else if (selection == 4) {
+      gotoSaveAsPage();
+    } else if (selection == 5) {
+      randomizeDungeon(&editDungeon);
+      modifiedSinceLastSave = 1;
+    } else if (selection == 6) {
+      if (modifiedSinceLastSave) {
+        setConfirmDialog3(&confirmedForceExit, "Warning",
+                          "Are you sure to exit?",
+                          "All unsaved changes will be lost!");
+        gotoConfirmDialog();
+      } else {
+        smPopStateUntil(idMainMenu);
+      }
     }
-  } else if (selection == 4) {
-    gotoSaveAsPage();
-  } else if (selection == 5) {
-    randomizeDungeon(&editDungeon);
-    modifiedSinceLastSave = 1;
-  } else if (selection == 6) {
-    if (modifiedSinceLastSave) {
-      setConfirmDialog3(&confirmedForceExit, "Warning", "Are you sure to exit?",
-                        "All unsaved changes will be lost!");
-      gotoConfirmDialog();
-    } else {
-      smPopStateUntil(idMainMenu);
+  } else {
+    static char *menuListRunningEdit[] = {"Edit", "Exit"};
+
+    selection =
+        menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRunningEdit,
+                 sizeof(menuListRunningEdit) / sizeof(menuListRunningEdit[0]));
+    if (selection == 1) {
+      smPopState();
     }
   }
 
@@ -83,6 +95,7 @@ void drawToolsBar() {
         setAlertDialog2("Error!", "Save failed");
         gotoAlertDialog();
       } else {
+        smPopStateUntil(idEditPage);
         gotoExplorer();
       }
     }
