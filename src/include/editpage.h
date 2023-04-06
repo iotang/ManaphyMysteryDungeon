@@ -74,6 +74,7 @@ int saveDungeonEditPage() {
 }
 
 void initEditPage() {
+  printf("call initEditPage\n");
   editCellSize = 1;
   if (!editHasReadDungeon) {
     editDungeon = currentDungeon;
@@ -116,7 +117,7 @@ void drawEditPage() {
   if (editCursor.y >= editDungeon.height)
     editCursor.y = editDungeon.height - 1;
 
-  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 1);
+  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 4, 1);
   drawDungeonCell(&editDungeon, editCursor.x, editCursor.y, editCellSize,
                   editMouseX, editMouseY);
 

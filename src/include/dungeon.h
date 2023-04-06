@@ -30,6 +30,25 @@ typedef struct Dungeon {
   LandEvent *event[MaxDungeonWidth][MaxDungeonHeight];
 } Dungeon;
 
+int isDungeonValid(Dungeon *dungeon) {
+  if (dungeon->width < 2 || dungeon->width > MaxDungeonWidth)
+    return 0;
+
+  if (dungeon->height < 2 || dungeon->height > MaxDungeonHeight)
+    return 0;
+
+  int gotStart = 0, gotEnd = 0;
+  for (int x = 0; x < dungeon->width; x++) {
+    for (int y = 0; y < dungeon->height; y++) {
+      if (dungeon->mp[x][y] == Start)
+        gotStart++;
+      if (dungeon->mp[x][y] == End)
+        gotEnd++;
+    }
+  }
+  return gotStart == 1 && gotEnd == 1;
+}
+
 int isInDungeon(Dungeon *dungeon, int x, int y) {
   return (x >= 0 && x < dungeon->width && y >= 0 && y < dungeon->height);
 }

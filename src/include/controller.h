@@ -10,19 +10,12 @@
 
 #include "statemanager.h"
 #include "dungeon.h"
+#include "hintvalue.h"
 #include "utils.h"
 
 #define MOVEGAP (333)
 
 extern void (*currentStateProc)(void);
-
-typedef enum TimeEvent {
-  ScreenRend,
-  MoveRight,
-  MoveUp,
-  MoveLeft,
-  MoveDown
-} TimeEvent;
 
 int timerStarted[99] = {0};
 
@@ -50,35 +43,46 @@ void render(int id) {
     playerMove(MoveLeft);
   if (id == MoveDown)
     playerMove(MoveDown);
+  if (id == HintExpire)
+    clearHint();
 }
 
 int controlPressed = 0;
+int shiftPressed = 0;
 
 void controlKeyboard(int key, int event) {
   if (event == KEY_DOWN) {
     if (key == VK_RIGHT || (key == 'D' && !controlPressed)) {
-      if (!timerStarted[MoveRight]) {
+      if (shiftPressed) {
+        playerMove(FaceRight);
+      } else if (!timerStarted[MoveRight]) {
         playerMove(MoveRight);
         startTimer(MoveRight, MOVEGAP);
         timerStarted[MoveRight] = 1;
       }
     }
     if (key == VK_UP || (key == 'W' && !controlPressed)) {
-      if (!timerStarted[MoveUp]) {
+      if (shiftPressed) {
+        playerMove(FaceUp);
+      } else if (!timerStarted[MoveUp]) {
         playerMove(MoveUp);
         startTimer(MoveUp, MOVEGAP);
         timerStarted[MoveUp] = 1;
       }
     }
     if (key == VK_LEFT || (key == 'A' && !controlPressed)) {
-      if (!timerStarted[MoveLeft]) {
+      if (shiftPressed) {
+        playerMove(FaceLeft);
+      } else if (!timerStarted[MoveLeft]) {
         playerMove(MoveLeft);
         startTimer(MoveLeft, MOVEGAP);
         timerStarted[MoveLeft] = 1;
       }
     }
     if (key == VK_DOWN || (key == 'S' && !controlPressed)) {
-      if (!timerStarted[MoveDown]) {
+      if (shiftPressed) {
+        playerMove(FaceDown);
+      } else if (!timerStarted[MoveDown]) {
         playerMove(MoveDown);
         startTimer(MoveDown, MOVEGAP);
         timerStarted[MoveDown] = 1;
@@ -87,25 +91,39 @@ void controlKeyboard(int key, int event) {
     if (key == VK_CONTROL) {
       controlPressed = 1;
     }
+    if (key == VK_SHIFT) {
+      shiftPressed = 1;
+    }
   } else if (event == KEY_UP) {
     if (key == VK_RIGHT || (key == 'D' && !controlPressed)) {
-      cancelTimer(MoveRight);
-      timerStarted[MoveRight] = 0;
+      if (timerStarted[MoveRight]) {
+        cancelTimer(MoveRight);
+        timerStarted[MoveRight] = 0;
+      }
     }
     if (key == VK_UP || (key == 'W' && !controlPressed)) {
-      cancelTimer(MoveUp);
-      timerStarted[MoveUp] = 0;
+      if (timerStarted[MoveUp]) {
+        cancelTimer(MoveUp);
+        timerStarted[MoveUp] = 0;
+      }
     }
     if (key == VK_LEFT || (key == 'A' && !controlPressed)) {
-      cancelTimer(MoveLeft);
-      timerStarted[MoveLeft] = 0;
+      if (timerStarted[MoveLeft]) {
+        cancelTimer(MoveLeft);
+        timerStarted[MoveLeft] = 0;
+      }
     }
     if (key == VK_DOWN || (key == 'S' && !controlPressed)) {
-      cancelTimer(MoveDown);
-      timerStarted[MoveDown] = 0;
+      if (timerStarted[MoveDown]) {
+        cancelTimer(MoveDown);
+        timerStarted[MoveDown] = 0;
+      }
     }
     if (key == VK_CONTROL) {
       controlPressed = 0;
+    }
+    if (key == VK_SHIFT) {
+      shiftPressed = 0;
     }
   }
 }

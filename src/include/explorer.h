@@ -14,6 +14,7 @@
 
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
+#include "hintvalue.h"
 
 #include "globalvalue.h"
 
@@ -22,6 +23,81 @@ char expDungeonFileName[MaxFileNameLength + 1];
 
 #define runCellSize (1.00)
 Pokemon manaphy;
+
+void checkManaphyHealth() {
+  while (updatePokemonStat(&manaphy))
+    ;
+  if (manaphy.hp <= 0) {
+    clearHint();
+    static char _failed[200];
+    sprintf(_failed, "Oh no! %s is fainted!", manaphy.name);
+    setHint(_failed);
+    cancelTimer(HintExpire);
+    isDungeonGameOver = 1;
+  }
+}
+
+void manaphyMoveAttempt(int event) {
+  if (isDungeonGameOver)
+    return;
+
+  if (event == FaceRight || event == FaceUp || event == FaceLeft ||
+      event == FaceDown) {
+    if (event == FaceRight) {
+      manaphy.direction = RIGHT;
+    }
+    if (event == FaceUp) {
+      manaphy.direction = UP;
+    }
+    if (event == FaceLeft) {
+      manaphy.direction = LEFT;
+    }
+    if (event == FaceDown) {
+      manaphy.direction = DOWN;
+    }
+  } else if (event == MoveRight || event == MoveUp || event == MoveLeft ||
+             event == MoveDown) {
+    int dx = manaphy.x, dy = manaphy.y;
+    if (event == MoveRight) {
+      manaphy.direction = RIGHT;
+      dx++;
+    }
+    if (event == MoveUp) {
+      manaphy.direction = UP;
+      dy++;
+    }
+    if (event == MoveLeft) {
+      manaphy.direction = LEFT;
+      dx--;
+    }
+    if (event == MoveDown) {
+      manaphy.direction = DOWN;
+      dy--;
+    }
+
+    if (dx >= 0 && dx < expDungeon.width && dy >= 0 && dy < expDungeon.height) {
+      if (expDungeon.mp[dx][dy] == Block) {
+        setHint("You cannot move into a block.");
+      } else {
+        clearHint();
+        manaphy.x = dx;
+        manaphy.y = dy;
+        manaphy.hp--;
+        manaphy.exp += 33;
+      }
+
+      checkManaphyHealth();
+      if (expDungeon.mp[dx][dy] == End) {
+        clearHint();
+        setHint("You have successfully conquered this dungeon!");
+        cancelTimer(HintExpire);
+        isDungeonGameOver = 1;
+      }
+    }
+  }
+
+  checkManaphyHealth();
+}
 
 void initExplorer() {
   expDungeon = currentDungeon;
@@ -56,10 +132,14 @@ void initExplorer() {
   }
 
   isDungeonRunning = 1;
+  isDungeonGameOver = 0;
+  clearHint();
+  bindPlayerMove(manaphyMoveAttempt);
 }
 
 void drawExplorer() {
-  drawDungeon(&editDungeon, manaphy.x, manaphy.y, editCellSize, 0);
+  drawDungeon(&editDungeon, manaphy.x, manaphy.y, runCellSize,
+              manaphy.direction, 0);
 
   // title
 
@@ -110,7 +190,7 @@ void drawExplorer() {
                 WindowHeightInch * 0.05, 1);
   if (hpRatio > 0.50) {
     SetPenColor("Green");
-  } else if (hpRatio > 0.50) {
+  } else if (hpRatio > 0.20) {
     SetPenColor("Yellow");
   } else {
     SetPenColor("Red");
@@ -196,12 +276,37 @@ void drawExplorer() {
     SetPointSize(_pointSize);
   }
 
+  // hint dialog
+
+  if (!isHintEmpty()) {
+    SetPenColor("White");
+    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
+                  Window43Width * 0.8, WindowHeightInch * 0.2, 1);
+    SetPenColor("Pink");
+    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
+                  Window43Width * 0.8, WindowHeightInch * 0.2, 0);
+    drawRectangle(Window43Left + Window43Width * 0.11, WindowHeightInch * 0.055,
+                  Window43Width * 0.78, WindowHeightInch * 0.19, 0);
+    _pointSize = GetPointSize();
+    SetPointSize(24);
+    drawBox(Window43Left + Window43Width * 0.11, WindowHeightInch * 0.055,
+            Window43Width * 0.78, WindowHeightInch * 0.19, 0, hintString, 'L',
+            "Black");
+    SetPointSize(_pointSize);
+  }
+
   drawToolsBar();
 }
 
 void stopExplorer() { isDungeonRunning = 0; }
 
-AppState Explorer = {idExplorer,    initExplorer, drawExplorer, stopExplorer,
-                     uiGetKeyboard, uiGetChar,    uiGetMouse};
+void uiExplorerGetKeyboard(int key, int event) {
+  controlKeyboard(key, event);
+  uiGetKeyboard(key, event);
+}
+
+AppState Explorer = {idExplorer,   initExplorer,          drawExplorer,
+                     stopExplorer, uiExplorerGetKeyboard, uiGetChar,
+                     uiGetMouse};
 
 void gotoExplorer() { smPushState(&Explorer); }

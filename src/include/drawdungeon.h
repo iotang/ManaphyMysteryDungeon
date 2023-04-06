@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "dungeon.h"
 
-void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
+void drawDungeon(Dungeon *dungeon, int basex, int basey, double size, int dir,
                  int showTag) {
   for (int x = 0; x < dungeon->width; x++) {
     double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
@@ -47,8 +47,9 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
 
       if (x == basex && y == basey) {
         SetPenColor("Black");
+        static char *dirTag[5] = {">", "^", "<", "v", "x"};
         drawBox(WindowWidthInch / 2 - size / 4, WindowHeightInch / 2 - size / 4,
-                size / 2, size / 2, 0, "You", 'C', "Blue");
+                size / 2, size / 2, 0, dirTag[dir], 'C', "Blue");
       }
     }
   }

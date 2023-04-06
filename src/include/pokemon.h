@@ -20,9 +20,6 @@
 #define MSurf (3)
 #define MHydroPump (4)
 
-typedef enum { Player, Enemy } Role;
-typedef enum { RIGHT, UP, LEFT, DOWN } Direction;
-
 typedef struct Move {
   char name[MaxMoveNameLength + 1];
   int effect, pp;
@@ -186,5 +183,5 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species) {
   pokemon->pp[4] = movedex[MHydroPump].pp;
 
   pokemon->x = pokemon->y = -1;
-  pokemon->direction = RIGHT;
+  pokemon->direction = DOWN;
 }

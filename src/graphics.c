@@ -1655,6 +1655,7 @@ static void InitColors(void) {
   DefineColor("Violet", .93, .5, .93);
   DefineColor("Magenta", 1, 0, 1);
   DefineColor("Pink", 1, 0.5, 0.8);
+  DefineColor("Pink", 1, 0.3, 0.5);
   DefineColor("Light Pink", 1, 0.8, 0.9);
   DefineColor("Cyan", 0, 1, 1);
 }

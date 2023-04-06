@@ -5,4 +5,5 @@
 Dungeon currentDungeon;
 int isDungeonOpened = 0;
 int isDungeonRunning = 0;
+int isDungeonGameOver = 0;
 int modifiedSinceLastSave = 0;

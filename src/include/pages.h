@@ -29,9 +29,9 @@ void drawToolsBar() {
   }
 
   SetPointSize(16);
-  static char *menuListEdit[] = {"Edit",          "New",        "Open",
-                                 "Save | Ctrl-S", "Save as...", "Randomize",
-                                 "Exit"};
+  static char *menuListEdit[] = {
+      "Edit",       "New | Ctrl-N", "Open | Ctrl-O", "Save | Ctrl-S",
+      "Save as...", "Randomize",    "Exit"};
 
   double fontHeight = GetFontHeight();
   double x = 0, y = WindowHeightInch;
@@ -70,7 +70,7 @@ void drawToolsBar() {
       }
     }
   } else {
-    static char *menuListRunningEdit[] = {"Edit", "Exit"};
+    static char *menuListRunningEdit[] = {"Edit", "Quit Running"};
 
     selection =
         menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRunningEdit,
@@ -82,7 +82,7 @@ void drawToolsBar() {
 
   if (isDungeonOpened) {
 
-    static char *menuListRun[] = {"Run", "Start New Run", "Find Solution"};
+    static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Find Solution"};
     x += w;
     w = TextStringWidth(menuListRun[0]) * 1.5;
     wlist = TextStringWidth(menuListRun[1]) + 0.2;
@@ -188,8 +188,8 @@ void drawNewPage() {
   }
 }
 
-AppState MainMenu = {idMainMenu, NULL, drawMainMenu, NULL,
-                     NULL,       NULL, uiGetMouse};
+AppState MainMenu = {idMainMenu,    NULL,      drawMainMenu, NULL,
+                     uiGetKeyboard, uiGetChar, uiGetMouse};
 
 AppState NewPage = {idNewPage,     initNewPage, drawNewPage, NULL,
                     uiGetKeyboard, uiGetChar,   uiGetMouse};

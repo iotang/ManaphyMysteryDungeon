@@ -48,6 +48,7 @@ void callDtor(AppState *now) {
 void smTopChanging() { currentStateProc = NULL; }
 
 void smRebuildTop() {
+  printf("smRebuildTop\n");
   if (smIsStateEmpty()) {
     registerKeyboardEvent(NULL);
     registerCharEvent(NULL);
@@ -66,12 +67,14 @@ void smRebuildTop() {
 }
 
 void smPushState(AppState *state) {
+  printf("smPushState\n");
   smTopChanging();
   stateStack.stk[stateStack.top++] = state;
   smRebuildTop();
 }
 
 void smPopState() {
+  printf("smPopState\n");
   if (smIsStateEmpty())
     return;
 
@@ -83,6 +86,7 @@ void smPopState() {
 }
 
 void smPopStateUntil(int target) {
+  printf("smPopStateUntil\n");
   if (smIsStateEmpty())
     return;
 
