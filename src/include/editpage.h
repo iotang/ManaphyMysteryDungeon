@@ -4,6 +4,7 @@
 #include "extgraph.h"
 #include "imgui.h"
 
+#include "helplist.h"
 #include "appstate.h"
 #include "statemanager.h"
 #include "utils.h"
@@ -81,22 +82,32 @@ int saveDungeonEditPage() {
 
 void initEditPage() {
   printf("call initEditPage\n");
-  editCellSize = 1;
+
   if (!editHasReadDungeon) {
+    editCellSize = 1;
     editDungeon = currentDungeon;
     editHasReadDungeon = 1;
-  }
-  editCursor.x = editCursor.y = 0;
-  for (int x = 0; x < editDungeon.width; x++) {
-    for (int y = 0; y < editDungeon.height; y++) {
-      if (editDungeon.mp[x][y] == Start) {
-        editCursor.x = x;
-        editCursor.y = y;
+
+    editCursor.x = editCursor.y = 0;
+    for (int x = 0; x < editDungeon.width; x++) {
+      for (int y = 0; y < editDungeon.height; y++) {
+        if (editDungeon.mp[x][y] == Start) {
+          editCursor.x = x;
+          editCursor.y = y;
+        }
       }
     }
+
+    editDungeon.mp[editCursor.x][editCursor.y] = Start;
   }
 
-  editDungeon.mp[editCursor.x][editCursor.y] = Start;
+  clearHelpList();
+  addHelpEntry("Move Camera:", "");
+  addHelpEntry("", "Arrow or WASD");
+  addHelpEntry("Select Cell:", "Left Click");
+  addHelpEntry("Jump to Cell:", "Right Click");
+  addHelpEntry("Zoom:", "Mouse Wheel");
+  clearHint();
 
   editMode = Flip;
   isDungeonOpened = 1;
@@ -154,6 +165,8 @@ void drawEditPage() {
 
   SetPenColor("Cyan");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
+
+  drawHelpList(0, WindowHeightInch * 0.9);
 
   // width height adj
 
@@ -214,6 +227,27 @@ void drawEditPage() {
              Window43Gap * 0.18, WindowHeightInch * 0.03, "-10")) {
     setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height - 10);
     modifiedSinceLastSave = 1;
+  }
+
+  sprintf(__buf, "%.2lf", editCellSize);
+  drawBoxWithoutBorder(Window43Gap * 0.4, WindowHeightInch * 0.06,
+                       Window43Gap * 0.2, WindowHeightInch * 0.03, 1, "Zoom",
+                       'C', "Black");
+  SetPenColor("White");
+  drawBox(Window43Gap * 0.25, WindowHeightInch * 0.02, Window43Gap * 0.5,
+          WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
+  setButtonColors("White", "Blue", "Blue", "White", 1);
+  if (button(GenUIID(0), Window43Gap * 0.78, WindowHeightInch * 0.02,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "+")) {
+    if (editCellSize < 3.00) {
+      editCellSize += 0.10;
+    }
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.02,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "-")) {
+    if (editCellSize > 0.30) {
+      editCellSize -= 0.10;
+    }
   }
 
   // edit mode

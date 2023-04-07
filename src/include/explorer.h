@@ -21,6 +21,7 @@
 
 Dungeon expDungeon;
 char expDungeonFileName[MaxFileNameLength + 1];
+int expHasReadDungeon;
 
 #define runCellSize (1.00)
 Pokemon manaphy;
@@ -101,39 +102,45 @@ void manaphyMoveAttempt(int event) {
 }
 
 void initExplorer() {
-  expDungeon = currentDungeon;
-  strcpy(expDungeonFileName, editDungeonFileName);
-  spawnPokemon(&manaphy, Player, NManaphy);
-  manaphy.exp = 400;
-  while (updatePokemonStat(&manaphy))
-    ;
+  if (!expHasReadDungeon) {
+    expDungeon = currentDungeon;
+    strcpy(expDungeonFileName, editDungeonFileName);
+    spawnPokemon(&manaphy, Player, NManaphy);
+    manaphy.exp = 400;
+    while (updatePokemonStat(&manaphy))
+      ;
 
-  int gotEnd = 0;
-  for (int x = 0; x < expDungeon.width; x++) {
-    for (int y = 0; y < expDungeon.height; y++) {
-      if (expDungeon.mp[x][y] == Start) {
-        manaphy.x = x;
-        manaphy.y = y;
-      }
-      if (expDungeon.mp[x][y] == End) {
-        gotEnd = 1;
+    int gotEnd = 0;
+    for (int x = 0; x < expDungeon.width; x++) {
+      for (int y = 0; y < expDungeon.height; y++) {
+        if (expDungeon.mp[x][y] == Start) {
+          manaphy.x = x;
+          manaphy.y = y;
+        }
+        if (expDungeon.mp[x][y] == End) {
+          gotEnd = 1;
+        }
       }
     }
-  }
 
-  if (manaphy.x < 0 || manaphy.y < 0) {
-    setAlertDialog2("Error", "No entry in the dungeon");
-    gotoAlertDialog();
-    smPopState();
-  }
+    if (manaphy.x < 0 || manaphy.y < 0) {
+      setAlertDialog2("Error", "No entry in the dungeon");
+      gotoAlertDialog();
+      smPopState();
+    }
 
-  if (!gotEnd) {
-    setAlertDialog2("Error", "No destination in the dungeon");
-    gotoAlertDialog();
-    smPopState();
-  }
+    if (!gotEnd) {
+      setAlertDialog2("Error", "No destination in the dungeon");
+      gotoAlertDialog();
+      smPopState();
+    }
 
-  isDungeonGameOver = 0;
+    isDungeonGameOver = 0;
+  }
+  clearHelpList();
+  addHelpEntry("Move:", "Arrow or WASD");
+  addHelpEntry("Change Direction:", "");
+  addHelpEntry("", "Shift-Arrow or Shift-WASD");
   clearHint();
   bindPlayerMove(manaphyMoveAttempt);
 }
@@ -154,7 +161,9 @@ void drawExplorer() {
   SetPenColor("Light Pink");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
-  drawStatusBar(&manaphy, 0, WindowHeightInch * 0.04);
+  drawHelpList(0, WindowHeightInch * 0.9);
+
+  drawStatusBar(&manaphy, 0, WindowHeightInch * 0.01);
 
   // tools bar
 
@@ -181,4 +190,7 @@ AppState Explorer = {idExplorer,   initExplorer,          drawExplorer,
                      stopExplorer, uiExplorerGetKeyboard, uiGetChar,
                      uiGetMouse};
 
-void gotoExplorer() { smPushState(&Explorer); }
+void gotoExplorer() {
+  expHasReadDungeon = 0;
+  smPushState(&Explorer);
+}

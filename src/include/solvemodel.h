@@ -38,6 +38,50 @@ void clearDungeonSolution(DungeonSolution *solution) {
   solution->route = NULL;
 }
 
+int solveDis[SolveStateCount];
+char solveVisited[SolveStateCount];
+int solveFrom[SolveStateCount];
+
+void makeBfs(Dungeon *dungeon, int sid, int tid) {
+  memset(solveDis, 0x3f, sizeof(solveDis));
+  memset(solveVisited, 0, sizeof(solveVisited));
+  memset(solveFrom, 0x3f, sizeof(solveFrom));
+
+  static int que[SolveQueueLength + 1];
+  int he = 0, ta = 0;
+  int height = dungeon->height;
+  solveDis[sid] = 0, que[++he] = sid;
+  solveVisited[sid] = 1;
+
+  while (he != ta) {
+    int a = que[++ta];
+    if (ta >= SolveQueueLength) {
+      ta -= SolveQueueLength;
+    }
+
+    int x, y;
+    a2xy(a, height, &x, &y);
+
+    for (int i = 0; i < 4; i++) {
+      int dx = x + go[i][0], dy = y + go[i][1];
+      if (dx >= 0 && dx < dungeon->width && dy >= 0 && dy < dungeon->height) {
+        if (dungeon->mp[dx][dy] == Block)
+          continue;
+        int da = xy2a(dx, dy, height);
+        if (solveVisited[da])
+          continue;
+        solveDis[da] = solveDis[a] + 1;
+        solveFrom[da] = a;
+        que[++he] = da;
+        solveVisited[da] = 1;
+        if (he >= SolveQueueLength) {
+          he -= SolveQueueLength;
+        }
+      }
+    }
+  }
+}
+
 int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   if (!isDungeonValid(dungeon))
     return -1;
@@ -50,68 +94,28 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   }
   solution->routeValid = 0;
   solution->route = NULL;
-
-  static int dis[SolveStateCount], ed[SolveStateCount], fr[SolveStateCount];
-  static int go[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-  memset(dis, 0x3f, sizeof(dis));
-  memset(ed, 0, sizeof(ed));
-  memset(fr, 0x3f, sizeof(fr));
-
-  static int que[SolveQueueLength + 1], he, ta;
-  he = 0, ta = 0;
-  int height = dungeon->height, sx, sy, sid, tx, ty, tid;
+  int sx, sy, tx, ty;
   getDungeonStart(dungeon, &sx, &sy);
   getDungeonEnd(dungeon, &tx, &ty);
-  sid = xy2a(sx, sy, height);
-  tid = xy2a(tx, ty, height);
-  dis[sid] = 0, que[++he] = sid;
+  int sid = xy2a(sx, sy, h);
+  int tid = xy2a(tx, ty, h);
+  makeBfs(dungeon, sid, tid);
 
-  while (he != ta) {
-    int a = que[++ta];
-    if (ta >= SolveQueueLength) {
-      ta -= SolveQueueLength;
-    }
-
-    int x, y;
-    a2xy(a, height, &x, &y);
-    // printf("%d %d %d\n", x, y, a);
-
-    for (int i = 0; i < 4; i++) {
-      int dx = x + go[i][0], dy = y + go[i][1];
-      if (dx >= 0 && dx < dungeon->width && dy >= 0 && dy < dungeon->height) {
-        if (dungeon->mp[dx][dy] == Block)
-          continue;
-        int da = xy2a(dx, dy, height);
-        if (ed[da])
-          continue;
-        // printf("%d %d %d -> %d %d %d\n", x, y, a, dx, dy, da);
-        dis[da] = dis[a] + 1;
-        fr[da] = a;
-        que[++he] = da;
-        ed[da] = 1;
-        if (he >= SolveQueueLength) {
-          he -= SolveQueueLength;
-        }
-      }
-    }
-    // printf("%d : %d\n", he, ta);
-  }
-
-  for (int i = 0; i < dungeon->width; i++) {
-    for (int j = 0; j < dungeon->height; j++) {
-      solution->mp[i][j] = dis[xy2a(i, j, height)] < inf;
+  for (int i = 0; i < w; i++) {
+    for (int j = 0; j < h; j++) {
+      solution->mp[i][j] = solveDis[xy2a(i, j, h)] < inf;
     }
   }
 
   solution->route = NULL;
-  if (dis[tid] < inf) {
+  if (solveDis[tid] < inf) {
     solution->routeValid = 1;
     int x = tx, y = ty;
     do {
       RouteNode *v = newRouteNode(x, y);
       v->nex = solution->route;
       solution->route = v;
-      a2xy(fr[xy2a(x, y, height)], height, &x, &y);
+      a2xy(solveFrom[xy2a(x, y, h)], h, &x, &y);
     } while (x != sx || y != sy);
 
   } else {
@@ -119,4 +123,17 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   }
 
   return solution->routeValid;
+}
+
+int getDungeonDistance(Dungeon *dungeon, int sx, int sy, int tx, int ty) {
+  if (!isInDungeon(dungeon, sx, sy) || !isInDungeon(dungeon, tx, ty))
+    return inf;
+
+  if (dungeon->mp[sx][sy] == Block)
+    return inf;
+
+  int sid = xy2a(sx, sy, dungeon->height);
+  int tid = xy2a(tx, ty, dungeon->height);
+  makeBfs(dungeon, sid, tid);
+  return solveDis[tid];
 }

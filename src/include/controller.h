@@ -29,8 +29,10 @@ void ScreenRender() {
 }
 
 void (*playerMove)(int event);
+void (*autoMove)(void);
 
 void bindPlayerMove(void (*_playerMove)(int)) { playerMove = _playerMove; }
+void bindAutoMove(void (*_autoMove)(void)) { autoMove = _autoMove; }
 
 void render(int id) {
   if (id == ScreenRend)
@@ -45,6 +47,8 @@ void render(int id) {
     playerMove(MoveDown);
   if (id == HintExpire)
     clearHint();
+  if (id == AutoRun)
+    autoMove();
 }
 
 int controlPressed = 0;

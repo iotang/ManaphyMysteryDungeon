@@ -44,10 +44,12 @@ typedef enum TimeEvent {
   FaceUp,
   FaceLeft,
   FaceDown,
-  HintExpire
+  HintExpire,
+  AutoRun
 } TimeEvent;
 
 typedef enum { Player, Enemy } Role;
-typedef enum { RIGHT, UP, LEFT, DOWN, NODIRECTION } Direction;
+typedef enum { RIGHT, UP, LEFT, DOWN, NODIRECTION, ERRORDIRECTION } Direction;
+int go[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
 #define inf (0x3f3f3f3f)
