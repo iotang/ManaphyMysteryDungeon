@@ -24,6 +24,7 @@ typedef struct Item {
 
 typedef enum {
   idMainMenu,
+  idAboutPage,
   idAlertDialog,
   idConfirmDialog,
   idNewPage,

@@ -104,6 +104,7 @@ void manaphyMoveAttempt(int event) {
 void initExplorer() {
   if (!expHasReadDungeon) {
     expDungeon = currentDungeon;
+    expHasReadDungeon = 1;
     strcpy(expDungeonFileName, editDungeonFileName);
     spawnPokemon(&manaphy, Player, NManaphy);
     manaphy.exp = 400;

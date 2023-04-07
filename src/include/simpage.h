@@ -27,7 +27,7 @@ char simDungeonFileName[MaxFileNameLength + 1];
 int simHasReadDungeon;
 
 double simCellSize;
-Pokemon simCursor, cresselia;
+Pokemon simCamera, cresselia;
 double simMouseX, simMouseY;
 
 int isMouseDownSimPage;
@@ -35,7 +35,7 @@ int isJumpedSimPage;
 
 int simulateSpeed;
 int isAutoSimulating;
-int isCursorFollowCresselia;
+int isCameraFollowCresselia;
 
 void checkCresseliaHealth() {
   while (updatePokemonStat(&cresselia))
@@ -51,23 +51,23 @@ void checkCresseliaHealth() {
 
 void playerMoveSimPage(int event) {
   if (event == MoveRight) {
-    if (simCursor.x + 1 < simDungeon.width) {
-      simCursor.x++;
+    if (simCamera.x + 1 < simDungeon.width) {
+      simCamera.x++;
     }
   }
   if (event == MoveUp) {
-    if (simCursor.y + 1 < simDungeon.height) {
-      simCursor.y++;
+    if (simCamera.y + 1 < simDungeon.height) {
+      simCamera.y++;
     }
   }
   if (event == MoveLeft) {
-    if (simCursor.x > 0) {
-      simCursor.x--;
+    if (simCamera.x > 0) {
+      simCamera.x--;
     }
   }
   if (event == MoveDown) {
-    if (simCursor.y > 0) {
-      simCursor.y--;
+    if (simCamera.y > 0) {
+      simCamera.y--;
     }
   }
 }
@@ -136,30 +136,31 @@ void initSimPage() {
   if (!simHasReadDungeon) {
     simCellSize = 1;
     simDungeon = currentDungeon;
+    simHasReadDungeon = 1;
     strcpy(simDungeonFileName, editDungeonFileName);
     clearDungeonSolution(&simHistory);
     simHistory.routeValid = 1;
 
-    simCursor.x = simCursor.y = 0;
+    simCamera.x = simCamera.y = 0;
     for (int x = 0; x < simDungeon.width; x++) {
       for (int y = 0; y < simDungeon.height; y++) {
         if (simDungeon.mp[x][y] == Start) {
-          simCursor.x = x;
-          simCursor.y = y;
+          simCamera.x = x;
+          simCamera.y = y;
         }
       }
     }
 
-    simDungeon.mp[simCursor.x][simCursor.y] = Start;
+    simDungeon.mp[simCamera.x][simCamera.y] = Start;
     spawnPokemon(&cresselia, Player, NCresselia);
-    cresselia.x = simCursor.x;
-    cresselia.y = simCursor.y;
+    cresselia.x = simCamera.x;
+    cresselia.y = simCamera.y;
     cresselia.exp = 4900;
     while (updatePokemonStat(&cresselia))
       ;
     isAutoSimulating = 0;
     simulateSpeed = 100;
-    isCursorFollowCresselia = 0;
+    isCameraFollowCresselia = 0;
   }
   clearHelpList();
   addHelpEntry("Move Camera:", "");
@@ -195,26 +196,26 @@ void setSimulateSpeed(int speed) {
 }
 
 void drawSimPage() {
-  if (isCursorFollowCresselia) {
-    simCursor.x = cresselia.x;
-    simCursor.y = cresselia.y;
+  if (isCameraFollowCresselia) {
+    simCamera.x = cresselia.x;
+    simCamera.y = cresselia.y;
   }
 
-  if (simCursor.x < 0)
-    simCursor.x = 0;
-  if (simCursor.x >= simDungeon.width)
-    simCursor.x = simDungeon.width - 1;
+  if (simCamera.x < 0)
+    simCamera.x = 0;
+  if (simCamera.x >= simDungeon.width)
+    simCamera.x = simDungeon.width - 1;
 
-  if (simCursor.y < 0)
-    simCursor.y = 0;
-  if (simCursor.y >= simDungeon.height)
-    simCursor.y = simDungeon.height - 1;
+  if (simCamera.y < 0)
+    simCamera.y = 0;
+  if (simCamera.y >= simDungeon.height)
+    simCamera.y = simDungeon.height - 1;
 
-  drawDungeon(&simDungeon, simCursor.x, simCursor.y, simCellSize, 1,
+  drawDungeon(&simDungeon, simCamera.x, simCamera.y, simCellSize, 1,
               &simHistory, 1);
-  drawDungeonHighlightCell(&simDungeon, simCursor.x, simCursor.y, simCellSize,
+  drawDungeonHighlightCell(&simDungeon, simCamera.x, simCamera.y, simCellSize,
                            simMouseX, simMouseY);
-  drawDungeonPokemon(&simDungeon, simCursor.x, simCursor.y, simCellSize,
+  drawDungeonPokemon(&simDungeon, simCamera.x, simCamera.y, simCellSize,
                      &cresselia);
 
   // title
@@ -285,11 +286,11 @@ void drawSimPage() {
     }
   }
 
-  setButtonColors(isCursorFollowCresselia ? "Magenta" : "White", "Blue", "Blue",
+  setButtonColors(isCameraFollowCresselia ? "Magenta" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.27,
              Window43Gap * 0.9, WindowHeightInch * 0.03, "Lock Camera")) {
-    isCursorFollowCresselia = !isCursorFollowCresselia;
+    isCameraFollowCresselia = !isCameraFollowCresselia;
   }
 
   // tools bar
@@ -312,16 +313,17 @@ void uiSimPageGetMouse(int x, int y, int button, int event) {
   }
 
   int mx, my;
-  getCellLocation(&simDungeon, simCursor.x, simCursor.y, simCellSize, simMouseX,
+  getCellLocation(&simDungeon, simCamera.x, simCamera.y, simCellSize, simMouseX,
                   simMouseY, &mx, &my);
   if (event == MOUSEMOVE) {
   } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) {
     isMouseDownSimPage = 1;
   } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
     if (!isJumpedSimPage && mx >= 0 && my >= 0) {
-      simCursor.x = mx;
-      simCursor.y = my;
+      simCamera.x = mx;
+      simCamera.y = my;
       isJumpedSimPage = 1;
+      isCameraFollowCresselia = 0;
     }
   } else if (event == BUTTON_UP && button == LEFT_BUTTON) {
     isMouseDownSimPage = 0;

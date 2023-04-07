@@ -17,6 +17,7 @@
 #include "editpage.h"
 #include "explorer.h"
 #include "simpage.h"
+#include "aboutpage.h"
 
 #include "globalvalue.h"
 
@@ -119,12 +120,15 @@ void drawToolsBar() {
   }
 
   if (1) {
-    static char *menuListAbout[] = {"About", "Help", "About"};
+    static char *menuListAbout[] = {"More", "About"};
     double w = TextStringWidth(menuListAbout[0]) * 1.5;
-    double wlist = TextStringWidth(menuListAbout[2]) + 0.2;
+    double wlist = TextStringWidth(menuListAbout[1]) + 0.2;
 
     int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListAbout,
                              sizeof(menuListAbout) / sizeof(menuListAbout[0]));
+    if (selection == 1) {
+      gotoAboutPage();
+    }
   }
 }
 

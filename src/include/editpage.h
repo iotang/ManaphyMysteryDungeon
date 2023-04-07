@@ -27,7 +27,7 @@ int editHasSolution;
 DungeonSolution editDungeonSolution;
 
 double editCellSize;
-Pokemon editCursor;
+Pokemon editCamera;
 double editMouseX, editMouseY;
 
 typedef enum EditMode {
@@ -46,23 +46,23 @@ int isJumpedEditPage;
 
 void playerMoveEditPage(int event) {
   if (event == MoveRight) {
-    if (editCursor.x + 1 < editDungeon.width) {
-      editCursor.x++;
+    if (editCamera.x + 1 < editDungeon.width) {
+      editCamera.x++;
     }
   }
   if (event == MoveUp) {
-    if (editCursor.y + 1 < editDungeon.height) {
-      editCursor.y++;
+    if (editCamera.y + 1 < editDungeon.height) {
+      editCamera.y++;
     }
   }
   if (event == MoveLeft) {
-    if (editCursor.x > 0) {
-      editCursor.x--;
+    if (editCamera.x > 0) {
+      editCamera.x--;
     }
   }
   if (event == MoveDown) {
-    if (editCursor.y > 0) {
-      editCursor.y--;
+    if (editCamera.y > 0) {
+      editCamera.y--;
     }
   }
 }
@@ -88,17 +88,17 @@ void initEditPage() {
     editDungeon = currentDungeon;
     editHasReadDungeon = 1;
 
-    editCursor.x = editCursor.y = 0;
+    editCamera.x = editCamera.y = 0;
     for (int x = 0; x < editDungeon.width; x++) {
       for (int y = 0; y < editDungeon.height; y++) {
         if (editDungeon.mp[x][y] == Start) {
-          editCursor.x = x;
-          editCursor.y = y;
+          editCamera.x = x;
+          editCamera.y = y;
         }
       }
     }
 
-    editDungeon.mp[editCursor.x][editCursor.y] = Start;
+    editDungeon.mp[editCamera.x][editCamera.y] = Start;
   }
 
   clearHelpList();
@@ -137,19 +137,19 @@ void editGetSolution() {
 }
 
 void drawEditPage() {
-  if (editCursor.x < 0)
-    editCursor.x = 0;
-  if (editCursor.x >= editDungeon.width)
-    editCursor.x = editDungeon.width - 1;
+  if (editCamera.x < 0)
+    editCamera.x = 0;
+  if (editCamera.x >= editDungeon.width)
+    editCamera.x = editDungeon.width - 1;
 
-  if (editCursor.y < 0)
-    editCursor.y = 0;
-  if (editCursor.y >= editDungeon.height)
-    editCursor.y = editDungeon.height - 1;
+  if (editCamera.y < 0)
+    editCamera.y = 0;
+  if (editCamera.y >= editDungeon.height)
+    editCamera.y = editDungeon.height - 1;
 
-  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 1,
+  drawDungeon(&editDungeon, editCamera.x, editCamera.y, editCellSize, 1,
               &editDungeonSolution, editHasSolution && !modifiedSinceLastSave);
-  drawDungeonHighlightCell(&editDungeon, editCursor.x, editCursor.y,
+  drawDungeonHighlightCell(&editDungeon, editCamera.x, editCamera.y,
                            editCellSize, editMouseX, editMouseY);
 
   // title
@@ -320,7 +320,7 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
   }
 
   int mx, my;
-  getCellLocation(&editDungeon, editCursor.x, editCursor.y, editCellSize,
+  getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
                   editMouseX, editMouseY, &mx, &my);
   if (event == MOUSEMOVE) {
     if (isMouseDownEditPage && mx >= 0 && my >= 0) {
@@ -356,8 +356,8 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
     }
   } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
     if (!isJumpedEditPage && mx >= 0 && my >= 0) {
-      editCursor.x = mx;
-      editCursor.y = my;
+      editCamera.x = mx;
+      editCamera.y = my;
       isJumpedEditPage = 1;
     }
   } else if (event == BUTTON_UP && button == LEFT_BUTTON) {
