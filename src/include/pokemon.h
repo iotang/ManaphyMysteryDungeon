@@ -35,6 +35,8 @@ typedef struct Pokemon {
   int lv;
   double exp;
 
+  double belly, maxbelly;
+
   int hp, maxhp;
   int atk, def;
 
@@ -189,6 +191,8 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species) {
   pokemon->moveCount = 1;
   pokemon->move[0] = MTackle;
   pokemon->pp[0] = movedex[MTackle].pp;
+
+  pokemon->belly = pokemon->maxbelly = 100.00;
 
   if (species == NManaphy) {
     pokemon->moveCount = 5;

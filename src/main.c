@@ -9,6 +9,7 @@
 #include "controller.h"
 #include "statemanager.h"
 #include "pages.h"
+#include "items.h"
 
 extern AppState MainMenu;
 
@@ -19,6 +20,7 @@ void Main() {
 
   initPokedex();
   initMovedex();
+  initItems();
 
   InitConsole();
 

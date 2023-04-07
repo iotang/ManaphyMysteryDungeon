@@ -14,23 +14,23 @@ void drawStatusBar(Pokemon *pokemon, double basex, double basey) {
   int _pointSize = GetPointSize();
   SetPointSize(16);
   drawBoxWithoutBorder(basex + Window43Gap * 0.05,
-                       basey + WindowHeightInch * 0.14, Window43Gap * 0.90,
+                       basey + WindowHeightInch * 0.18, Window43Gap * 0.90,
                        WindowHeightInch * 0.03, 0, pokemon->name, 'L', "Black");
   char lvTag[99];
   sprintf(lvTag, "%d", pokemon->lv);
   SetPenColor("Light Gray");
-  drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.113,
+  drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.153,
                 Window43Gap * 0.90, WindowHeightInch * 0.01, 1);
   SetPenColor("Cyan");
   if (expRatio > 0) {
-    drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.113,
+    drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.153,
                   Window43Gap * 0.90 * expRatio, WindowHeightInch * 0.01, 1);
   }
   drawBoxWithoutBorder(basex + Window43Gap * 0.05,
-                       basey + WindowHeightInch * 0.11, Window43Gap * 0.90,
+                       basey + WindowHeightInch * 0.15, Window43Gap * 0.90,
                        WindowHeightInch * 0.03, 0, "Lv.", 'L', "Black");
   drawBoxWithoutBorder(basex + Window43Gap * 0.05,
-                       basey + WindowHeightInch * 0.11, Window43Gap * 0.90,
+                       basey + WindowHeightInch * 0.15, Window43Gap * 0.90,
                        WindowHeightInch * 0.03, 0, lvTag, 'R', "Black");
   SetPointSize(_pointSize);
 
@@ -41,7 +41,7 @@ void drawStatusBar(Pokemon *pokemon, double basex, double basey) {
     hpRatio = 0;
 
   SetPenColor("Light Gray");
-  drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.06,
+  drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.09,
                 Window43Gap * 0.90, WindowHeightInch * 0.05, 1);
   if (hpRatio > 0.50) {
     SetPenColor("Green");
@@ -51,7 +51,7 @@ void drawStatusBar(Pokemon *pokemon, double basex, double basey) {
     SetPenColor("Red");
   }
   if (hpRatio > 0) {
-    drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.06,
+    drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.09,
                   Window43Gap * 0.90 * hpRatio, WindowHeightInch * 0.05, 1);
   }
 
@@ -61,8 +61,27 @@ void drawStatusBar(Pokemon *pokemon, double basex, double basey) {
   SetPointSize(32);
   sprintf(hpTag, "%d / %d", pokemon->hp, pokemon->maxhp);
   drawBoxWithoutBorder(basex + Window43Gap * 0.05,
-                       basey + WindowHeightInch * 0.063, Window43Gap * 0.90,
+                       basey + WindowHeightInch * 0.093, Window43Gap * 0.90,
                        WindowHeightInch * 0.05, 0, hpTag, 'R', "Black");
+  SetPointSize(_pointSize);
+
+  char bellyTag[99];
+  double bellyRatio = 1.00 * pokemon->belly / pokemon->maxbelly;
+  sprintf(bellyTag, "%.0lf%%", pokemon->belly);
+  SetPenColor("Light Gray");
+  drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.063,
+                Window43Gap * 0.90, WindowHeightInch * 0.02, 1);
+  SetPenColor("Orange");
+  if (bellyRatio > 0) {
+    drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.063,
+                  Window43Gap * 0.90 * bellyRatio, WindowHeightInch * 0.02, 1);
+  }
+  drawBoxWithoutBorder(basex + Window43Gap * 0.05,
+                       basey + WindowHeightInch * 0.06, Window43Gap * 0.90,
+                       WindowHeightInch * 0.03, 0, "Belly", 'L', "Black");
+  drawBoxWithoutBorder(basex + Window43Gap * 0.05,
+                       basey + WindowHeightInch * 0.06, Window43Gap * 0.90,
+                       WindowHeightInch * 0.03, 0, bellyTag, 'R', "Black");
   SetPointSize(_pointSize);
 
   _pointSize = GetPointSize();

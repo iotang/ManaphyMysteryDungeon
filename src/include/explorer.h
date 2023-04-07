@@ -1,5 +1,7 @@
 #pragma once
 
+#include <time.h>
+
 #include "graphics.h"
 #include "extgraph.h"
 #include "imgui.h"
@@ -84,8 +86,11 @@ void manaphyMoveAttempt(int event) {
         clearHint();
         manaphy.x = dx;
         manaphy.y = dy;
-        manaphy.hp--;
-        manaphy.exp += 33;
+        manaphy.belly -= 0.1;
+        if (manaphy.belly <= 0) {
+          manaphy.belly = 0;
+          manaphy.hp--;
+        }
       }
 
       checkManaphyHealth();
@@ -153,12 +158,34 @@ void drawExplorer() {
   // title
 
   SetPenColor("White");
-  drawBox(Window43Left, 0, Window43Right - Window43Left,
-          WindowHeightInch * 0.03, 1, expDungeonFileName, 'L', "Black");
+  drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
+          expDungeonFileName, 'L', "Black");
+
+  int colorType = (clock() >> 8) & 1;
+  int hpLow = manaphy.hp * 5 <= manaphy.maxhp;
+  int emptyBelly = manaphy.belly <= 0;
+  if (hpLow) {
+    SetPenColor(colorType ? "Red" : "Light Pink");
+    drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
+            WindowHeightInch * 0.03, 1, "Danger! HP Low!", 'L',
+            colorType ? "White" : "Black");
+  } else if (emptyBelly) {
+    SetPenColor(colorType ? "Yellow" : "Light Pink");
+    drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
+            WindowHeightInch * 0.03, 1, "Danger! Belly is Empty!", 'L',
+            "Black");
+  }
 
   // status bar
-  int _pointSize;
-
+  /*
+    if (hpLow) {
+      SetPenColor(colorType ? "Red" : "Light Pink");
+    } else if (emptyBelly) {
+      SetPenColor(colorType ? "Yellow" : "Light Pink");
+    } else {
+      SetPenColor("Light Pink");
+    }
+  */
   SetPenColor("Light Pink");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
@@ -167,7 +194,6 @@ void drawExplorer() {
   drawStatusBar(&manaphy, 0, WindowHeightInch * 0.01);
 
   // tools bar
-
   SetPenColor("Light Pink");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
 

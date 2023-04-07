@@ -112,6 +112,11 @@ void cresseliaMove() {
     cresselia.x = x;
     cresselia.y = y;
     cresselia.direction = dir;
+    cresselia.belly -= 0.1;
+    if (cresselia.belly <= 0) {
+      cresselia.belly = 0;
+      cresselia.hp--;
+    }
   } else if (dir == ERRORDIRECTION) {
     clearHint();
     static char _failed[200];
@@ -221,8 +226,8 @@ void drawSimPage() {
   // title
 
   SetPenColor("White");
-  drawBox(Window43Left, 0, Window43Right - Window43Left,
-          WindowHeightInch * 0.03, 1, simDungeonFileName, 'L', "Black");
+  drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
+          simDungeonFileName, 'L', "Black");
 
   // status bar
 
