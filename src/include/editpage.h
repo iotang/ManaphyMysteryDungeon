@@ -87,23 +87,16 @@ void initEditPage() {
     editHasReadDungeon = 1;
   }
   editCursor.x = editCursor.y = 0;
-  int gotEnd = 0;
   for (int x = 0; x < editDungeon.width; x++) {
     for (int y = 0; y < editDungeon.height; y++) {
       if (editDungeon.mp[x][y] == Start) {
         editCursor.x = x;
         editCursor.y = y;
       }
-      if (editDungeon.mp[x][y] == End) {
-        gotEnd = 1;
-      }
     }
   }
 
   editDungeon.mp[editCursor.x][editCursor.y] = Start;
-  if (!gotEnd) {
-    editDungeon.mp[editDungeon.width - 1][editDungeon.height - 1] = End;
-  }
 
   editMode = Flip;
   isDungeonOpened = 1;
@@ -143,10 +136,10 @@ void drawEditPage() {
   if (editCursor.y >= editDungeon.height)
     editCursor.y = editDungeon.height - 1;
 
-  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 4, 1,
+  drawDungeon(&editDungeon, editCursor.x, editCursor.y, editCellSize, 1,
               &editDungeonSolution, editHasSolution && !modifiedSinceLastSave);
-  drawDungeonCell(&editDungeon, editCursor.x, editCursor.y, editCellSize,
-                  editMouseX, editMouseY);
+  drawDungeonHighlightCell(&editDungeon, editCursor.x, editCursor.y,
+                           editCellSize, editMouseX, editMouseY);
 
   // title
   /*

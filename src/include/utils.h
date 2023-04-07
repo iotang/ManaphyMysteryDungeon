@@ -30,6 +30,7 @@ typedef enum {
   idOpenPage,
   idSaveAsPage,
   idEditPage,
+  idSimPage,
   idExplorer
 } AppStateID;
 
@@ -47,6 +48,6 @@ typedef enum TimeEvent {
 } TimeEvent;
 
 typedef enum { Player, Enemy } Role;
-typedef enum { RIGHT, UP, LEFT, DOWN } Direction;
+typedef enum { RIGHT, UP, LEFT, DOWN, NODIRECTION } Direction;
 
 #define inf (0x3f3f3f3f)

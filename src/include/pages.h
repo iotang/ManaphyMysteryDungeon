@@ -16,6 +16,7 @@
 #include "getfilenamedialog.h"
 #include "editpage.h"
 #include "explorer.h"
+#include "simpage.h"
 
 #include "globalvalue.h"
 
@@ -29,21 +30,20 @@ void drawToolsBar() {
   }
 
   SetPointSize(16);
-  static char *menuListEdit[] = {
-      "Edit",       "New | Ctrl-N", "Open | Ctrl-O", "Save | Ctrl-S",
-      "Save as...", "Randomize",    "Exit"};
-
   double fontHeight = GetFontHeight();
   double x = 0, y = WindowHeightInch;
   double h = fontHeight * 1.5;
-  double w = TextStringWidth(menuListEdit[0]) * 1.5;
-  double wlist = TextStringWidth(menuListEdit[3]) * 1.2;
-  int selection;
 
-  if (!isDungeonRunning) {
-    selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListEdit,
-                         sizeof(menuListEdit) / sizeof(menuListEdit[0]) -
-                             (isDungeonOpened ? 0 : 4));
+  if (smStateTop()->uid == idEditPage || smStateTop()->uid == idMainMenu) {
+    static char *menuListEdit[] = {
+        "Edit",       "New | Ctrl-N", "Open | Ctrl-O", "Save | Ctrl-S",
+        "Save as...", "Randomize",    "Exit"};
+
+    double w = TextStringWidth(menuListEdit[0]) * 1.5;
+    double wlist = TextStringWidth(menuListEdit[3]) * 1.2;
+    int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListEdit,
+                             sizeof(menuListEdit) / sizeof(menuListEdit[0]) -
+                                 (isDungeonOpened ? 0 : 4));
 
     if (selection == 1) {
       gotoNewPage();
@@ -69,26 +69,31 @@ void drawToolsBar() {
         smPopStateUntil(idMainMenu);
       }
     }
-  } else {
+    x += w;
+  } else if (smStateTop()->uid == idExplorer ||
+             smStateTop()->uid == idSimPage) {
     static char *menuListRunningEdit[] = {"Edit", "Quit Running"};
 
-    selection =
+    double w = TextStringWidth(menuListRunningEdit[0]) * 1.5;
+    double wlist = TextStringWidth(menuListRunningEdit[1]) * 1.2;
+    int selection =
         menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRunningEdit,
                  sizeof(menuListRunningEdit) / sizeof(menuListRunningEdit[0]));
     if (selection == 1) {
       smPopState();
     }
+    x += w;
   }
 
   if (isDungeonOpened) {
-    static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Find Solution"};
-    x += w;
-    w = TextStringWidth(menuListRun[0]) * 1.5;
-    wlist = TextStringWidth(menuListRun[1]) + 0.2;
+    static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run",
+                                  "Find Solution"};
+    double w = TextStringWidth(menuListRun[0]) * 1.5;
+    double wlist = TextStringWidth(menuListRun[1]) + 0.2;
 
-    selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
-                         sizeof(menuListRun) / sizeof(menuListRun[0]) -
-                             isDungeonRunning);
+    int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
+                             sizeof(menuListRun) / sizeof(menuListRun[0]) -
+                                 (smStateTop()->uid == idEditPage ? 0 : 1));
 
     if (selection == 1) {
       if (saveDungeonEditPage() < 0) {
@@ -99,17 +104,28 @@ void drawToolsBar() {
         gotoExplorer();
       }
     } else if (selection == 2) {
+      if (saveDungeonEditPage() < 0) {
+        setAlertDialog2("Error!", "Save failed");
+        gotoAlertDialog();
+      } else {
+        smPopStateUntil(idEditPage);
+        gotoSimPage();
+      }
+    } else if (selection == 3) {
       editGetSolution();
     }
+
+    x += w;
   }
 
-  static char *menuListAbout[] = {"About", "Help", "About"};
-  x += w;
-  w = TextStringWidth(menuListAbout[0]) * 1.5;
-  wlist = TextStringWidth(menuListAbout[2]) + 0.2;
+  if (1) {
+    static char *menuListAbout[] = {"About", "Help", "About"};
+    double w = TextStringWidth(menuListAbout[0]) * 1.5;
+    double wlist = TextStringWidth(menuListAbout[2]) + 0.2;
 
-  selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListAbout,
-                       sizeof(menuListAbout) / sizeof(menuListAbout[0]));
+    int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListAbout,
+                             sizeof(menuListAbout) / sizeof(menuListAbout[0]));
+  }
 }
 
 void drawMainMenu() {

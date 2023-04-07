@@ -10,6 +10,7 @@
 #define PokemonSpeciesNumber (1011)
 #define NKate (0)
 #define NManaphy (490)
+#define NCresselia (488)
 #define NBasculin (550)
 #define NSuicune (245)
 
@@ -19,6 +20,7 @@
 #define MBubbleBeam (2)
 #define MSurf (3)
 #define MHydroPump (4)
+#define MPsychic (5)
 
 typedef struct Move {
   char name[MaxMoveNameLength + 1];
@@ -86,6 +88,14 @@ void initPokedex() {
   pokedex[NSuicune].hpGrowth = 2.3;
   pokedex[NSuicune].atkGrowth = 1.7;
   pokedex[NSuicune].defGrowth = 1.9;
+
+  strcpy(pokedex[NCresselia].name, "Cresselia");
+  pokedex[NCresselia].hpBase = 36;
+  pokedex[NCresselia].atkBase = 5.5;
+  pokedex[NCresselia].defBase = 7;
+  pokedex[NCresselia].hpGrowth = 3.1;
+  pokedex[NCresselia].atkGrowth = 1.6;
+  pokedex[NCresselia].defGrowth = 2.1;
 };
 
 void initMovedex() {
@@ -108,6 +118,10 @@ void initMovedex() {
   strcpy(movedex[MHydroPump].name, "Hydro Pump");
   movedex[MHydroPump].effect = 100;
   movedex[MHydroPump].pp = 5;
+
+  strcpy(movedex[MPsychic].name, "Psychic");
+  movedex[MPsychic].effect = 90;
+  movedex[MPsychic].pp = 10;
 }
 
 double getBaseStat(int lv, double base, double growth) {
@@ -172,17 +186,25 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species) {
                              pokedex[species].defGrowth);
   memset(pokemon->move, 0, sizeof(pokemon->move));
   memset(pokemon->pp, 0, sizeof(pokemon->pp));
-  pokemon->moveCount = 5;
+  pokemon->moveCount = 1;
   pokemon->move[0] = MTackle;
   pokemon->pp[0] = movedex[MTackle].pp;
-  pokemon->move[1] = MWaterGun;
-  pokemon->pp[1] = movedex[MWaterGun].pp;
-  pokemon->move[2] = MBubbleBeam;
-  pokemon->pp[2] = movedex[MBubbleBeam].pp;
-  pokemon->move[3] = MSurf;
-  pokemon->pp[3] = movedex[MSurf].pp;
-  pokemon->move[4] = MHydroPump;
-  pokemon->pp[4] = movedex[MHydroPump].pp;
+
+  if (species == NManaphy) {
+    pokemon->moveCount = 5;
+    pokemon->move[1] = MWaterGun;
+    pokemon->pp[1] = movedex[MWaterGun].pp;
+    pokemon->move[2] = MBubbleBeam;
+    pokemon->pp[2] = movedex[MBubbleBeam].pp;
+    pokemon->move[3] = MSurf;
+    pokemon->pp[3] = movedex[MSurf].pp;
+    pokemon->move[4] = MHydroPump;
+    pokemon->pp[4] = movedex[MHydroPump].pp;
+  } else if (species == NCresselia) {
+    pokemon->moveCount = 2;
+    pokemon->move[1] = MPsychic;
+    pokemon->pp[1] = movedex[MPsychic].pp;
+  }
 
   pokemon->x = pokemon->y = -1;
   pokemon->direction = DOWN;

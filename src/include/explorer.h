@@ -15,6 +15,7 @@
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
 #include "hintvalue.h"
+#include "statusbar.h"
 
 #include "globalvalue.h"
 
@@ -101,6 +102,7 @@ void manaphyMoveAttempt(int event) {
 
 void initExplorer() {
   expDungeon = currentDungeon;
+  strcpy(expDungeonFileName, editDungeonFileName);
   spawnPokemon(&manaphy, Player, NManaphy);
   manaphy.exp = 400;
   while (updatePokemonStat(&manaphy))
@@ -131,21 +133,20 @@ void initExplorer() {
     smPopState();
   }
 
-  isDungeonRunning = 1;
   isDungeonGameOver = 0;
   clearHint();
   bindPlayerMove(manaphyMoveAttempt);
 }
 
 void drawExplorer() {
-  drawDungeon(&editDungeon, manaphy.x, manaphy.y, runCellSize,
-              manaphy.direction, 0, NULL, 0);
+  drawDungeon(&expDungeon, manaphy.x, manaphy.y, runCellSize, 0, NULL, 0);
+  drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize, &manaphy);
 
   // title
 
   SetPenColor("White");
   drawBox(Window43Left, 0, Window43Right - Window43Left,
-          WindowHeightInch * 0.03, 1, editDungeonFileName, 'L', "Black");
+          WindowHeightInch * 0.03, 1, expDungeonFileName, 'L', "Black");
 
   // status bar
   int _pointSize;
@@ -153,152 +154,23 @@ void drawExplorer() {
   SetPenColor("Light Pink");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
-  SetPenColor("Black");
-
-  double expRatio = 0.01 * manaphy.exp;
-  _pointSize = GetPointSize();
-  SetPointSize(16);
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.18,
-                       Window43Gap * 0.90, WindowHeightInch * 0.03, 0,
-                       manaphy.name, 'L', "Black");
-  char lvTag[99];
-  sprintf(lvTag, "%d", manaphy.lv);
-  SetPenColor("Light Gray");
-  drawRectangle(Window43Gap * 0.05, WindowHeightInch * 0.153,
-                Window43Gap * 0.90, WindowHeightInch * 0.01, 1);
-  SetPenColor("Cyan");
-  if (expRatio > 0) {
-    drawRectangle(Window43Gap * 0.05, WindowHeightInch * 0.153,
-                  Window43Gap * 0.90 * expRatio, WindowHeightInch * 0.01, 1);
-  }
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.15,
-                       Window43Gap * 0.90, WindowHeightInch * 0.03, 0, "Lv.",
-                       'L', "Black");
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.15,
-                       Window43Gap * 0.90, WindowHeightInch * 0.03, 0, lvTag,
-                       'R', "Black");
-  SetPointSize(_pointSize);
-
-  double hpRatio = 1.00 * manaphy.hp / manaphy.maxhp;
-  if (hpRatio > 1)
-    hpRatio = 1;
-  if (hpRatio < 0)
-    hpRatio = 0;
-
-  SetPenColor("Light Gray");
-  drawRectangle(Window43Gap * 0.05, WindowHeightInch * 0.1, Window43Gap * 0.90,
-                WindowHeightInch * 0.05, 1);
-  if (hpRatio > 0.50) {
-    SetPenColor("Green");
-  } else if (hpRatio > 0.20) {
-    SetPenColor("Yellow");
-  } else {
-    SetPenColor("Red");
-  }
-  if (hpRatio > 0) {
-    drawRectangle(Window43Gap * 0.05, WindowHeightInch * 0.1,
-                  Window43Gap * 0.90 * hpRatio, WindowHeightInch * 0.05, 1);
-  }
-
-  SetPenColor("Black");
-  char hpTag[99];
-  _pointSize = GetPointSize();
-  SetPointSize(32);
-  sprintf(hpTag, "%d / %d", manaphy.hp, manaphy.maxhp);
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.103,
-                       Window43Gap * 0.90, WindowHeightInch * 0.05, 0, hpTag,
-                       'R', "Black");
-  SetPointSize(_pointSize);
-
-  _pointSize = GetPointSize();
-  SetPointSize(16);
-  char statTag[99];
-  sprintf(statTag, "%d", manaphy.atk);
-  SetPenColor("Light Gray");
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.07,
-                       Window43Gap * 0.90, WindowHeightInch * 0.03, 0, "Attack",
-                       'L', "Black");
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.07,
-                       Window43Gap * 0.90, WindowHeightInch * 0.03, 0, statTag,
-                       'R', "Black");
-  sprintf(statTag, "%d", manaphy.def);
-  SetPenColor("Light Gray");
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.04,
-                       Window43Gap * 0.90, WindowHeightInch * 0.03, 0,
-                       "Defense", 'L', "Black");
-  drawBoxWithoutBorder(Window43Gap * 0.05, WindowHeightInch * 0.04,
-                       Window43Gap * 0.90, WindowHeightInch * 0.03, 0, statTag,
-                       'R', "Black");
-  SetPointSize(_pointSize);
+  drawStatusBar(&manaphy, 0, WindowHeightInch * 0.04);
 
   // tools bar
 
   SetPenColor("Light Pink");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
 
-  SetPenColor("White");
-  drawRectangle(Window43Right + Window43Gap * 0.03, WindowHeightInch * 0.005,
-                Window43Gap * 0.94, WindowHeightInch * 0.49, 1);
-
-  for (int i = 0; i < manaphy.moveCount; i++) {
-    double baseHeight = WindowHeightInch * (0.40 - i * 0.10 + 0.01);
-    SetPenColor("White");
-
-    setButtonColors("White", "Blue", "Cyan", "Blue", 1);
-    button(GenUIID(i), Window43Right + Window43Gap * 0.05, baseHeight,
-           Window43Gap * 0.9, WindowHeightInch * 0.08, NULL);
-
-    SetPenColor("Black");
-    _pointSize = GetPointSize();
-    SetPointSize(18);
-    drawBoxWithoutBorder(Window43Right + Window43Gap * 0.05,
-                         baseHeight + WindowHeightInch * 0.03,
-                         Window43Gap * 0.9, WindowHeightInch * 0.05, 0,
-                         movedex[manaphy.move[i]].name, 'C', "Black");
-    SetPointSize(_pointSize);
-    _pointSize = GetPointSize();
-    SetPointSize(8);
-    char effectTag[99];
-    sprintf(effectTag, "Eff. %d", movedex[manaphy.move[i]].effect);
-    char ppTag[99];
-    if (movedex[manaphy.move[i]].pp > 0) {
-      sprintf(ppTag, "%d / %d", manaphy.pp[i], movedex[manaphy.move[i]].pp);
-    } else {
-      sprintf(ppTag, "Unlimited");
-    }
-
-    drawBoxWithoutBorder(Window43Right + Window43Gap * 0.05, baseHeight,
-                         Window43Gap * 0.9, WindowHeightInch * 0.03, 0,
-                         effectTag, 'L', "Black");
-    drawBoxWithoutBorder(Window43Right + Window43Gap * 0.05, baseHeight,
-                         Window43Gap * 0.9, WindowHeightInch * 0.03, 0, ppTag,
-                         'R', "Black");
-    SetPointSize(_pointSize);
-  }
+  drawMoveList(&manaphy, Window43Right, 0);
 
   // hint dialog
 
-  if (!isHintEmpty()) {
-    SetPenColor("White");
-    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
-                  Window43Width * 0.8, WindowHeightInch * 0.2, 1);
-    SetPenColor("Pink");
-    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
-                  Window43Width * 0.8, WindowHeightInch * 0.2, 0);
-    drawRectangle(Window43Left + Window43Width * 0.11, WindowHeightInch * 0.055,
-                  Window43Width * 0.78, WindowHeightInch * 0.19, 0);
-    _pointSize = GetPointSize();
-    SetPointSize(24);
-    drawBox(Window43Left + Window43Width * 0.11, WindowHeightInch * 0.055,
-            Window43Width * 0.78, WindowHeightInch * 0.19, 0, hintString, 'L',
-            "Black");
-    SetPointSize(_pointSize);
-  }
+  drawHintDialog();
 
   drawToolsBar();
 }
 
-void stopExplorer() { isDungeonRunning = 0; }
+void stopExplorer() { clearHint(); }
 
 void uiExplorerGetKeyboard(int key, int event) {
   controlKeyboard(key, event);

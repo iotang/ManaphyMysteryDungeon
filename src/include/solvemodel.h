@@ -32,6 +32,12 @@ void a2xy(int a, int h, int *x, int *y) {
   *y = a % h;
 }
 
+void clearDungeonSolution(DungeonSolution *solution) {
+  memset(solution->mp, 0, sizeof(solution->mp));
+  solution->routeValid = 0;
+  solution->route = NULL;
+}
+
 int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   if (!isDungeonValid(dungeon))
     return -1;
@@ -46,7 +52,7 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   solution->route = NULL;
 
   static int dis[SolveStateCount], ed[SolveStateCount], fr[SolveStateCount];
-  static int go[2][4] = {{1, 0, -1, 0}, {0, 1, 0, -1}};
+  static int go[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
   memset(dis, 0x3f, sizeof(dis));
   memset(ed, 0, sizeof(ed));
   memset(fr, 0x3f, sizeof(fr));
@@ -71,7 +77,7 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
     // printf("%d %d %d\n", x, y, a);
 
     for (int i = 0; i < 4; i++) {
-      int dx = x + go[0][i], dy = y + go[1][i];
+      int dx = x + go[i][0], dy = y + go[i][1];
       if (dx >= 0 && dx < dungeon->width && dy >= 0 && dy < dungeon->height) {
         if (dungeon->mp[dx][dy] == Block)
           continue;
