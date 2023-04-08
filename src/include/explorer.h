@@ -178,6 +178,8 @@ void manaphyMoveAttempt(int event) {
 }
 
 void giveCheat() {
+  if (isDungeonGameOver)
+    return;
   int tx, ty, key = getKeyInItemBag(&manaphyItemBag);
   getDungeonEnd(&expDungeon, &tx, &ty);
   Direction ret = ERRORDIRECTION;

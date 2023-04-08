@@ -196,6 +196,8 @@ void usePredefinedTexBoxColors(int k);
 void drawLabel(double x, double y, char *label);
 
 /* 画一个矩形 */
+void drawRectangleDensity(double x, double y, double w, double h, int fillflag,
+                          double density);
 void drawRectangle(double x, double y, double w, double h, int fillflag);
 
 /* 显示带字符串标签的矩形

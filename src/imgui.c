@@ -586,10 +586,12 @@ int textbox(int id, double x, double y, double w, double h, char textbuf[],
 }
 
 /* 画一个矩形 */
-void drawRectangle(double x, double y, double w, double h, int fillflag) {
+
+void drawRectangleDensity(double x, double y, double w, double h, int fillflag,
+                          double density) {
   MovePen(x, y);
   if (fillflag)
-    StartFilledRegion(1);
+    StartFilledRegion(density);
   {
     DrawLine(0, h);
     DrawLine(w, 0);
@@ -598,6 +600,10 @@ void drawRectangle(double x, double y, double w, double h, int fillflag) {
   }
   if (fillflag)
     EndFilledRegion();
+}
+
+void drawRectangle(double x, double y, double w, double h, int fillflag) {
+  drawRectangleDensity(x, y, w, h, fillflag, 1);
 }
 
 /* 画一个矩形，并在其内部居中显示一个字符串标签label */

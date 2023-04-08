@@ -108,6 +108,7 @@ int cresseliaAttempt() {
         continue;
       lint distan = getDungeonDistance(&simDungeon, dx, dy, key, tx, ty,
                                        DefaultHPPenalty);
+      printf("%d %d %d: %lld\n", dx, dy, key, distan);
       if (distan < minDistan || (distan == minDistan && RandomChance(0.5))) {
         ret = i;
         minDistan = distan;

@@ -37,9 +37,10 @@ void drawHintDialog() {
   if (!isHintEmpty()) {
     /*
     SetPenColor("White");
-    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
-                   Window43Width * 0.8, WindowHeightInch * 0.2, 1);
-    */
+    drawRectangleDensity(Window43Left + Window43Width * 0.1,
+                         WindowHeightInch * 0.05, Window43Width * 0.8,
+                         WindowHeightInch * 0.2, 1, 0.5);
+                         */
     SetPenColor("Pink");
     drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
                   Window43Width * 0.8, WindowHeightInch * 0.2, 0);
@@ -76,12 +77,18 @@ void drawHintDialog() {
 
     for (int i = 0; i < MaxHintLine; i++) {
       if (tmp[now][0]) {
-        drawBoxWithoutBorder(
-            Window43Left + Window43Width * 0.11 + h * 0.08,
-            WindowHeightInch * 0.245 -
-                WindowHeightInch * 0.19 / MaxHintLine * (i + 1) - h * 0.08,
-            Window43Width * 0.78, WindowHeightInch * 0.19 / MaxHintLine, 0,
-            tmp[now], 'L', "White");
+        static double fuzz[8][2] = {
+            {0.08, 0.00}, {-0.08, 0.00}, {0.00, 0.08},   {0.00, -0.08},
+            {0.08, 0.08}, {0.08, -0.08}, {-0.08, -0.08}, {-0.08, 0.08}};
+        for (int x = 0; x < 8; x++) {
+          drawBoxWithoutBorder(
+              Window43Left + Window43Width * 0.11 + h * fuzz[x][0],
+              WindowHeightInch * 0.245 -
+                  WindowHeightInch * 0.19 / MaxHintLine * (i + 1) -
+                  h * fuzz[x][1],
+              Window43Width * 0.78, WindowHeightInch * 0.19 / MaxHintLine, 0,
+              tmp[now], 'L', "White");
+        }
         drawBoxWithoutBorder(
             Window43Left + Window43Width * 0.11,
             WindowHeightInch * 0.245 -

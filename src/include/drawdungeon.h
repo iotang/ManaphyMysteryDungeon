@@ -63,7 +63,8 @@ void drawDungeonPokemon(Dungeon *dungeon, int basex, int basey, double size,
 
 void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
                  int showTag, DungeonSolution *solution, int enableSolution) {
-  static char *dirTag[5] = {">", "^", "<", "v", "x"};
+  int _pointSize = GetPointSize();
+  SetPointSize(4);
   for (int x = 0; x < dungeon->width; x++) {
     double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
     if (xloc + size < Window43Left || xloc > Window43Right)
@@ -105,6 +106,7 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
       }
     }
   }
+  SetPointSize(_pointSize);
 
   for (int x = 0; x < dungeon->width; x++) {
     double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
@@ -116,7 +118,7 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
         continue;
 
       if (size > 0.2) {
-        int _pointSize = GetPointSize();
+        _pointSize = GetPointSize();
         if (size >= 0.8)
           SetPointSize(8);
         else if (size >= 0.6)
