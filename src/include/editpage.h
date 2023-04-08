@@ -104,6 +104,10 @@ void initEditPage() {
     editDungeon.mp[editCamera.x][editCamera.y] = Start;
     editCursor.x = editCamera.x;
     editCursor.y = editCamera.y;
+
+    editLandItem.type = IApple;
+    editLandEvent.type = Lock;
+    editLandEvent.arg = 1;
   }
 
   clearHelpList();
@@ -152,14 +156,19 @@ void drawEditPage() {
   if (editCamera.y >= editDungeon.height)
     editCamera.y = editDungeon.height - 1;
 
+  int mx, my;
+  getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
+                  editMouseX, editMouseY, &mx, &my);
   drawDungeon(&editDungeon, editCamera.x, editCamera.y, editCellSize, 1,
               &editDungeonSolution, editHasSolution && !modifiedSinceLastSave);
-  drawDungeonHighlightCell(&editDungeon, editCamera.x, editCamera.y,
-                           editCellSize, editMouseX, editMouseY, editCellSize,
-                           0, "Magenta");
   drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
-                             editCellSize, editCursor.x, editCursor.y,
-                             editCellSize * 0.5, 1, "Orange");
+                             editCellSize, mx, my, editCellSize, 0, "Magenta",
+                             0, 0);
+  if (editMode == Targeted) {
+    drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
+                               editCellSize, editCursor.x, editCursor.y,
+                               editCellSize * 0.2, 1, "Orange", 0.3, -0.3);
+  }
 
   // title
   /*
@@ -320,6 +329,22 @@ void drawEditPage() {
     editMode = PlaceEnd;
   }
 
+  // event and item
+
+  if (editMode == Targeted) {
+    if (drawDungeonEventEdit(&editDungeon.event[editCursor.x][editCursor.y],
+                             &editDungeon.item[editCursor.x][editCursor.y],
+                             Window43Right, 0, "Orange", 1)) {
+      modifiedSinceLastSave = 1;
+    }
+  } else if (editMode == SetLandEvent) {
+    drawDungeonEventEdit(&editLandEvent, &editLandItem, Window43Right, 0,
+                         "Magenta", 1);
+  } else {
+    drawDungeonEventEdit(&editDungeon.event[mx][my], &editDungeon.item[mx][my],
+                         Window43Right, 0, "White", 0);
+  }
+
   drawToolsBar();
 }
 
@@ -347,6 +372,10 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
       } else if (editMode == SetBlock && editDungeon.mp[mx][my] == Plain) {
         editDungeon.mp[mx][my] = Block;
         modifiedSinceLastSave = 1;
+      } else if (editMode == SetLandEvent) {
+        editDungeon.event[mx][my] = editLandEvent;
+        editDungeon.item[mx][my] = editLandItem;
+        modifiedSinceLastSave = 1;
       }
     }
   } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) {
@@ -369,6 +398,13 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
       } else if (editMode == PlaceEnd) {
         setDungeonEnd(&editDungeon, mx, my);
         modifiedSinceLastSave = 1;
+      } else if (editMode == Targeted) {
+        editCursor.x = mx;
+        editCursor.y = my;
+      } else if (editMode == SetLandEvent) {
+        editDungeon.event[mx][my] = editLandEvent;
+        editDungeon.item[mx][my] = editLandItem;
+        modifiedSinceLastSave = 1;
       }
     }
   } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
@@ -382,12 +418,18 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
   } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
     isJumpedEditPage = 0;
   } else if (event == ROLL_DOWN) {
-    if (editCellSize > 0.30) {
-      editCellSize -= 0.10;
+    if (editCellSize > 0.15) {
+      if (editCellSize > 1.00)
+        editCellSize -= 0.10;
+      else
+        editCellSize -= 0.05;
     }
   } else if (event == ROLL_UP) {
-    if (editCellSize < 3.00) {
-      editCellSize += 0.10;
+    if (editCellSize < 2.00) {
+      if (editCellSize < 1.00)
+        editCellSize += 0.05;
+      else
+        editCellSize += 0.10;
     }
   }
 

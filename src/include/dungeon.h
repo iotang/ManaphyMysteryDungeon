@@ -4,25 +4,12 @@
 #include <string.h>
 #include "random.h"
 #include "items.h"
+#include "landevent.h"
 
 #define MaxDungeonWidth (50)
 #define MaxDungeonHeight (50)
 
 typedef enum LandType { Plain, Block, Start, End } LandType;
-
-typedef enum LandEventType {
-  None,
-  Lock,
-  Damage,
-  Heal,
-  DamageOT,
-  HealOT
-} LandEventType;
-
-typedef struct LandEvent {
-  LandEventType type;
-  int arg;
-} LandEvent;
 
 typedef struct Dungeon {
   int width, height;

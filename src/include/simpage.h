@@ -85,7 +85,7 @@ Direction cresseliaAttempt() {
     if (dx >= 0 && dx < simDungeon.width && dy >= 0 && dy < simDungeon.height) {
       if (simDungeon.mp[dx][dy] == Block)
         continue;
-      int distan = getDungeonDistance(&simDungeon, dx, dy, tx, ty);
+      int distan = getDungeonDistance(&simDungeon, dx, dy, 0, tx, ty);
       if (distan < minDistan || (distan == minDistan && RandomChance(0.5))) {
         ret = i;
         minDistan = distan;
@@ -219,7 +219,8 @@ void drawSimPage() {
   drawDungeon(&simDungeon, simCamera.x, simCamera.y, simCellSize, 1,
               &simHistory, 1);
   drawDungeonHighlightCell(&simDungeon, simCamera.x, simCamera.y, simCellSize,
-                           simMouseX, simMouseY, simCellSize, 0, "Magenta");
+                           simMouseX, simMouseY, simCellSize, 0, "Magenta", 0,
+                           0);
   drawDungeonPokemon(&simDungeon, simCamera.x, simCamera.y, simCellSize,
                      &cresselia);
 

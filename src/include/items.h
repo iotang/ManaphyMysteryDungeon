@@ -3,7 +3,7 @@
 #include <string.h>
 #include "utils.h"
 
-#define MaxItemNumber (999)
+#define MaxItemNumber (7)
 #define MaxItemNameLength (16)
 
 #define INone (0)
@@ -15,6 +15,8 @@
 #define IKey (6)
 #define ITM (7)
 
+#define MaxKeyID (4)
+
 typedef struct ItemData {
   char name[MaxItemNameLength + 1];
   double dexp;
@@ -23,6 +25,7 @@ typedef struct ItemData {
   int datk, ddef;
   int dmove;
   int keyid;
+  int defaultArg;
 } ItemData;
 
 typedef struct Item {
@@ -33,7 +36,7 @@ typedef struct Item {
 ItemData itemsData[MaxItemNumber + 1];
 
 void initItems() {
-  strcpy(itemsData[INone].name, "");
+  strcpy(itemsData[INone].name, "No Item");
   itemsData[INone].dexp = 0;
   itemsData[INone].dberry = 0;
   itemsData[INone].dhp = 0;
@@ -42,6 +45,7 @@ void initItems() {
   itemsData[INone].ddef = 0;
   itemsData[INone].dmove = 0;
   itemsData[INone].keyid = 0;
+  itemsData[INone].defaultArg = 0;
 
   strcpy(itemsData[IApple].name, "Apple");
   itemsData[IApple].dexp = 0;
@@ -52,6 +56,7 @@ void initItems() {
   itemsData[IApple].ddef = 0;
   itemsData[IApple].dmove = 0;
   itemsData[IApple].keyid = 0;
+  itemsData[IApple].defaultArg = 0;
 
   strcpy(itemsData[IGummi].name, "Gummi");
   itemsData[IGummi].dexp = 50;
@@ -62,6 +67,7 @@ void initItems() {
   itemsData[IGummi].ddef = 0;
   itemsData[IGummi].dmove = 0;
   itemsData[IGummi].keyid = 0;
+  itemsData[IGummi].defaultArg = 0;
 
   strcpy(itemsData[IOranBerry].name, "Oran Berry");
   itemsData[IOranBerry].dexp = 0;
@@ -72,6 +78,7 @@ void initItems() {
   itemsData[IOranBerry].ddef = 0;
   itemsData[IOranBerry].dmove = 0;
   itemsData[IOranBerry].keyid = 0;
+  itemsData[IOranBerry].defaultArg = 0;
 
   strcpy(itemsData[ISitrusBerry].name, "Sitrus Berry");
   itemsData[ISitrusBerry].dexp = 0;
@@ -82,6 +89,7 @@ void initItems() {
   itemsData[ISitrusBerry].ddef = 0;
   itemsData[ISitrusBerry].dmove = 0;
   itemsData[ISitrusBerry].keyid = 0;
+  itemsData[ISitrusBerry].defaultArg = 0;
 
   strcpy(itemsData[IElixir].name, "Elixir");
   itemsData[IElixir].dexp = 0;
@@ -92,6 +100,7 @@ void initItems() {
   itemsData[IElixir].ddef = 3;
   itemsData[IElixir].dmove = 0;
   itemsData[IElixir].keyid = 0;
+  itemsData[IElixir].defaultArg = 0;
 
   strcpy(itemsData[IKey].name, "Key");
   itemsData[IKey].dexp = 0;
@@ -102,6 +111,7 @@ void initItems() {
   itemsData[IKey].ddef = 0;
   itemsData[IKey].dmove = 0;
   itemsData[IKey].keyid = 1;
+  itemsData[IKey].defaultArg = 1;
 
   strcpy(itemsData[ITM].name, "TM");
   itemsData[ITM].dexp = 0;
@@ -112,6 +122,7 @@ void initItems() {
   itemsData[ITM].ddef = 0;
   itemsData[ITM].dmove = 1;
   itemsData[ITM].keyid = 0;
+  itemsData[ITM].defaultArg = 1;
 }
 
 int cmpItems(const void *lhs, const void *rhs) {

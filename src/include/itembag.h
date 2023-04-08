@@ -32,6 +32,7 @@ int removeOutItemBag(ItemBag *itemBag, size_t index) {
     itemBag->items[i] = itemBag->items[i + 1];
   }
   itemBag->count--;
+  return 1;
 }
 
 void sortItemBag(ItemBag *itemBag) {
