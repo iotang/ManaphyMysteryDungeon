@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+
 #include "random.h"
 #include "items.h"
 #include "landevent.h"
@@ -17,6 +18,17 @@ typedef struct Dungeon {
   LandEvent event[MaxDungeonWidth][MaxDungeonHeight];
   Item item[MaxDungeonWidth][MaxDungeonHeight];
 } Dungeon;
+
+void sortDungeon(Dungeon *dungeon) {
+  for (int x = 0; x < dungeon->width; x++) {
+    for (int y = 0; y < dungeon->height; y++) {
+      if (dungeon->mp[x][y] == Start || dungeon->mp[x][y] == End) {
+        dungeon->event[x][y].type = 0;
+        dungeon->item[x][y].type = 0;
+      }
+    }
+  }
+}
 
 int isDungeonValid(Dungeon *dungeon) {
   if (dungeon->width < 2 || dungeon->width > MaxDungeonWidth)

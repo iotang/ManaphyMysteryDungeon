@@ -114,7 +114,7 @@ void initExplorer() {
     expDungeon = currentDungeon;
     expHasReadDungeon = 1;
     strcpy(expDungeonFileName, editDungeonFileName);
-    spawnPokemon(&manaphy, Player, NManaphy);
+    spawnPokemon(&manaphy, Player, NManaphy, Male);
     manaphy.exp = 400;
     while (updatePokemonStat(&manaphy))
       ;

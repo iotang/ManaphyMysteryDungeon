@@ -1650,6 +1650,7 @@ static void InitColors(void) {
   DefineColor("Red", 1, 0, 0);
   DefineColor("Orange", 1, .40, .1);
   DefineColor("Yellow", 1, 1, 0);
+  DefineColor("Light Yellow", 1, 1, 0.5);
   DefineColor("Green", 0, 1, 0);
   DefineColor("Blue", 0, 0, 1);
   DefineColor("Violet", .93, .5, .93);

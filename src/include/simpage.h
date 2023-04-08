@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "pokemon.h"
 #include "dungeon.h"
+#include "dungeonprocess.h"
 #include "drawdungeon.h"
 #include "solvemodel.h"
 #include "controller.h"
@@ -28,7 +29,26 @@ int simHasReadDungeon;
 
 double simCellSize;
 Pokemon simCamera, cresselia;
+ItemBag cresseliaItemBag;
 double simMouseX, simMouseY;
+
+void decSimCellSize() {
+  if (simCellSize > 0.15) {
+    if (simCellSize > 1.00)
+      simCellSize -= 0.10;
+    else
+      simCellSize -= 0.05;
+  }
+}
+
+void incSimCellSize() {
+  if (simCellSize < 2.00) {
+    if (simCellSize < 1.00)
+      simCellSize += 0.05;
+    else
+      simCellSize += 0.10;
+  }
+}
 
 int isMouseDownSimPage;
 int isJumpedSimPage;
@@ -73,19 +93,20 @@ void playerMoveSimPage(int event) {
 }
 
 Direction cresseliaAttempt() {
-  int tx, ty;
+  int tx, ty, key = getKeyInItemBag(&cresseliaItemBag);
   getDungeonEnd(&simDungeon, &tx, &ty);
   if (cresselia.x == tx && cresselia.y == ty)
     return NODIRECTION;
 
   Direction ret = ERRORDIRECTION;
-  int minDistan = inf - 1;
+  lint minDistan = linf - 1;
   for (int i = 0; i < 4; i++) {
     int dx = cresselia.x + go[i][0], dy = cresselia.y + go[i][1];
     if (dx >= 0 && dx < simDungeon.width && dy >= 0 && dy < simDungeon.height) {
       if (simDungeon.mp[dx][dy] == Block)
         continue;
-      int distan = getDungeonDistance(&simDungeon, dx, dy, 0, tx, ty);
+      lint distan = getDungeonDistance(&simDungeon, dx, dy, key, tx, ty,
+                                       DefaultHPPenalty);
       if (distan < minDistan || (distan == minDistan && RandomChance(0.5))) {
         ret = i;
         minDistan = distan;
@@ -97,6 +118,8 @@ Direction cresseliaAttempt() {
 }
 
 void cresseliaMove() {
+  if (isDungeonSimTerminated)
+    return;
   Direction dir = cresseliaAttempt();
   if (dir != NODIRECTION && dir != ERRORDIRECTION) {
     int x = cresselia.x + go[dir][0], y = cresselia.y + go[dir][1];
@@ -124,6 +147,7 @@ void cresseliaMove() {
     setHint(_failed);
   }
 
+  pokemonStepOn(&simDungeon, &cresselia, &cresseliaItemBag);
   checkCresseliaHealth();
   if (simDungeon.mp[cresselia.x][cresselia.y] == End) {
     clearHint();
@@ -146,6 +170,8 @@ void initSimPage() {
     clearDungeonSolution(&simHistory);
     simHistory.routeValid = 1;
 
+    clearItemBag(&cresseliaItemBag);
+
     simCamera.x = simCamera.y = 0;
     for (int x = 0; x < simDungeon.width; x++) {
       for (int y = 0; y < simDungeon.height; y++) {
@@ -157,7 +183,7 @@ void initSimPage() {
     }
 
     simDungeon.mp[simCamera.x][simCamera.y] = Start;
-    spawnPokemon(&cresselia, Player, NCresselia);
+    spawnPokemon(&cresselia, Player, NCresselia, Female);
     cresselia.x = simCamera.x;
     cresselia.y = simCamera.y;
     cresselia.exp = 4900;
@@ -166,6 +192,7 @@ void initSimPage() {
     isAutoSimulating = 0;
     simulateSpeed = 100;
     isCameraFollowCresselia = 0;
+    isDungeonSimTerminated = 0;
   }
   clearHelpList();
   addHelpEntry("Move Camera:", "");
@@ -232,7 +259,7 @@ void drawSimPage() {
 
   // status bar
 
-  SetPenColor("Yellow");
+  SetPenColor("Light Yellow");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
   drawHelpList(0, WindowHeightInch * 0.9);
@@ -301,8 +328,10 @@ void drawSimPage() {
 
   // tools bar
 
-  SetPenColor("Yellow");
+  SetPenColor("Light Yellow");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
+
+  drawItemBag(&cresseliaItemBag, Window43Right, WindowHeightInch * 0.5);
   drawMoveList(&cresselia, Window43Right, 0);
 
   // hint dialog
@@ -336,13 +365,9 @@ void uiSimPageGetMouse(int x, int y, int button, int event) {
   } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
     isJumpedSimPage = 0;
   } else if (event == ROLL_DOWN) {
-    if (simCellSize > 0.30) {
-      simCellSize -= 0.10;
-    }
+    decSimCellSize();
   } else if (event == ROLL_UP) {
-    if (simCellSize < 3.00) {
-      simCellSize += 0.10;
-    }
+    incSimCellSize();
   }
 
   uiGetMouse(x, y, button, event);

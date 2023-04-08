@@ -174,6 +174,7 @@ void drawOpenPage() {
     } else {
       smPopState();
       loadDungeon(&currentDungeon, file);
+      sortDungeon(&currentDungeon);
       strcpy(editDungeonFileName, dialogFileName);
       modifiedSinceLastSave = 0;
       gotoEditPage();
@@ -202,6 +203,7 @@ void drawNewPage() {
       modifiedSinceLastSave = 1;
     } else {
       loadDungeon(&currentDungeon, file);
+      sortDungeon(&currentDungeon);
       modifiedSinceLastSave = 0;
     }
     smPopState();

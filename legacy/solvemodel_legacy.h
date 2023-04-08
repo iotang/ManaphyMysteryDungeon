@@ -4,62 +4,7 @@
 #include "dungeon.h"
 
 #define SolveStateCount (50000)
-#define SolveHeapSize (2000000)
-#define DefaultHPPenalty (10000000ll)
-
-typedef struct HeapNode {
-  int stat;
-  lint dis;
-} HeapNode;
-
-HeapNode heapBuf[SolveHeapSize + 1];
-HeapNode infNode = {inf, linf};
-int heapSize;
-
-void clearHeap() { heapSize = 0; }
-
-int isHeapEmpty() { return heapSize <= 0; }
-
-void pushUpHeap(int x) {
-  while (x > 1 && heapBuf[x].dis < heapBuf[x >> 1].dis) {
-    HeapNode tmp = heapBuf[x >> 1];
-    heapBuf[x >> 1] = heapBuf[x];
-    heapBuf[x] = tmp;
-    x >>= 1;
-  }
-}
-
-void pushDownHeap(int x) {
-  int b;
-  while ((b = x << 1) <= heapSize) {
-    if (b + 1 <= heapSize && heapBuf[b + 1].dis < heapBuf[b].dis)
-      b++;
-    if (heapBuf[b].dis > heapBuf[x].dis)
-      break;
-    HeapNode tmp = heapBuf[b];
-    heapBuf[b] = heapBuf[x];
-    heapBuf[x] = tmp;
-    x = b;
-  }
-}
-
-void popHeap() {
-  if (isHeapEmpty())
-    return;
-  heapBuf[1] = heapBuf[heapSize--];
-  pushDownHeap(1);
-}
-
-void emplaceHeap(HeapNode node) {
-  heapBuf[++heapSize] = node;
-  pushUpHeap(heapSize);
-}
-
-HeapNode topHeap() {
-  if (isHeapEmpty())
-    return infNode;
-  return heapBuf[1];
-}
+#define SolveQueueLength (2000000)
 
 typedef struct RouteNode {
   int x, y;
@@ -82,7 +27,7 @@ RouteNode *newRouteNode(int x, int y) {
 
 int xy2a(int x, int y, int h, int hasKey, int allKey) {
   allKey = (1 << allKey);
-  return (x * h + y) * allKey + (hasKey & (allKey - 1));
+  return (x * h + y) * allKey + hasKey;
 }
 
 void a2xy(int a, int h, int allKey, int *x, int *y, int *hasKey) {
@@ -98,46 +43,31 @@ void clearDungeonSolution(DungeonSolution *solution) {
   solution->route = NULL;
 }
 
-lint solveDis[SolveStateCount];
+int solveDis[SolveStateCount];
 char solveVisited[SolveStateCount];
 int solveFrom[SolveStateCount];
 
 #define pick(a, b) (((a) >> (b)) & 1)
 
-void makeDijkstra(Dungeon *dungeon, int sid, int tid, int allKey,
-                  lint hpPenalty) {
+void makeBfs(Dungeon *dungeon, int sid, int tid, int allKey) {
   memset(solveDis, 0x3f, sizeof(solveDis));
   memset(solveVisited, 0, sizeof(solveVisited));
   memset(solveFrom, 0x3f, sizeof(solveFrom));
 
-  int height = dungeon->height, sx, sy, skey, tx, ty, tkey;
-  a2xy(sid, height, allKey, &sx, &sy, &skey);
+  static int que[SolveQueueLength + 1];
+  int he = 0, ta = 0, tx, ty, tkey;
+  int height = dungeon->height;
+  solveDis[sid] = 0, que[++he] = sid;
+  solveVisited[sid] = 1;
   a2xy(tid, height, allKey, &tx, &ty, &tkey);
 
-  solveDis[sid] = 0;
-  if (dungeon->event[sx][sy].type == Damage ||
-      dungeon->event[sx][sy].type == DamageOT) {
-    solveDis[sid] += hpPenalty * dungeon->event[sx][sy].arg;
-  }
-  if (dungeon->item[sx][sy].type == IKey) {
-    skey |= 1 << (dungeon->item[sx][sy].arg - 1);
-  }
-  sid = xy2a(sx, sy, height, skey, allKey);
+  while (he != ta) {
+    int a = que[++ta];
+    if (ta >= SolveQueueLength) {
+      ta -= SolveQueueLength;
+    }
 
-  clearHeap();
-  HeapNode node;
-  node.stat = sid;
-  node.dis = solveDis[sid];
-  emplaceHeap(node);
-
-  while (!isHeapEmpty()) {
-    node = topHeap();
-    popHeap();
-    if (solveVisited[node.stat])
-      continue;
-    solveVisited[node.stat] = 1;
-
-    int a = node.stat, x, y, hasKey;
+    int x, y, hasKey;
     a2xy(a, height, allKey, &x, &y, &hasKey);
 
     for (int i = 0; i < 4; i++) {
@@ -148,30 +78,21 @@ void makeDijkstra(Dungeon *dungeon, int sid, int tid, int allKey,
             (dungeon->event[dx][dy].type == Lock &&
              !pick(hasKey, dungeon->event[dx][dy].arg - 1)))
           continue;
-
-        lint dis = solveDis[a] + 1;
-        if (dungeon->event[dx][dy].type == Damage ||
-            dungeon->event[dx][dy].type == DamageOT) {
-          dis += hpPenalty * dungeon->event[dx][dy].arg;
-        }
-
         int dkey = hasKey;
         if (dungeon->item[dx][dy].type == IKey &&
             dungeon->item[dx][dy].arg <= allKey) {
           dkey |= 1 << (dungeon->item[dx][dy].arg - 1);
         }
-
         int da = xy2a(dx, dy, height, dkey, allKey);
-
-        if (solveDis[da] <= dis)
+        if (solveVisited[da])
           continue;
-
-        solveDis[da] = dis;
+        solveDis[da] = solveDis[a] + 1;
         solveFrom[da] = a;
-        HeapNode tmp;
-        tmp.dis = dis;
-        tmp.stat = da;
-        emplaceHeap(tmp);
+        que[++he] = da;
+        solveVisited[da] = 1;
+        if (he >= SolveQueueLength) {
+          he -= SolveQueueLength;
+        }
       }
     }
   }
@@ -204,19 +125,19 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   getDungeonEnd(dungeon, &tx, &ty);
   int sid = xy2a(sx, sy, h, 0, allKey);
   int tid = xy2a(tx, ty, h, 0, allKey);
-  makeDijkstra(dungeon, sid, tid, allKey, DefaultHPPenalty);
+  makeBfs(dungeon, sid, tid, allKey);
 
   for (int i = 0; i < w; i++) {
     for (int j = 0; j < h; j++) {
       for (int stat = 0; stat < (1 << allKey); stat++) {
-        solution->mp[i][j] = solveDis[xy2a(i, j, h, stat, allKey)] < linf;
+        solution->mp[i][j] = solveDis[xy2a(i, j, h, stat, allKey)] < inf;
         if (solution->mp[i][j])
           break;
       }
     }
   }
 
-  lint minDistan = linf;
+  int minDistan = inf;
   int minLocation = 0;
   for (int stat = 0; stat < (1 << allKey); stat++) {
     int val = xy2a(tx, ty, h, stat, allKey);
@@ -227,7 +148,7 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   }
 
   solution->route = NULL;
-  if (minDistan < linf) {
+  if (minDistan < inf) {
     solution->routeValid = 1;
     int x, y, key;
     a2xy(minLocation, h, allKey, &x, &y, &key);
@@ -245,13 +166,13 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   return solution->routeValid;
 }
 
-lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
-                        int ty, lint hpPenalty) {
+int getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
+                       int ty) {
   if (!isInDungeon(dungeon, sx, sy) || !isInDungeon(dungeon, tx, ty))
-    return linf;
+    return inf;
 
   if (dungeon->mp[sx][sy] == Block)
-    return linf;
+    return inf;
 
   int allKey = 0;
   for (int i = 0; i < dungeon->width; i++) {
@@ -263,15 +184,11 @@ lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
       }
     }
   }
-  if (dungeon->item[sx][sy].type == IKey) {
-    skey |= 1 << (dungeon->item[sx][sy].arg - 1);
-  }
-
   int sid = xy2a(sx, sy, dungeon->height, skey, allKey);
   int tid = xy2a(tx, ty, dungeon->height, 0, allKey);
-  makeDijkstra(dungeon, sid, tid, allKey, hpPenalty);
+  makeBfs(dungeon, sid, tid, allKey);
 
-  lint minDistan = linf;
+  int minDistan = inf;
   for (int stat = 0; stat < (1 << allKey); stat++) {
     int val = xy2a(tx, ty, dungeon->height, stat, allKey);
     if (solveDis[val] < minDistan) {

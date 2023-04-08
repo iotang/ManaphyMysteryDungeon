@@ -5,7 +5,7 @@
 #include "utils.h"
 #include "items.h"
 
-#define MaxItemBagVolume (48)
+#define MaxItemBagVolume (200000)
 
 typedef struct ItemBag {
   size_t count;
@@ -33,6 +33,16 @@ int removeOutItemBag(ItemBag *itemBag, size_t index) {
   }
   itemBag->count--;
   return 1;
+}
+
+int getKeyInItemBag(ItemBag *itemBag) {
+  int hasKey = 0;
+  for (size_t i = 0; i < itemBag->count; i++) {
+    if (itemBag->items[i].type == IKey) {
+      hasKey |= 1 << (itemBag->items[i].arg - 1);
+    }
+  }
+  return hasKey;
 }
 
 void sortItemBag(ItemBag *itemBag) {

@@ -27,10 +27,13 @@ typedef struct Move {
   int effect, pp;
 } Move;
 
+typedef enum Gender { Female, Male } Gender;
+
 typedef struct Pokemon {
   Role role;
 
   char name[MaxPokemonNameLength + 1];
+  Gender gender;
   int species;
   int lv;
   double exp;
@@ -141,6 +144,15 @@ double calcExp(int aLv, int bLv) {
 }
 
 int updatePokemonStat(Pokemon *pokemon) {
+  if (pokemon->maxhp <= 0)
+    pokemon->maxhp = 1;
+  if (pokemon->hp <= 0)
+    pokemon->hp = 0;
+  if (pokemon->atk <= 0)
+    pokemon->atk = 1;
+  if (pokemon->def <= 0)
+    pokemon->def = 1;
+
   if (pokemon->exp < 100)
     return 0;
   pokemon->exp -= 100;
@@ -166,6 +178,8 @@ int updatePokemonStat(Pokemon *pokemon) {
 
   if (pokemon->maxhp <= 0)
     pokemon->maxhp = 1;
+  if (pokemon->hp <= 0)
+    pokemon->hp = 0;
   if (pokemon->atk <= 0)
     pokemon->atk = 1;
   if (pokemon->def <= 0)
@@ -174,9 +188,10 @@ int updatePokemonStat(Pokemon *pokemon) {
   return 1;
 }
 
-void spawnPokemon(Pokemon *pokemon, Role role, int species) {
+void spawnPokemon(Pokemon *pokemon, Role role, int species, int gender) {
   pokemon->role = role;
   strcpy(pokemon->name, pokedex[species].name);
+  pokemon->gender = gender;
   pokemon->species = species;
   pokemon->lv = 1;
   pokemon->exp = 0;
