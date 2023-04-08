@@ -148,15 +148,27 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
   }
 }
 
+void drawDungeonHighlightCellAt(Dungeon *dungeon, int basex, int basey,
+                                double size, int x, int y, double length,
+                                int fill, char *color) {
+  if (!isInDungeon(dungeon, x, y))
+    return;
+
+  double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
+  double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
+  SetPenColor(color);
+  drawBox(xloc + (size - length) / 2, yloc + (size - length) / 2, length,
+          length, fill, NULL, 'C', "Black");
+  return;
+}
+
 void drawDungeonHighlightCell(Dungeon *dungeon, int basex, int basey,
-                              double size, double lx, double ly) {
+                              double size, double lx, double ly, double length,
+                              int fill, char *color) {
   int x = -1, y = -1;
   getCellLocation(dungeon, basex, basey, size, lx, ly, &x, &y);
   if (x < 0 || y < 0)
     return;
-  double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
-  double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
-  SetPenColor("Magenta");
-  drawRectangle(xloc, yloc, size, size, 0);
-  return;
+  drawDungeonHighlightCellAt(dungeon, basex, basey, size, x, y, length, fill,
+                             color);
 }

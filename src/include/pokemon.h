@@ -195,15 +195,11 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species) {
   pokemon->belly = pokemon->maxbelly = 100.00;
 
   if (species == NManaphy) {
-    pokemon->moveCount = 5;
+    pokemon->moveCount = 3;
     pokemon->move[1] = MWaterGun;
     pokemon->pp[1] = movedex[MWaterGun].pp;
     pokemon->move[2] = MBubbleBeam;
     pokemon->pp[2] = movedex[MBubbleBeam].pp;
-    pokemon->move[3] = MSurf;
-    pokemon->pp[3] = movedex[MSurf].pp;
-    pokemon->move[4] = MHydroPump;
-    pokemon->pp[4] = movedex[MHydroPump].pp;
   } else if (species == NCresselia) {
     pokemon->moveCount = 2;
     pokemon->move[1] = MPsychic;

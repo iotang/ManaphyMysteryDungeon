@@ -219,15 +219,15 @@ void drawSimPage() {
   drawDungeon(&simDungeon, simCamera.x, simCamera.y, simCellSize, 1,
               &simHistory, 1);
   drawDungeonHighlightCell(&simDungeon, simCamera.x, simCamera.y, simCellSize,
-                           simMouseX, simMouseY);
+                           simMouseX, simMouseY, simCellSize, 0, "Magenta");
   drawDungeonPokemon(&simDungeon, simCamera.x, simCamera.y, simCellSize,
                      &cresselia);
 
   // title
 
   SetPenColor("White");
-  drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
-          simDungeonFileName, 'L', "Black");
+  drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
+          WindowHeightInch * 0.03, 1, simDungeonFileName, 'L', "Black");
 
   // status bar
 

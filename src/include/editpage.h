@@ -27,14 +27,17 @@ int editHasSolution;
 DungeonSolution editDungeonSolution;
 
 double editCellSize;
-Pokemon editCamera;
+Pokemon editCamera, editCursor;
 double editMouseX, editMouseY;
+LandEvent editLandEvent;
+Item editLandItem;
 
 typedef enum EditMode {
+  Targeted,
+  SetLandEvent,
   Flip,
   SetPlain,
   SetBlock,
-  Targeted,
   PlaceStart,
   PlaceEnd
 } EditMode;
@@ -99,6 +102,8 @@ void initEditPage() {
     }
 
     editDungeon.mp[editCamera.x][editCamera.y] = Start;
+    editCursor.x = editCamera.x;
+    editCursor.y = editCamera.y;
   }
 
   clearHelpList();
@@ -150,7 +155,11 @@ void drawEditPage() {
   drawDungeon(&editDungeon, editCamera.x, editCamera.y, editCellSize, 1,
               &editDungeonSolution, editHasSolution && !modifiedSinceLastSave);
   drawDungeonHighlightCell(&editDungeon, editCamera.x, editCamera.y,
-                           editCellSize, editMouseX, editMouseY);
+                           editCellSize, editMouseX, editMouseY, editCellSize,
+                           0, "Magenta");
+  drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
+                             editCellSize, editCursor.x, editCursor.y,
+                             editCellSize * 0.5, 1, "Orange");
 
   // title
   /*
@@ -160,8 +169,8 @@ void drawEditPage() {
   */
 
   SetPenColor(modifiedSinceLastSave ? "Yellow" : "White");
-  drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
-          editDungeonFileName, 'L', "Black");
+  drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
+          WindowHeightInch * 0.03, 1, editDungeonFileName, 'L', "Black");
 
   SetPenColor("Cyan");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
@@ -258,48 +267,56 @@ void drawEditPage() {
   setButtonColors(editMode == Targeted ? "Yellow" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
-             WindowHeightInch * 0.9, Window43Gap * 0.8, WindowHeightInch * 0.04,
-             "Event")) {
+             WindowHeightInch * 0.90, Window43Gap * 0.8,
+             WindowHeightInch * 0.04, "Select")) {
     editMode = Targeted;
+  }
+
+  setButtonColors(editMode == SetLandEvent ? "Yellow" : "White", "Blue", "Blue",
+                  "White", 1);
+  if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
+             WindowHeightInch * 0.85, Window43Gap * 0.8,
+             WindowHeightInch * 0.04, "Event")) {
+    editMode = SetLandEvent;
   }
 
   setButtonColors(editMode == Flip ? "Yellow" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
-             WindowHeightInch * 0.85, Window43Gap * 0.8,
-             WindowHeightInch * 0.04, "Flip")) {
+             WindowHeightInch * 0.8, Window43Gap * 0.8, WindowHeightInch * 0.04,
+             "Flip")) {
     editMode = Flip;
   }
 
   setButtonColors(editMode == SetPlain ? "Yellow" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
-             WindowHeightInch * 0.8, Window43Gap * 0.8, WindowHeightInch * 0.04,
-             "Plain")) {
+             WindowHeightInch * 0.75, Window43Gap * 0.8,
+             WindowHeightInch * 0.04, "Plain")) {
     editMode = SetPlain;
   }
 
   setButtonColors(editMode == SetBlock ? "Yellow" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
-             WindowHeightInch * 0.75, Window43Gap * 0.8,
-             WindowHeightInch * 0.04, "Block")) {
+             WindowHeightInch * 0.7, Window43Gap * 0.8, WindowHeightInch * 0.04,
+             "Block")) {
     editMode = SetBlock;
   }
 
   setButtonColors(editMode == PlaceStart ? "Yellow" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
-             WindowHeightInch * 0.7, Window43Gap * 0.8, WindowHeightInch * 0.04,
-             "Starts at")) {
+             WindowHeightInch * 0.65, Window43Gap * 0.8,
+             WindowHeightInch * 0.04, "Starts at")) {
     editMode = PlaceStart;
   }
 
   setButtonColors(editMode == PlaceEnd ? "Cyan" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
-             WindowHeightInch * 0.65, Window43Gap * 0.8,
-             WindowHeightInch * 0.04, "Ends at")) {
+             WindowHeightInch * 0.6, Window43Gap * 0.8, WindowHeightInch * 0.04,
+             "Ends at")) {
     editMode = PlaceEnd;
   }
 

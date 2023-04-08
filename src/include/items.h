@@ -83,7 +83,7 @@ void initItems() {
   itemsData[ISitrusBerry].dmove = 0;
   itemsData[ISitrusBerry].keyid = 0;
 
-  strcpy(itemsData[IElixir].name, "IElixir");
+  strcpy(itemsData[IElixir].name, "Elixir");
   itemsData[IElixir].dexp = 0;
   itemsData[IElixir].dberry = 5;
   itemsData[IElixir].dhp = 0;
@@ -112,4 +112,14 @@ void initItems() {
   itemsData[ITM].ddef = 0;
   itemsData[ITM].dmove = 1;
   itemsData[ITM].keyid = 0;
+}
+
+int cmpItems(const void *lhs, const void *rhs) {
+  int typel = (*(Item *)lhs).type;
+  int typer = (*(Item *)rhs).type;
+  int argl = (*(Item *)lhs).arg;
+  int argr = (*(Item *)rhs).arg;
+  if (typel != typer)
+    return typel - typer;
+  return argl - argr;
 }

@@ -13,11 +13,13 @@
 #include "dungeon.h"
 #include "drawdungeon.h"
 #include "controller.h"
+#include "itembag.h"
 
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
 #include "hintvalue.h"
 #include "statusbar.h"
+#include "drawitembag.h"
 
 #include "globalvalue.h"
 
@@ -27,6 +29,7 @@ int expHasReadDungeon;
 
 #define runCellSize (1.00)
 Pokemon manaphy;
+ItemBag manaphyItemBag;
 
 void checkManaphyHealth() {
   while (updatePokemonStat(&manaphy))
@@ -86,7 +89,7 @@ void manaphyMoveAttempt(int event) {
         clearHint();
         manaphy.x = dx;
         manaphy.y = dy;
-        manaphy.belly -= 0.1;
+        manaphy.belly -= 2.8;
         if (manaphy.belly <= 0) {
           manaphy.belly = 0;
           manaphy.hp--;
@@ -115,6 +118,26 @@ void initExplorer() {
     manaphy.exp = 400;
     while (updatePokemonStat(&manaphy))
       ;
+    clearItemBag(&manaphyItemBag);
+    for (int i = 0; i < 3; i++) {
+      Item item;
+      item.type = IApple;
+      addIntoItemBag(&manaphyItemBag, item);
+      item.type = IGummi;
+      addIntoItemBag(&manaphyItemBag, item);
+      item.type = IOranBerry;
+      addIntoItemBag(&manaphyItemBag, item);
+      item.type = ISitrusBerry;
+      addIntoItemBag(&manaphyItemBag, item);
+      item.type = IElixir;
+      addIntoItemBag(&manaphyItemBag, item);
+      item.type = IKey;
+      item.arg = i + 1;
+      addIntoItemBag(&manaphyItemBag, item);
+      item.type = ITM;
+      item.arg = i + 1;
+      addIntoItemBag(&manaphyItemBag, item);
+    }
 
     int gotEnd = 0;
     for (int x = 0; x < expDungeon.width; x++) {
@@ -158,22 +181,20 @@ void drawExplorer() {
   // title
 
   SetPenColor("White");
-  drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
-          expDungeonFileName, 'L', "Black");
+  drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
+          WindowHeightInch * 0.03, 1, expDungeonFileName, 'L', "Black");
 
   int colorType = (clock() >> 8) & 1;
   int hpLow = manaphy.hp * 5 <= manaphy.maxhp;
   int emptyBelly = manaphy.belly <= 0;
   if (hpLow) {
     SetPenColor(colorType ? "Red" : "Light Pink");
-    drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
-            WindowHeightInch * 0.03, 1, "Danger! HP Low!", 'L',
-            colorType ? "White" : "Black");
+    drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
+            "Danger! HP Low!", 'L', colorType ? "White" : "Black");
   } else if (emptyBelly) {
     SetPenColor(colorType ? "Yellow" : "Light Pink");
-    drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
-            WindowHeightInch * 0.03, 1, "Danger! Belly is Empty!", 'L',
-            "Black");
+    drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
+            "Danger! Belly is Empty!", 'L', "Black");
   }
 
   // status bar
@@ -197,6 +218,7 @@ void drawExplorer() {
   SetPenColor("Light Pink");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
 
+  drawItemBag(&manaphyItemBag, Window43Right, WindowHeightInch * 0.5);
   drawMoveList(&manaphy, Window43Right, 0);
 
   // hint dialog
