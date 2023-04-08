@@ -102,8 +102,6 @@ lint solveDis[SolveStateCount];
 char solveVisited[SolveStateCount];
 int solveFrom[SolveStateCount];
 
-#define pick(a, b) (((a) >> (b)) & 1)
-
 void makeDijkstra(Dungeon *dungeon, int sid, int tid, int allKey,
                   lint hpPenalty) {
   memset(solveDis, 0x3f, sizeof(solveDis));
@@ -281,5 +279,3 @@ lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
 
   return minDistan;
 }
-
-#undef pick

@@ -103,12 +103,28 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
         sprintf(locationTag, "(%d, %d)", x, y);
         drawLabel(xloc + 0.1 * size, yloc + 0.1 * size, locationTag);
       }
+    }
+  }
 
-      if (size >= 0.8) {
+  for (int x = 0; x < dungeon->width; x++) {
+    double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
+    if (xloc + size < Window43Left || xloc > Window43Right)
+      continue;
+    for (int y = 0; y < dungeon->height; y++) {
+      double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
+      if (yloc + size < 0 || yloc > WindowHeightInch)
+        continue;
+
+      if (size > 0.2) {
         int _pointSize = GetPointSize();
-        SetPointSize(8);
+        if (size >= 0.8)
+          SetPointSize(8);
+        else if (size >= 0.6)
+          SetPointSize(4);
+        else
+          SetPointSize(2);
         char _tag[99];
-        double h = GetFontHeight() * 1.1;
+        double h = GetFontHeight() * 0.7;
         if (dungeon->item[x][y].type != INone) {
           SetPenColor("Brown");
           if (dungeon->item[x][y].type == IKey ||
@@ -284,18 +300,22 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
                WindowHeightInch * 0.03, "Last Item")) {
       if (item->type > 0) {
         item->type--;
-        item->arg = itemsData[item->type].defaultArg;
-        modified = 1;
+      } else {
+        item->type = MaxItemNumber;
       }
+      item->arg = itemsData[item->type].defaultArg;
+      modified = 1;
     }
     if (button(GenUIID(0), basex + Window43Gap * 0.51,
                basey + WindowHeightInch * 0.38, Window43Gap * 0.43,
                WindowHeightInch * 0.03, "Next Item")) {
       if (item->type < MaxItemNumber) {
         item->type++;
-        item->arg = itemsData[item->type].defaultArg;
-        modified = 1;
+      } else {
+        item->type = 0;
       }
+      item->arg = itemsData[item->type].defaultArg;
+      modified = 1;
     }
 
     if (item->type == IKey || item->type == ITM) {
@@ -390,18 +410,22 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
                WindowHeightInch * 0.03, "Last Event")) {
       if (landEvent->type > 0) {
         landEvent->type--;
-        landEvent->arg = landEventsData[landEvent->type].defaultArg;
-        modified = 1;
+      } else {
+        landEvent->type = MaxLandEventTypeNumber;
       }
+      landEvent->arg = landEventsData[landEvent->type].defaultArg;
+      modified = 1;
     }
     if (button(GenUIID(0), basex + Window43Gap * 0.51,
                basey + WindowHeightInch * 0.135, Window43Gap * 0.43,
                WindowHeightInch * 0.03, "Next Event")) {
       if (landEvent->type < MaxLandEventTypeNumber) {
         landEvent->type++;
-        landEvent->arg = landEventsData[landEvent->type].defaultArg;
-        modified = 1;
+      } else {
+        landEvent->type = 0;
       }
+      landEvent->arg = landEventsData[landEvent->type].defaultArg;
+      modified = 1;
     }
     if (landEvent->type != None) {
       if (button(GenUIID(0), basex + Window43Gap * 0.06,

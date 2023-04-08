@@ -15,6 +15,7 @@
 #include "solvemodel.h"
 #include "controller.h"
 #include "helplist.h"
+#include "attempt.h"
 
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
@@ -92,7 +93,7 @@ void playerMoveSimPage(int event) {
   }
 }
 
-Direction cresseliaAttempt() {
+int cresseliaAttempt() {
   int tx, ty, key = getKeyInItemBag(&cresseliaItemBag);
   getDungeonEnd(&simDungeon, &tx, &ty);
   if (cresselia.x == tx && cresselia.y == ty)
@@ -114,37 +115,40 @@ Direction cresseliaAttempt() {
     }
   }
 
-  return ret;
+  return makeMoveAttempt(ret);
 }
 
 void cresseliaMove() {
   if (isDungeonSimTerminated)
     return;
-  Direction dir = cresseliaAttempt();
-  if (dir != NODIRECTION && dir != ERRORDIRECTION) {
-    int x = cresselia.x + go[dir][0], y = cresselia.y + go[dir][1];
-    simHistory.mp[cresselia.x][cresselia.y] = 1;
-    RouteNode *node = newRouteNode(x, y);
-    if (simHistory.route == NULL)
-      simHistory.route = newRouteNode(cresselia.x, cresselia.y);
-    RouteNode *now = simHistory.route;
-    while (now->nex != NULL) {
-      now = now->nex;
+  int att = cresseliaAttempt();
+  if (isMoveAttempt(att)) {
+    int dir = argMoveAttempt(att);
+    if (dir != NODIRECTION && dir != ERRORDIRECTION) {
+      int x = cresselia.x + go[dir][0], y = cresselia.y + go[dir][1];
+      simHistory.mp[cresselia.x][cresselia.y] = 1;
+      RouteNode *node = newRouteNode(x, y);
+      if (simHistory.route == NULL)
+        simHistory.route = newRouteNode(cresselia.x, cresselia.y);
+      RouteNode *now = simHistory.route;
+      while (now->nex != NULL) {
+        now = now->nex;
+      }
+      now->nex = node;
+      cresselia.x = x;
+      cresselia.y = y;
+      cresselia.direction = dir;
+      cresselia.belly -= 0.1;
+      if (cresselia.belly <= 0) {
+        cresselia.belly = 0;
+        cresselia.hp--;
+      }
+    } else if (dir == ERRORDIRECTION) {
+      clearHint();
+      static char _failed[200];
+      sprintf(_failed, "%s: I cannot find a way to get out!", cresselia.name);
+      setHint(_failed);
     }
-    now->nex = node;
-    cresselia.x = x;
-    cresselia.y = y;
-    cresselia.direction = dir;
-    cresselia.belly -= 0.1;
-    if (cresselia.belly <= 0) {
-      cresselia.belly = 0;
-      cresselia.hp--;
-    }
-  } else if (dir == ERRORDIRECTION) {
-    clearHint();
-    static char _failed[200];
-    sprintf(_failed, "%s: I cannot find a way to get out!", cresselia.name);
-    setHint(_failed);
   }
 
   pokemonStepOn(&simDungeon, &cresselia, &cresseliaItemBag);
@@ -193,13 +197,13 @@ void initSimPage() {
     simulateSpeed = 100;
     isCameraFollowCresselia = 0;
     isDungeonSimTerminated = 0;
+    clearHint();
   }
   clearHelpList();
   addHelpEntry("Move Camera:", "");
   addHelpEntry("", "Arrow or WASD");
   addHelpEntry("Jump to Cell:", "Right Click");
   addHelpEntry("Zoom:", "Mouse Wheel");
-  clearHint();
 
   isMouseDownSimPage = 0;
   isJumpedSimPage = 0;

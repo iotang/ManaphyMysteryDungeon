@@ -150,22 +150,3 @@ int drawMoveList(Pokemon *pokemon, double basex, double basey) {
 
   return ret;
 }
-
-void drawHintDialog() {
-  if (!isHintEmpty()) {
-    SetPenColor("White");
-    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
-                  Window43Width * 0.8, WindowHeightInch * 0.2, 1);
-    SetPenColor("Pink");
-    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
-                  Window43Width * 0.8, WindowHeightInch * 0.2, 0);
-    drawRectangle(Window43Left + Window43Width * 0.11, WindowHeightInch * 0.055,
-                  Window43Width * 0.78, WindowHeightInch * 0.19, 0);
-    int _pointSize = GetPointSize();
-    SetPointSize(24);
-    drawBox(Window43Left + Window43Width * 0.11, WindowHeightInch * 0.055,
-            Window43Width * 0.78, WindowHeightInch * 0.19, 0, hintString, 'L',
-            "Black");
-    SetPointSize(_pointSize);
-  }
-}

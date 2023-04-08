@@ -17,7 +17,7 @@ void pokemonStepOn(Dungeon *dungeon, Pokemon *pokemon, ItemBag *itemBag) {
     sprintf(_pickItem, "%s finds a %s, and %s puts it into the bag.",
             pokemon->name, itemsData[dungeon->item[x][y].type].name,
             pokemon->gender ? "he" : "she");
-    setHint(_pickItem);
+    emplaceHint(_pickItem);
     addIntoItemBag(itemBag, dungeon->item[x][y]);
     dungeon->item[x][y].type = INone;
   }
@@ -26,19 +26,20 @@ void pokemonStepOn(Dungeon *dungeon, Pokemon *pokemon, ItemBag *itemBag) {
     static char _openLock[200];
     sprintf(_openLock, "%s opened the %s.", pokemon->name,
             landEventsData[dungeon->event[x][y].type].name);
-    setHint(_openLock);
+    emplaceHint(_openLock);
+    dungeon->mp[x][y] = Plain;
   } else if (dungeon->event[x][y].type == Damage ||
              dungeon->event[x][y].type == DamageOT) {
     static char _hurt[200];
     sprintf(_hurt, "%s receives %d damage!", pokemon->name,
             dungeon->event[x][y].arg);
-    setHint(_hurt);
+    emplaceHint(_hurt);
     pokemon->hp -= dungeon->event[x][y].arg;
   } else if (dungeon->event[x][y].type == HealOT) {
     static char _heal[200];
     sprintf(_heal, "%s recovers %d HP.", pokemon->name,
             dungeon->event[x][y].arg);
-    setHint(_heal);
+    emplaceHint(_heal);
     pokemon->hp += dungeon->event[x][y].arg;
   }
 

@@ -48,3 +48,6 @@ int go[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
 #define inf (0x3f3f3f3f)
 #define linf (0x3f3f3f3f3f3f3f3fll)
+
+int pick(int a, int b) { return ((a) >> (b)) & 1; }
+int shl(int a) { return 1 << a; }

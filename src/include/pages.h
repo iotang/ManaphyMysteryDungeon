@@ -87,36 +87,94 @@ void drawToolsBar() {
   }
 
   if (isDungeonOpened) {
-    static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run",
-                                  "Find Solution"};
-    double w = TextStringWidth(menuListRun[0]) * 1.5;
-    double wlist = TextStringWidth(menuListRun[1]) + 0.2;
+    if (smStateTop()->uid == idEditPage) {
+      static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run",
+                                    "Find Solution"};
+      double w = TextStringWidth(menuListRun[0]) * 1.5;
+      double wlist = TextStringWidth(menuListRun[1]) + 0.2;
 
-    int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
-                             sizeof(menuListRun) / sizeof(menuListRun[0]) -
-                                 (smStateTop()->uid == idEditPage ? 0 : 1));
+      int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
+                               sizeof(menuListRun) / sizeof(menuListRun[0]));
 
-    if (selection == 1) {
-      if (saveDungeonEditPage() < 0) {
-        setAlertDialog2("Error!", "Save failed");
-        gotoAlertDialog();
-      } else {
-        smPopStateUntil(idEditPage);
-        gotoExplorer();
+      if (selection == 1) {
+        if (saveDungeonEditPage() < 0) {
+          setAlertDialog2("Error!", "Save failed");
+          gotoAlertDialog();
+        } else {
+          smPopStateUntil(idEditPage);
+          gotoExplorer();
+        }
+      } else if (selection == 2) {
+        if (saveDungeonEditPage() < 0) {
+          setAlertDialog2("Error!", "Save failed");
+          gotoAlertDialog();
+        } else {
+          smPopStateUntil(idEditPage);
+          gotoSimPage();
+        }
+      } else if (selection == 3) {
+        editGetSolution();
       }
-    } else if (selection == 2) {
-      if (saveDungeonEditPage() < 0) {
-        setAlertDialog2("Error!", "Save failed");
-        gotoAlertDialog();
-      } else {
-        smPopStateUntil(idEditPage);
-        gotoSimPage();
+
+      x += w;
+    } else if (smStateTop()->uid == idSimPage) {
+      static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run"};
+      double w = TextStringWidth(menuListRun[0]) * 1.5;
+      double wlist = TextStringWidth(menuListRun[1]) + 0.2;
+
+      int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
+                               sizeof(menuListRun) / sizeof(menuListRun[0]));
+
+      if (selection == 1) {
+        if (saveDungeonEditPage() < 0) {
+          setAlertDialog2("Error!", "Save failed");
+          gotoAlertDialog();
+        } else {
+          smPopStateUntil(idEditPage);
+          gotoExplorer();
+        }
+      } else if (selection == 2) {
+        if (saveDungeonEditPage() < 0) {
+          setAlertDialog2("Error!", "Save failed");
+          gotoAlertDialog();
+        } else {
+          smPopStateUntil(idEditPage);
+          gotoSimPage();
+        }
       }
-    } else if (selection == 3) {
-      editGetSolution();
+
+      x += w;
+    } else if (smStateTop()->uid == idExplorer) {
+      static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run",
+                                    "Cheat | Ctrl-P"};
+      double w = TextStringWidth(menuListRun[0]) * 1.5;
+      double wlist = TextStringWidth(menuListRun[1]) + 0.2;
+
+      int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
+                               sizeof(menuListRun) / sizeof(menuListRun[0]));
+
+      if (selection == 1) {
+        if (saveDungeonEditPage() < 0) {
+          setAlertDialog2("Error!", "Save failed");
+          gotoAlertDialog();
+        } else {
+          smPopStateUntil(idEditPage);
+          gotoExplorer();
+        }
+      } else if (selection == 2) {
+        if (saveDungeonEditPage() < 0) {
+          setAlertDialog2("Error!", "Save failed");
+          gotoAlertDialog();
+        } else {
+          smPopStateUntil(idEditPage);
+          gotoSimPage();
+        }
+      } else if (selection == 3) {
+        giveCheat();
+      }
+
+      x += w;
     }
-
-    x += w;
   }
 
   if (1) {

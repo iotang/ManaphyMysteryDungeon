@@ -12,8 +12,10 @@
 #include "pokemon.h"
 #include "dungeon.h"
 #include "drawdungeon.h"
+#include "dungeonprocess.h"
 #include "controller.h"
 #include "itembag.h"
+#include "attempt.h"
 
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
@@ -44,69 +46,161 @@ void checkManaphyHealth() {
   }
 }
 
+int emptyBellyHintCount;
+
+void enemyRound() {}
+
+int manaphyMove(int att) {
+  if (isDungeonGameOver)
+    return 0;
+
+  if (isFaceAttempt(att)) {
+    Direction dir = argFaceAttempt(att);
+    if (dir == RIGHT) {
+      manaphy.direction = RIGHT;
+    } else if (dir == UP) {
+      manaphy.direction = UP;
+    } else if (dir == LEFT) {
+      manaphy.direction = LEFT;
+    } else if (dir == DOWN) {
+      manaphy.direction = DOWN;
+    }
+    return 0;
+  }
+
+  if (isMoveAttempt(att)) {
+    Direction dir = argMoveAttempt(att);
+    int dx = manaphy.x, dy = manaphy.y;
+    if (dir == RIGHT) {
+      dx++;
+      manaphy.direction = RIGHT;
+    } else if (dir == UP) {
+      dy++;
+      manaphy.direction = UP;
+    } else if (dir == LEFT) {
+      dx--;
+      manaphy.direction = LEFT;
+    } else if (dir == DOWN) {
+      dy--;
+      manaphy.direction = DOWN;
+    }
+    if (!isInDungeon(&expDungeon, dx, dy))
+      return 0;
+
+    int successMove = 0;
+
+    if (expDungeon.event[dx][dy].type == Lock) {
+      int key = getKeyInItemBag(&manaphyItemBag);
+      if (!((key >> (expDungeon.event[dx][dy].arg - 1)) & 1)) {
+        emplaceHint("You don't have the right key to open it.");
+      } else {
+        successMove = 1;
+      }
+    } else if (expDungeon.mp[dx][dy] == Block) {
+      emplaceHint("You cannot move into a block.");
+    } else {
+      successMove = 1;
+    }
+
+    if (successMove) {
+      manaphy.x = dx;
+      manaphy.y = dy;
+      manaphy.belly -= 2.8;
+      if (manaphy.belly <= 0) {
+        manaphy.belly = 0;
+        manaphy.hp--;
+        if (emptyBellyHintCount == 0) {
+          emplaceHint("Oh, no! Your belly is empty!");
+        } else if (emptyBellyHintCount == 1) {
+          emplaceHint("Hurry up! You must have something to eat!");
+        } else if (emptyBellyHintCount == 2) {
+          emplaceHint("Otherwise you will fall soon! ");
+        }
+        emptyBellyHintCount++;
+      } else
+        emptyBellyHintCount = 0;
+    }
+
+    return successMove;
+  }
+
+  return 0;
+}
+
+void manaphyRound(int att) {
+  if (!manaphyMove(att))
+    return;
+
+  pokemonStepOn(&expDungeon, &manaphy, &manaphyItemBag);
+
+  checkManaphyHealth();
+  if (expDungeon.mp[manaphy.x][manaphy.y] == End) {
+    clearHint();
+    setHint("You have successfully conquered this dungeon!");
+    cancelTimer(HintExpire);
+    isDungeonGameOver = 1;
+  }
+
+  enemyRound();
+}
+
 void manaphyMoveAttempt(int event) {
   if (isDungeonGameOver)
     return;
 
+  int att = makeFaceAttempt(DOWN);
+
   if (event == FaceRight || event == FaceUp || event == FaceLeft ||
       event == FaceDown) {
     if (event == FaceRight) {
-      manaphy.direction = RIGHT;
-    }
-    if (event == FaceUp) {
-      manaphy.direction = UP;
-    }
-    if (event == FaceLeft) {
-      manaphy.direction = LEFT;
-    }
-    if (event == FaceDown) {
-      manaphy.direction = DOWN;
+      att = makeFaceAttempt(RIGHT);
+    } else if (event == FaceUp) {
+      att = makeFaceAttempt(UP);
+    } else if (event == FaceLeft) {
+      att = makeFaceAttempt(LEFT);
+    } else if (event == FaceDown) {
+      att = makeFaceAttempt(DOWN);
     }
   } else if (event == MoveRight || event == MoveUp || event == MoveLeft ||
              event == MoveDown) {
-    int dx = manaphy.x, dy = manaphy.y;
     if (event == MoveRight) {
-      manaphy.direction = RIGHT;
-      dx++;
+      att = makeMoveAttempt(RIGHT);
+    } else if (event == MoveUp) {
+      att = makeMoveAttempt(UP);
+    } else if (event == MoveLeft) {
+      att = makeMoveAttempt(LEFT);
+    } else if (event == MoveDown) {
+      att = makeMoveAttempt(DOWN);
     }
-    if (event == MoveUp) {
-      manaphy.direction = UP;
-      dy++;
-    }
-    if (event == MoveLeft) {
-      manaphy.direction = LEFT;
-      dx--;
-    }
-    if (event == MoveDown) {
-      manaphy.direction = DOWN;
-      dy--;
-    }
+  }
 
+  return manaphyRound(att);
+}
+
+void giveCheat() {
+  int tx, ty, key = getKeyInItemBag(&manaphyItemBag);
+  getDungeonEnd(&expDungeon, &tx, &ty);
+  Direction ret = ERRORDIRECTION;
+  lint minDistan = linf - 1;
+  for (int i = 0; i < 4; i++) {
+    int dx = manaphy.x + go[i][0], dy = manaphy.y + go[i][1];
     if (dx >= 0 && dx < expDungeon.width && dy >= 0 && dy < expDungeon.height) {
-      if (expDungeon.mp[dx][dy] == Block) {
-        setHint("You cannot move into a block.");
-      } else {
-        clearHint();
-        manaphy.x = dx;
-        manaphy.y = dy;
-        manaphy.belly -= 2.8;
-        if (manaphy.belly <= 0) {
-          manaphy.belly = 0;
-          manaphy.hp--;
-        }
-      }
-
-      checkManaphyHealth();
-      if (expDungeon.mp[dx][dy] == End) {
-        clearHint();
-        setHint("You have successfully conquered this dungeon!");
-        cancelTimer(HintExpire);
-        isDungeonGameOver = 1;
+      if (expDungeon.mp[dx][dy] == Block)
+        continue;
+      lint distan = getDungeonDistance(&expDungeon, dx, dy, key, tx, ty,
+                                       DefaultHPPenalty);
+      if (distan < minDistan || (distan == minDistan && RandomChance(0.5))) {
+        ret = i;
+        minDistan = distan;
       }
     }
   }
 
-  checkManaphyHealth();
+  static char _cheat[99];
+  sprintf(_cheat, "Walk %s may good for you.",
+          ret == RIGHT ? "right"
+                       : (ret == UP ? "up" : (ret == LEFT ? "left" : "down")));
+  emplaceHint(_cheat);
 }
 
 void initExplorer() {
@@ -119,25 +213,6 @@ void initExplorer() {
     while (updatePokemonStat(&manaphy))
       ;
     clearItemBag(&manaphyItemBag);
-    for (int i = 0; i < 3; i++) {
-      Item item;
-      item.type = IApple;
-      addIntoItemBag(&manaphyItemBag, item);
-      item.type = IGummi;
-      addIntoItemBag(&manaphyItemBag, item);
-      item.type = IOranBerry;
-      addIntoItemBag(&manaphyItemBag, item);
-      item.type = ISitrusBerry;
-      addIntoItemBag(&manaphyItemBag, item);
-      item.type = IElixir;
-      addIntoItemBag(&manaphyItemBag, item);
-      item.type = IKey;
-      item.arg = i + 1;
-      addIntoItemBag(&manaphyItemBag, item);
-      item.type = ITM;
-      item.arg = i + 1;
-      addIntoItemBag(&manaphyItemBag, item);
-    }
 
     int gotEnd = 0;
     for (int x = 0; x < expDungeon.width; x++) {
@@ -165,12 +240,13 @@ void initExplorer() {
     }
 
     isDungeonGameOver = 0;
+    emptyBellyHintCount = 0;
+    clearHint();
   }
   clearHelpList();
   addHelpEntry("Move:", "Arrow or WASD");
   addHelpEntry("Change Direction:", "");
   addHelpEntry("", "Shift-Arrow or Shift-WASD");
-  clearHint();
   bindPlayerMove(manaphyMoveAttempt);
 }
 
@@ -218,8 +294,15 @@ void drawExplorer() {
   SetPenColor("Light Pink");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
 
-  drawItemBag(&manaphyItemBag, Window43Right, WindowHeightInch * 0.5);
-  drawMoveList(&manaphy, Window43Right, 0);
+  int useItem =
+      drawItemBag(&manaphyItemBag, Window43Right, WindowHeightInch * 0.5);
+  if (useItem >= 0) {
+    manaphyMove(makeUseItemAttempt(useItem));
+  }
+  int useMove = drawMoveList(&manaphy, Window43Right, 0);
+  if (useMove >= 0) {
+    manaphyMove(makeUseMoveAttempt(useMove));
+  }
 
   // hint dialog
 
