@@ -14,12 +14,16 @@
 #include "utils.h"
 
 #define MOVEGAP (150)
-#define USEMOVEGAP (1500)
+#define USEMOVEGAP (500)
 
 extern void (*currentStateProc)(void);
 
 int timerStarted[99] = {0};
 int isUsingMove = 0;
+int pauseBuffer = 0;
+
+int controlPressed = 0;
+int shiftPressed = 0;
 
 void ScreenRender() {
   DisplayClear();
@@ -35,9 +39,12 @@ void bindPlayerMove(void (*_playerMove)(int)) { playerMove = _playerMove; }
 void bindAutoMove(void (*_autoMove)(void)) { autoMove = _autoMove; }
 
 void render(int id) {
-  if (id == ScreenRend)
+  if (id == ScreenRend) {
+    if (pauseBuffer) {
+      clearTimers();
+    }
     ScreenRender();
-
+  }
   if (id == MoveRight)
     playerMove(MoveRight);
   if (id == MoveUp)
@@ -46,17 +53,8 @@ void render(int id) {
     playerMove(MoveLeft);
   if (id == MoveDown)
     playerMove(MoveDown);
-
-  if (id == UseMove1)
-    playerMove(UseMove1);
-  if (id == UseMove2)
-    playerMove(UseMove2);
-  if (id == UseMove3)
-    playerMove(UseMove3);
-  if (id == UseMove4)
-    playerMove(UseMove4);
-  if (id == UseMove5)
-    playerMove(UseMove5);
+  if (id == MoveNoDirection)
+    playerMove(MoveNoDirection);
 
   if (id == HintExpire)
     clearHint();
@@ -67,12 +65,40 @@ void render(int id) {
     isUsingMove = 0;
     cancelTimer(ClearUsingMove);
   }
+
+  if (id == PauseBufferExpire) {
+    pauseBuffer = 0;
+  }
 }
 
-int controlPressed = 0;
-int shiftPressed = 0;
+void setPauseBuffer() {
+  pauseBuffer = 1;
+  startTimer(PauseBufferExpire, 100);
+}
+
+void clearTimers() {
+  timerStarted[MoveRight] = 0;
+  timerStarted[MoveUp] = 0;
+  timerStarted[MoveLeft] = 0;
+  timerStarted[MoveDown] = 0;
+  timerStarted[MoveNoDirection] = 0;
+  isUsingMove = 0;
+  controlPressed = 0;
+  shiftPressed = 0;
+  cancelTimer(MoveRight);
+  cancelTimer(MoveUp);
+  cancelTimer(MoveLeft);
+  cancelTimer(MoveDown);
+  cancelTimer(MoveNoDirection);
+  cancelTimer(ClearUsingMove);
+}
 
 void controlKeyboard(int key, int event) {
+  if (pauseBuffer) {
+    clearTimers();
+    return;
+  }
+
   if (event == KEY_DOWN) {
     if (key == VK_RIGHT || (key == 'D' && !controlPressed)) {
       if (shiftPressed) {
@@ -110,13 +136,18 @@ void controlKeyboard(int key, int event) {
         timerStarted[MoveDown] = 1;
       }
     }
+    if (key == ' ') {
+      if (!timerStarted[MoveNoDirection]) {
+        playerMove(MoveNoDirection);
+        startTimer(MoveNoDirection, MOVEGAP);
+        timerStarted[MoveNoDirection] = 1;
+      }
+    }
     if (key == '1') {
       if (!isUsingMove) {
         playerMove(UseMove1);
         isUsingMove = 1;
         startTimer(ClearUsingMove, USEMOVEGAP);
-        // startTimer(UseMove1, USEMOVEGAP);
-        // timerStarted[UseMove1] = 1;
       }
     }
     if (key == '2') {
@@ -124,8 +155,6 @@ void controlKeyboard(int key, int event) {
         playerMove(UseMove2);
         isUsingMove = 1;
         startTimer(ClearUsingMove, USEMOVEGAP);
-        // startTimer(UseMove2, USEMOVEGAP);
-        // timerStarted[UseMove2] = 1;
       }
     }
     if (key == '3') {
@@ -133,8 +162,6 @@ void controlKeyboard(int key, int event) {
         playerMove(UseMove3);
         isUsingMove = 1;
         startTimer(ClearUsingMove, USEMOVEGAP);
-        // startTimer(UseMove3, USEMOVEGAP);
-        // timerStarted[UseMove3] = 1;
       }
     }
     if (key == '4') {
@@ -142,8 +169,6 @@ void controlKeyboard(int key, int event) {
         playerMove(UseMove4);
         isUsingMove = 1;
         startTimer(ClearUsingMove, USEMOVEGAP);
-        // startTimer(UseMove4, USEMOVEGAP);
-        // timerStarted[UseMove4] = 1;
       }
     }
     if (key == '5') {
@@ -151,8 +176,6 @@ void controlKeyboard(int key, int event) {
         playerMove(UseMove5);
         isUsingMove = 1;
         startTimer(ClearUsingMove, USEMOVEGAP);
-        // startTimer(UseMove5, USEMOVEGAP);
-        // timerStarted[UseMove5] = 1;
       }
     }
     if (key == VK_CONTROL) {
@@ -186,45 +209,14 @@ void controlKeyboard(int key, int event) {
         timerStarted[MoveDown] = 0;
       }
     }
-    if (key == '1') {
-      if (isUsingMove) {
-        isUsingMove = 0;
-        cancelTimer(ClearUsingMove);
-        // cancelTimer(UseMove1);
-        // timerStarted[UseMove1] = 0;
+    if (key == ' ') {
+      if (timerStarted[MoveNoDirection]) {
+        cancelTimer(MoveNoDirection);
+        timerStarted[MoveNoDirection] = 0;
       }
     }
-    if (key == '2') {
-      if (isUsingMove) {
-        isUsingMove = 0;
-        cancelTimer(ClearUsingMove);
-        // cancelTimer(UseMove2);
-        // timerStarted[UseMove2] = 0;
-      }
-    }
-    if (key == '3') {
-      if (isUsingMove) {
-        isUsingMove = 0;
-        cancelTimer(ClearUsingMove);
-        // cancelTimer(UseMove3);
-        // timerStarted[UseMove3] = 0;
-      }
-    }
-    if (key == '4') {
-      if (isUsingMove) {
-        isUsingMove = 0;
-        cancelTimer(ClearUsingMove);
-        // cancelTimer(UseMove4);
-        // timerStarted[UseMove4] = 0;
-      }
-    }
-    if (key == '5') {
-      if (isUsingMove) {
-        isUsingMove = 0;
-        cancelTimer(ClearUsingMove);
-        // cancelTimer(UseMove5);
-        // timerStarted[UseMove5] = 0;
-      }
+    if (key >= '1' && key <= '5') {
+      isUsingMove = 0;
     }
     if (key == VK_CONTROL) {
       controlPressed = 0;

@@ -32,6 +32,9 @@ double editMouseX, editMouseY;
 LandEvent editLandEvent;
 Item editLandItem;
 
+int editEventOverrideItem;
+int editEventOverrideLandEvent;
+
 void decEditCellSize() {
   if (editCellSize > 0.15) {
     if (editCellSize > 1.00)
@@ -125,6 +128,9 @@ void initEditPage() {
     editLandItem.type = INone;
     editLandEvent.type = None;
     editLandEvent.arg = 0;
+
+    editEventOverrideItem = 1;
+    editEventOverrideLandEvent = 1;
   }
 
   clearHelpList();
@@ -356,8 +362,9 @@ void drawEditPage() {
       modifiedSinceLastSave = 1;
     }
   } else if (editMode == SetLandEvent) {
-    drawDungeonEventEdit(&editLandEvent, &editLandItem, Window43Right, 0,
-                         "Magenta", 1, idEditPage);
+    drawDungeonEventEditOverride(
+        &editLandEvent, &editLandItem, Window43Right, 0, "Magenta", 1,
+        idEditPage, 1, &editEventOverrideItem, &editEventOverrideLandEvent);
   } else {
     drawDungeonEventEdit(&editDungeon.event[mx][my], &editDungeon.item[mx][my],
                          Window43Right, 0, "White", 0, idEditPage);
@@ -398,8 +405,10 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
           editDungeon.mp[mx][my] = Block;
           modifiedSinceLastSave = 1;
         } else if (editMode == SetLandEvent) {
-          editDungeon.event[mx][my] = editLandEvent;
-          editDungeon.item[mx][my] = editLandItem;
+          if (editEventOverrideItem)
+            editDungeon.item[mx][my] = editLandItem;
+          if (editEventOverrideLandEvent)
+            editDungeon.event[mx][my] = editLandEvent;
           modifiedSinceLastSave = 1;
         }
       }
@@ -429,8 +438,10 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
         } else if (editMode == SetLandEvent &&
                    editDungeon.mp[mx][my] != Start &&
                    editDungeon.mp[mx][my] != End) {
-          editDungeon.event[mx][my] = editLandEvent;
-          editDungeon.item[mx][my] = editLandItem;
+          if (editEventOverrideItem)
+            editDungeon.item[mx][my] = editLandItem;
+          if (editEventOverrideLandEvent)
+            editDungeon.event[mx][my] = editLandEvent;
           modifiedSinceLastSave = 1;
         }
       }

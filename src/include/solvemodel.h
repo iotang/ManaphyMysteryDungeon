@@ -250,6 +250,8 @@ lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
 
   if (dungeon->mp[sx][sy] == Block)
     return linf;
+  if (!enableKey && dungeon->event[sx][sy].type == Lock)
+    return linf;
   if (dungeon->event[sx][sy].type == Lock &&
       !pick(skey, dungeon->event[sx][sy].arg - 1))
     return linf;

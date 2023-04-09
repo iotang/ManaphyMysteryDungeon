@@ -41,6 +41,8 @@ void getCellLocation(Dungeon *dungeon, int basex, int basey, double size,
 void drawDungeonPokemon(Dungeon *dungeon, int basex, int basey, double size,
                         Pokemon *pokemon) {
   int x = pokemon->x, y = pokemon->y;
+  if (!isInDungeon(dungeon, x, y))
+    return;
   double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
   double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
   if (xloc + size < Window43Left || xloc > Window43Right)
@@ -256,8 +258,10 @@ void drawDungeonHighlightCell(Dungeon *dungeon, int basex, int basey,
                              color, dx, dy);
 }
 
-int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
-                         double basey, char *bgcolor, int isEdit, int belong) {
+int drawDungeonEventEditOverride(LandEvent *landEvent, Item *item, double basex,
+                                 double basey, char *bgcolor, int isEdit,
+                                 int belong, int controlOverride,
+                                 int *overrideItem, int *overrideLandEvent) {
   int modified = 0;
 
   int _pointSize = GetPointSize();
@@ -368,6 +372,20 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     }
   }
 
+  if (controlOverride) {
+    if (*overrideItem) {
+      setButtonColors("Blue", "White", "White", "Blue", 1);
+    } else {
+      setButtonColors("White", "Blue", "Blue", "White", 1);
+    }
+    if (button(GenUIID(0), basex + Window43Gap * 0.06,
+               basey + WindowHeightInch * 0.27, Window43Gap * 0.88,
+               WindowHeightInch * 0.03,
+               *overrideItem ? "Override" : "Not Override", belong)) {
+      *overrideItem ^= 1;
+    }
+  }
+
   SetPenColor("Black");
   drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.255,
                 Window43Gap * 0.9, WindowHeightInch * 0.235, 0);
@@ -470,6 +488,20 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     }
   }
 
+  if (controlOverride) {
+    if (*overrideLandEvent) {
+      setButtonColors("Blue", "White", "White", "Blue", 1);
+    } else {
+      setButtonColors("White", "Blue", "Blue", "White", 1);
+    }
+    if (button(GenUIID(0), basex + Window43Gap * 0.06,
+               basey + WindowHeightInch * 0.025, Window43Gap * 0.88,
+               WindowHeightInch * 0.03,
+               *overrideLandEvent ? "Override" : "Not Override", belong)) {
+      *overrideLandEvent ^= 1;
+    }
+  }
+
   SetPenColor("Black");
   drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.01,
                 Window43Gap * 0.9, WindowHeightInch * 0.235, 0);
@@ -477,6 +509,11 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
   SetPointSize(_pointSize);
 
   return modified;
+}
+int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
+                         double basey, char *bgcolor, int isEdit, int belong) {
+  return drawDungeonEventEditOverride(landEvent, item, basex, basey, bgcolor,
+                                      isEdit, belong, 0, NULL, NULL);
 }
 
 bool notInAllMenu(double x, double y) {

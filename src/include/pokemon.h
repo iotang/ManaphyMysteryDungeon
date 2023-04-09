@@ -134,7 +134,7 @@ double getBaseStat(int lv, double base, double growth) {
 }
 
 double calcDamage(int lv, double effect, double atk, double def) {
-  return (effect * (lv + 20.00) / 120.00) * atk / def;
+  return (effect * (lv + 5.00) / 105.00) * atk / def;
 }
 
 double calcExp(int aLv, int bLv) {

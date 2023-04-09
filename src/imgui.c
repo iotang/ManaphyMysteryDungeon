@@ -291,8 +291,9 @@ int button(int id, double x, double y, double w, double h, char *label,
       inBox(gs_UIState.editMouseX, gs_UIState.editMouseY, x, x + w, y, y + h)) {
     static int timesss = 0;
     timesss++;
-    printf("%d not in %f %f %f %f\n", timesss, gs_menuRect[0], gs_menuRect[1],
-           gs_menuRect[2], gs_menuRect[3]);
+    // printf("%d not in %f %f %f %f\n", timesss, gs_menuRect[0],
+    // gs_menuRect[1],
+    //       gs_menuRect[2], gs_menuRect[3]);
     frameColor = gs_button_color.hotFrame;
     labelColor = gs_button_color.hotLabel;
     gs_UIState.actingMenu = 0; // menu lose focus

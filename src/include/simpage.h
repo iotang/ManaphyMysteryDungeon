@@ -105,7 +105,7 @@ int cresseliaAttempt() {
   lint minDistan = linf - 1;
   for (int i = 0; i < 4; i++) {
     int dx = cresselia.x + go[i][0], dy = cresselia.y + go[i][1];
-    if (dx >= 0 && dx < simDungeon.width && dy >= 0 && dy < simDungeon.height) {
+    if (isInDungeon(&simDungeon, dx, dy)) {
       if (simDungeon.mp[dx][dy] == Block)
         continue;
       lint distan = getDungeonDistance(&simDungeon, dx, dy, key, tx, ty,
@@ -386,10 +386,10 @@ void uiSimPageGetMouse(int x, int y, int button, int event) {
 }
 
 void uiSimPageGetKeyboard(int key, int event) {
-  if (smStateTop()->uid != idSimPage)
-    return;
   controlKeyboard(key, event);
-  uiGetKeyboard(key, event);
+  if (smStateTop()->uid == idSimPage) {
+    uiGetKeyboard(key, event);
+  }
 }
 
 void uiSimPageGetChar(int ch) {

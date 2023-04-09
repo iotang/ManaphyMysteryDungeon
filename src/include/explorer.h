@@ -37,6 +37,7 @@ Pokemon manaphy;
 ItemBag manaphyItemBag;
 
 EnemyList enemyList;
+int isEnemyMove;
 
 void checkManaphyHealth() {
   while (updatePokemonStat(&manaphy))
@@ -51,12 +52,128 @@ void checkManaphyHealth() {
   }
 }
 
-int emptyBellyHintCount;
+int manhattanDistance(int x1, int y1, int x2, int y2) {
+  return abs(x1 - x2) + abs(y1 - y2);
+}
 
-void enemyRound() {}
+void enemyRound() {
+  isEnemyMove = 1;
+  for (size_t i = 0; i < enemyList.count; i++) {
+    Pokemon *who = &enemyList.enemy[i];
+    Item *item = &enemyList.item[i];
+
+    int distan = manhattanDistance(who->x, who->y, manaphy.x, manaphy.y);
+
+    int madeDecision = 0;
+
+    if (distan <= 1) {
+      if (who->x == manaphy.x - 1)
+        who->direction = RIGHT;
+      if (who->x == manaphy.x + 1)
+        who->direction = LEFT;
+      if (who->y == manaphy.y - 1)
+        who->direction = UP;
+      if (who->y == manaphy.y + 1)
+        who->direction = DOWN;
+
+      int able[MaxMoveCount], ableCount = 0;
+      for (int i = 0; i < who->moveCount; i++) {
+        if (movedex[who->move[i]].pp < 0 || who->pp[i] > 0) {
+          able[ableCount++] = i;
+        }
+      }
+      if (ableCount > 0) {
+        int index = able[RandomInteger(0, ableCount - 1)];
+        int move = who->move[index];
+        static char _useMove[99];
+        sprintf(_useMove, "%s uses %s!", who->name, movedex[move].name);
+        emplaceHint(_useMove);
+        who->pp[index]--;
+        makePause(0.5);
+
+        int dmg =
+            calcDamage(who->lv, movedex[move].effect, who->atk, manaphy.def) *
+            RandomReal(0.85, 1);
+        if (dmg < 1)
+          dmg = 1;
+        sprintf(_useMove, "%s takes %d damage!", manaphy.name, dmg);
+        emplaceHint(_useMove);
+        manaphy.hp -= dmg;
+        makePokemonStatBound(&manaphy);
+        makePause(0.5);
+        checkManaphyHealth();
+        madeDecision = 1;
+      }
+    }
+
+    if (!madeDecision) {
+      if (distan > 10) {
+        int dx = who->x + go[who->direction][0],
+            dy = who->y + go[who->direction][1];
+        if (isInDungeon(&expDungeon, dx, dy) &&
+            expDungeon.mp[dx][dy] == Plain && expDungeon.mp[dx][dy] != Lock &&
+            (dx != manaphy.x || dy != manaphy.y) &&
+            !isOnEnemyList(&enemyList, dx, dy)) {
+          who->x = dx;
+          who->y = dy;
+          madeDecision = 1;
+        }
+      }
+
+      if (!madeDecision) {
+        Direction ret = who->direction;
+        lint minDistan = linf - 1;
+        for (int j = 0; j < 4; j++) {
+          int dx = who->x + go[j][0], dy = who->y + go[j][1];
+          if (isInDungeon(&expDungeon, dx, dy)) {
+            if (expDungeon.mp[dx][dy] == Block)
+              continue;
+            lint distan = getDungeonDistance(&expDungeon, dx, dy, 0, manaphy.x,
+                                             manaphy.y, DefaultHPPenalty, 0);
+            if (distan < minDistan ||
+                (distan == minDistan && RandomChance(0.5))) {
+              ret = j;
+              minDistan = distan;
+            }
+          }
+        }
+        who->direction = ret;
+        int dx = who->x + go[ret][0], dy = who->y + go[ret][1];
+        if (isInDungeon(&expDungeon, dx, dy) &&
+            expDungeon.mp[dx][dy] == Plain && expDungeon.mp[dx][dy] != Lock &&
+            (dx != manaphy.x || dy != manaphy.y) &&
+            !isOnEnemyList(&enemyList, dx, dy)) {
+          who->x = dx;
+          who->y = dy;
+        }
+        madeDecision = 1;
+      }
+    }
+
+    pokemonOneItemStepOn(&expDungeon, who, item);
+    if (who->hp <= 0) {
+      static char _failed[200];
+      sprintf(_failed, "%s is fainted.", who->name);
+      setHint(_failed);
+      who->x = who->y = -1;
+    }
+  }
+
+  for (int i = 0; i < enemyList.count; i++) {
+    if (enemyList.enemy[i].hp <= 0) {
+      removeAtEnemyList(&enemyList, i);
+      i--;
+    }
+  }
+  isEnemyMove = 0;
+}
+
+int emptyBellyHintCount;
 
 int manaphyMove(int att) {
   if (isDungeonGameOver)
+    return 0;
+  if (isEnemyMove)
     return 0;
 
   if (isFaceAttempt(att)) {
@@ -247,7 +364,7 @@ int manaphyMove(int att) {
 
       while (updatePokemonStat(&manaphy)) {
         sprintf(_useItem, "%s raises to level %d!", manaphy.name, manaphy.lv);
-        setHint(_useItem);
+        emplaceHint(_useItem);
       }
 
       makePause(0.3);
@@ -297,6 +414,7 @@ int manaphyMove(int att) {
     emplaceHint(_useMove);
     enemyList.enemy[who].hp -= dmg;
     makePokemonStatBound(&enemyList.enemy[who]);
+    makePause(0.5);
 
     if (enemyList.enemy[who].hp <= 0) {
       sprintf(_useMove, "%s is fainted!", enemyList.enemy[who].name);
@@ -313,7 +431,7 @@ int manaphyMove(int att) {
 
       while (updatePokemonStat(&manaphy)) {
         sprintf(_useMove, "%s raises to level %d!", manaphy.name, manaphy.lv);
-        setHint(_useMove);
+        emplaceHint(_useMove);
       }
 
       if (getItem.type != 0) {
@@ -393,6 +511,8 @@ void manaphyRound(int att) {
 void manaphyMoveAttempt(int event) {
   if (isDungeonGameOver)
     return;
+  if (isEnemyMove)
+    return;
 
   int att = 0;
 
@@ -408,7 +528,7 @@ void manaphyMoveAttempt(int event) {
       att = makeFaceAttempt(DOWN);
     }
   } else if (event == MoveRight || event == MoveUp || event == MoveLeft ||
-             event == MoveDown) {
+             event == MoveDown || event == MoveNoDirection) {
     if (event == MoveRight) {
       att = makeMoveAttempt(RIGHT);
     } else if (event == MoveUp) {
@@ -417,6 +537,8 @@ void manaphyMoveAttempt(int event) {
       att = makeMoveAttempt(LEFT);
     } else if (event == MoveDown) {
       att = makeMoveAttempt(DOWN);
+    } else if (event == MoveNoDirection) {
+      att = makeMoveAttempt(NODIRECTION);
     }
   } else if (event == UseMove1 || event == UseMove2 || event == UseMove3 ||
              event == UseMove4 || event == UseMove5) {
@@ -438,6 +560,8 @@ void manaphyMoveAttempt(int event) {
 
 void giveCheat() {
   if (isDungeonGameOver)
+    return;
+  if (isEnemyMove)
     return;
   int tx, ty, key = getKeyInItemBag(&manaphyItemBag);
   getDungeonEnd(&expDungeon, &tx, &ty);
@@ -530,6 +654,7 @@ void initExplorer() {
   }
   clearHelpList();
   addHelpEntry("Move:", "Arrow or WASD");
+  addHelpEntry("Rest:", "Space");
   addHelpEntry("Change Direction:", "");
   addHelpEntry("", "Shift-Arrow or Shift-WASD");
   addHelpEntry("Use Items:", "Click on list");
@@ -590,12 +715,12 @@ void drawExplorer() {
   int itemAtt = drawItemBag(&manaphyItemBag, Window43Right,
                             WindowHeightInch * 0.5, idExplorer);
   if (itemAtt != 0) {
-    manaphyMove(itemAtt);
+    manaphyRound(itemAtt);
   }
 
   int moveAtt = drawMoveList(&manaphy, Window43Right, 0, idExplorer);
   if (moveAtt != 0) {
-    manaphyMove(moveAtt);
+    manaphyRound(moveAtt);
   }
 
   // hint dialog
@@ -609,7 +734,9 @@ void stopExplorer() { clearHint(); }
 
 void uiExplorerGetKeyboard(int key, int event) {
   controlKeyboard(key, event);
-  uiGetKeyboard(key, event);
+  if (smStateTop()->uid == idExplorer) {
+    uiGetKeyboard(key, event);
+  }
 }
 
 void uiExplorerGetChar(int ch) {

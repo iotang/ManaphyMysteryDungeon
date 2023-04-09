@@ -33,14 +33,15 @@ typedef enum {
 
 typedef enum TimeEvent {
   ScreenRend,
-  MoveRight,
-  MoveUp,
-  MoveLeft,
-  MoveDown,
   FaceRight,
   FaceUp,
   FaceLeft,
   FaceDown,
+  MoveRight,
+  MoveUp,
+  MoveLeft,
+  MoveDown,
+  MoveNoDirection,
   UseMove1,
   UseMove2,
   UseMove3,
@@ -48,12 +49,13 @@ typedef enum TimeEvent {
   UseMove5,
   HintExpire,
   AutoRun,
-  ClearUsingMove
+  ClearUsingMove,
+  PauseBufferExpire
 } TimeEvent;
 
 typedef enum { Player, Enemy } Role;
 typedef enum { RIGHT, UP, LEFT, DOWN, NODIRECTION, ERRORDIRECTION } Direction;
-int go[4][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+int go[5][2] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {0, 0}};
 
 #define inf (0x3f3f3f3f)
 #define linf (0x3f3f3f3f3f3f3f3fll)

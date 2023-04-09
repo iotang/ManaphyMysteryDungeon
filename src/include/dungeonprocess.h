@@ -6,22 +6,10 @@
 #include "dungeon.h"
 #include "pokemon.h"
 #include "hintvalue.h"
+#include "pausepage.h"
 
-void pokemonStepOn(Dungeon *dungeon, Pokemon *pokemon, ItemBag *itemBag) {
+void landEventCalc(Dungeon *dungeon, Pokemon *pokemon) {
   int x = pokemon->x, y = pokemon->y;
-  if (!isInDungeon(dungeon, x, y))
-    return;
-
-  if (dungeon->item[x][y].type != INone) {
-    static char _pickItem[200];
-    sprintf(_pickItem, "%s finds a %s, and %s puts it into the bag.",
-            pokemon->name, itemsData[dungeon->item[x][y].type].name,
-            pokemon->gender ? "he" : "she");
-    emplaceHint(_pickItem);
-    addIntoItemBag(itemBag, dungeon->item[x][y]);
-    dungeon->item[x][y].type = INone;
-  }
-
   if (dungeon->event[x][y].type == Lock) {
     static char _openLock[200];
     sprintf(_openLock, "%s opened the %s.", pokemon->name,
@@ -46,7 +34,48 @@ void pokemonStepOn(Dungeon *dungeon, Pokemon *pokemon, ItemBag *itemBag) {
   if (!landEventsData[dungeon->event[x][y].type].permanent) {
     dungeon->event[x][y].type = None;
   }
+}
 
+void pokemonStepOn(Dungeon *dungeon, Pokemon *pokemon, ItemBag *itemBag) {
+  int x = pokemon->x, y = pokemon->y;
+  if (!isInDungeon(dungeon, x, y))
+    return;
+
+  if (dungeon->item[x][y].type != INone) {
+    static char _pickItem[200];
+    sprintf(_pickItem, "%s finds a %s, and %s puts it into the bag.",
+            pokemon->name, itemsData[dungeon->item[x][y].type].name,
+            pokemon->gender ? "he" : "she");
+    emplaceHint(_pickItem);
+    addIntoItemBag(itemBag, dungeon->item[x][y]);
+    dungeon->item[x][y].type = INone;
+  }
+
+  landEventCalc(dungeon, pokemon);
   while (updatePokemonStat(pokemon))
     ;
+}
+
+void pokemonOneItemStepOn(Dungeon *dungeon, Pokemon *pokemon, Item *item) {
+  int x = pokemon->x, y = pokemon->y;
+  if (!isInDungeon(dungeon, x, y))
+    return;
+
+  if (dungeon->item[x][y].type != INone) {
+    static char _pickItem[200];
+    if (item->type == INone) {
+      sprintf(_pickItem, "%s picks up a %s.", pokemon->name,
+              itemsData[dungeon->item[x][y].type].name);
+      emplaceHint(_pickItem);
+      *item = dungeon->item[x][y];
+      dungeon->item[x][y].type = INone;
+      makePause(0.5);
+    } else {
+      sprintf(_pickItem, "%s ignores a %s.", pokemon->name,
+              itemsData[dungeon->item[x][y].type].name);
+      emplaceHint(_pickItem);
+    }
+  }
+
+  landEventCalc(dungeon, pokemon);
 }

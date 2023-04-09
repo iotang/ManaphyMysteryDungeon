@@ -8,12 +8,30 @@ void initPausePage() { smLastProc(); }
 
 void drawPausePage() { smLastProc(); }
 
-AppState PausePage = {idPausePage, initPausePage, drawPausePage, NULL,
-                      NULL,        NULL,          NULL};
+void uiPausePageGetKeyboard(int key, int event) {
+  controlKeyboard(key, event);
+  uiGetKeyboard(key, event);
+}
+
+void uiPausePageGetChar(int ch) { uiGetChar(ch); }
+
+void uiPausePageGetMouse(int x, int y, int button, int event) {
+  uiGetMouse(x, y, button, event);
+}
+
+AppState PausePage = {idPausePage,
+                      initPausePage,
+                      drawPausePage,
+                      NULL,
+                      uiPausePageGetKeyboard,
+                      uiPausePageGetChar,
+                      uiPausePageGetMouse};
 
 void clearPause() {
-  if (smStateTop()->uid == idPausePage)
+  if (smStateTop()->uid == idPausePage) {
     smPopState();
+  }
+  setPauseBuffer();
 }
 
 void makePause(double seconds) {
