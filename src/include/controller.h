@@ -20,8 +20,6 @@ extern void (*currentStateProc)(void);
 int timerStarted[99] = {0};
 
 void ScreenRender() {
-  // printf("sm: %llu\n", stateStack.top);
-
   DisplayClear();
   if (currentStateProc != NULL) {
     currentStateProc();

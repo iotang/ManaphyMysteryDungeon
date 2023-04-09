@@ -4,7 +4,7 @@
 
 typedef void (*voidFn)(void);
 typedef void (*keyboardCallback)(int button, int event);
-typedef void (*charCallback)(char ch);
+typedef void (*charCallback)(int ch);
 typedef void (*mouseCallback)(int x, int y, int button, int event);
 
 typedef struct AppState {

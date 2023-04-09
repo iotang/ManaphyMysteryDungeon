@@ -41,6 +41,7 @@
 #include <time.h>
 
 #include "imgui.h"
+#include "statemanager.h"
 
 #define KMOD_SHIFT 0x01
 #define KMOD_CTRL 0x02
@@ -68,7 +69,7 @@ static bool inBox(double x, double y, double x1, double x2, double y1,
   return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 }
 
-static bool notInMenu(double x, double y) {
+bool notInMenu(double x, double y) {
   return !inBox(x, y, gs_menuRect[0], gs_menuRect[1], gs_menuRect[2],
                 gs_menuRect[3]);
 }
@@ -275,15 +276,17 @@ void uiGetChar(int ch) { gs_UIState.charInput = ch; }
  *   0 - 用户没有点击（按下并释放）按钮
  *   1 - 点击了按钮
  */
-int button(int id, double x, double y, double w, double h, char *label) {
+int button(int id, double x, double y, double w, double h, char *label,
+           int belong) {
   char *frameColor = gs_button_color.frame;
   char *labelColor = gs_button_color.label;
-  double movement = 0.2 * h;
+  // double movement = 0.2 * h;
   double shrink = 0.15 * h;
   double sinkx = 0, sinky = 0;
   // int isHotItem = 0;
+  int isEnabled = smIsStateEmpty() || (belong == smStateTop()->uid);
 
-  if (notInMenu(gs_UIState.editMouseX, gs_UIState.editMouseY) &&
+  if (isEnabled && notInMenu(gs_UIState.editMouseX, gs_UIState.editMouseY) &&
       inBox(gs_UIState.editMouseX, gs_UIState.editMouseY, x, x + w, y, y + h)) {
     static int timesss = 0;
     timesss++;
@@ -302,21 +305,24 @@ int button(int id, double x, double y, double w, double h, char *label) {
       gs_UIState.clickedItem = 0;
   }
 
-  // If no widget has keyboard focus, take it
-  if (gs_UIState.kbdItem == 0)
-    gs_UIState.kbdItem = id;
-  // If we have keyboard focus, we'll need to process the keys
-  if (gs_UIState.kbdItem == id && gs_UIState.keyPress == VK_TAB) {
-    // If tab is pressed, lose keyboard focus.
-    // Next widget will grab the focus.
-    gs_UIState.kbdItem = 0;
-    // If shift was also pressed, we want to move focus
-    // to the previous widget instead.
-    if (gs_UIState.keyModifiers & KMOD_SHIFT)
-      gs_UIState.kbdItem = gs_UIState.lastItem;
-    gs_UIState.keyPress = 0;
+  if (isEnabled) {
+
+    // If no widget has keyboard focus, take it
+    if (gs_UIState.kbdItem == 0)
+      gs_UIState.kbdItem = id;
+    // If we have keyboard focus, we'll need to process the keys
+    if (gs_UIState.kbdItem == id && gs_UIState.keyPress == VK_TAB) {
+      // If tab is pressed, lose keyboard focus.
+      // Next widget will grab the focus.
+      gs_UIState.kbdItem = 0;
+      // If shift was also pressed, we want to move focus
+      // to the previous widget instead.
+      if (gs_UIState.keyModifiers & KMOD_SHIFT)
+        gs_UIState.kbdItem = gs_UIState.lastItem;
+      gs_UIState.keyPress = 0;
+    }
+    gs_UIState.lastItem = id;
   }
-  gs_UIState.lastItem = id;
 
   // draw the button
   mySetPenColor(frameColor);
@@ -327,18 +333,21 @@ int button(int id, double x, double y, double w, double h, char *label) {
     drawRectangle(x - sinkx / 2, y - sinky / 2, w + sinkx, h + sinky, 0);
   }
 
-  // 画键盘提示, show a small ractangle frane
-  if (gs_UIState.kbdItem == id) {
-    mySetPenColor(labelColor);
-    drawRectangle(x + shrink, y + shrink, w - 2 * shrink, h - 2 * shrink, 0);
-  }
+  if (isEnabled) {
 
-  if (gs_UIState.clickedItem == id && // must be clicked before
-      !gs_UIState.mousedown)          // but now mouse button is up
-  {
-    gs_UIState.clickedItem = 0;
-    gs_UIState.kbdItem = id;
-    return 1;
+    // 画键盘提示, show a small ractangle frane
+    if (gs_UIState.kbdItem == id) {
+      mySetPenColor(labelColor);
+      drawRectangle(x + shrink, y + shrink, w - 2 * shrink, h - 2 * shrink, 0);
+    }
+
+    if (gs_UIState.clickedItem == id && // must be clicked before
+        !gs_UIState.mousedown)          // but now mouse button is up
+    {
+      gs_UIState.clickedItem = 0;
+      gs_UIState.kbdItem = id;
+      return 1;
+    }
   }
 
   return 0;

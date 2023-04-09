@@ -257,7 +257,7 @@ void drawDungeonHighlightCell(Dungeon *dungeon, int basex, int basey,
 }
 
 int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
-                         double basey, char *bgcolor, int isEdit) {
+                         double basey, char *bgcolor, int isEdit, int belong) {
   int modified = 0;
 
   int _pointSize = GetPointSize();
@@ -299,7 +299,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     SetPointSize(8);
     if (button(GenUIID(0), basex + Window43Gap * 0.06,
                basey + WindowHeightInch * 0.38, Window43Gap * 0.43,
-               WindowHeightInch * 0.03, "Last Item")) {
+               WindowHeightInch * 0.03, "Last Item", belong)) {
       if (item->type > 0) {
         item->type--;
       } else {
@@ -310,7 +310,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     }
     if (button(GenUIID(0), basex + Window43Gap * 0.51,
                basey + WindowHeightInch * 0.38, Window43Gap * 0.43,
-               WindowHeightInch * 0.03, "Next Item")) {
+               WindowHeightInch * 0.03, "Next Item", belong)) {
       if (item->type < MaxItemNumber) {
         item->type++;
       } else {
@@ -323,7 +323,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     if (item->type == IKey || item->type == ITM) {
       if (button(GenUIID(0), basex + Window43Gap * 0.06,
                  basey + WindowHeightInch * 0.31, Window43Gap * 0.25,
-                 WindowHeightInch * 0.03, "-10")) {
+                 WindowHeightInch * 0.03, "-10", belong)) {
         if (item->arg > 1) {
           item->arg -= 10;
           if (item->arg < 1)
@@ -333,7 +333,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
       }
       if (button(GenUIID(0), basex + Window43Gap * 0.33,
                  basey + WindowHeightInch * 0.31, Window43Gap * 0.17,
-                 WindowHeightInch * 0.03, "-")) {
+                 WindowHeightInch * 0.03, "-", belong)) {
         if (item->arg > 1) {
           item->arg--;
           modified = 1;
@@ -341,7 +341,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
       }
       if (button(GenUIID(0), basex + Window43Gap * 0.51,
                  basey + WindowHeightInch * 0.31, Window43Gap * 0.17,
-                 WindowHeightInch * 0.03, "+")) {
+                 WindowHeightInch * 0.03, "+", belong)) {
         if (item->type == IKey && item->arg < MaxKeyID) {
           item->arg++;
           modified = 1;
@@ -352,7 +352,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
       }
       if (button(GenUIID(0), basex + Window43Gap * 0.69,
                  basey + WindowHeightInch * 0.31, Window43Gap * 0.25,
-                 WindowHeightInch * 0.03, "+10")) {
+                 WindowHeightInch * 0.03, "+10", belong)) {
         if (item->type == IKey && item->arg < MaxKeyID) {
           item->arg += 10;
           if (item->arg > MaxKeyID)
@@ -409,7 +409,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     SetPointSize(8);
     if (button(GenUIID(0), basex + Window43Gap * 0.06,
                basey + WindowHeightInch * 0.135, Window43Gap * 0.43,
-               WindowHeightInch * 0.03, "Last Event")) {
+               WindowHeightInch * 0.03, "Last Event", belong)) {
       if (landEvent->type > 0) {
         landEvent->type--;
       } else {
@@ -420,7 +420,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     }
     if (button(GenUIID(0), basex + Window43Gap * 0.51,
                basey + WindowHeightInch * 0.135, Window43Gap * 0.43,
-               WindowHeightInch * 0.03, "Next Event")) {
+               WindowHeightInch * 0.03, "Next Event", belong)) {
       if (landEvent->type < MaxLandEventTypeNumber) {
         landEvent->type++;
       } else {
@@ -432,7 +432,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
     if (landEvent->type != None) {
       if (button(GenUIID(0), basex + Window43Gap * 0.06,
                  basey + WindowHeightInch * 0.065, Window43Gap * 0.25,
-                 WindowHeightInch * 0.03, "-10")) {
+                 WindowHeightInch * 0.03, "-10", belong)) {
         if (landEvent->arg > 1) {
           landEvent->arg -= 10;
           if (landEvent->arg < 1)
@@ -442,7 +442,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
       }
       if (button(GenUIID(0), basex + Window43Gap * 0.33,
                  basey + WindowHeightInch * 0.065, Window43Gap * 0.17,
-                 WindowHeightInch * 0.03, "-")) {
+                 WindowHeightInch * 0.03, "-", belong)) {
         if (landEvent->arg > 1) {
           landEvent->arg--;
           modified = 1;
@@ -450,7 +450,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
       }
       if (button(GenUIID(0), basex + Window43Gap * 0.51,
                  basey + WindowHeightInch * 0.065, Window43Gap * 0.17,
-                 WindowHeightInch * 0.03, "+")) {
+                 WindowHeightInch * 0.03, "+", belong)) {
         if (landEvent->type != Lock || landEvent->arg < MaxKeyID) {
           landEvent->arg++;
           modified = 1;
@@ -458,7 +458,7 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
       }
       if (button(GenUIID(0), basex + Window43Gap * 0.69,
                  basey + WindowHeightInch * 0.065, Window43Gap * 0.25,
-                 WindowHeightInch * 0.03, "+10")) {
+                 WindowHeightInch * 0.03, "+10", belong)) {
         if (landEvent->type != Lock || landEvent->arg < MaxKeyID) {
           landEvent->arg += 10;
           if (landEvent->type == Lock && landEvent->arg > MaxKeyID) {

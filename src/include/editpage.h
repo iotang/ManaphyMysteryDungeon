@@ -99,6 +99,7 @@ int saveDungeonEditPage() {
   if (modifiedSinceLastSave)
     editHasSolution = 0;
   modifiedSinceLastSave = 0;
+  return 1;
 }
 
 void initEditPage() {
@@ -216,22 +217,22 @@ void drawEditPage() {
           WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
   setButtonColors("White", "Blue", "Blue", "White", 1);
   if (button(GenUIID(0), Window43Gap * 0.64, WindowHeightInch * 0.19,
-             Window43Gap * 0.1, WindowHeightInch * 0.03, "+")) {
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "+", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width + 1, editDungeon.height);
     modifiedSinceLastSave = 1;
   }
   if (button(GenUIID(0), Window43Gap * 0.78, WindowHeightInch * 0.19,
-             Window43Gap * 0.18, WindowHeightInch * 0.03, "+10")) {
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "+10", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width + 10, editDungeon.height);
     modifiedSinceLastSave = 1;
   }
   if (button(GenUIID(0), Window43Gap * 0.26, WindowHeightInch * 0.19,
-             Window43Gap * 0.1, WindowHeightInch * 0.03, "-")) {
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "-", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width - 1, editDungeon.height);
     modifiedSinceLastSave = 1;
   }
   if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.19,
-             Window43Gap * 0.18, WindowHeightInch * 0.03, "-10")) {
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "-10", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width - 10, editDungeon.height);
     modifiedSinceLastSave = 1;
   }
@@ -245,22 +246,22 @@ void drawEditPage() {
           WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
   setButtonColors("White", "Blue", "Blue", "White", 1);
   if (button(GenUIID(0), Window43Gap * 0.64, WindowHeightInch * 0.1,
-             Window43Gap * 0.1, WindowHeightInch * 0.03, "+")) {
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "+", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height + 1);
     modifiedSinceLastSave = 1;
   }
   if (button(GenUIID(0), Window43Gap * 0.78, WindowHeightInch * 0.1,
-             Window43Gap * 0.18, WindowHeightInch * 0.03, "+10")) {
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "+10", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height + 10);
     modifiedSinceLastSave = 1;
   }
   if (button(GenUIID(0), Window43Gap * 0.26, WindowHeightInch * 0.1,
-             Window43Gap * 0.1, WindowHeightInch * 0.03, "-")) {
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "-", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height - 1);
     modifiedSinceLastSave = 1;
   }
   if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.1,
-             Window43Gap * 0.18, WindowHeightInch * 0.03, "-10")) {
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "-10", idEditPage)) {
     setDungeonSize(&editDungeon, editDungeon.width, editDungeon.height - 10);
     modifiedSinceLastSave = 1;
   }
@@ -274,11 +275,11 @@ void drawEditPage() {
           WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
   setButtonColors("White", "Blue", "Blue", "White", 1);
   if (button(GenUIID(0), Window43Gap * 0.78, WindowHeightInch * 0.02,
-             Window43Gap * 0.18, WindowHeightInch * 0.03, "+")) {
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "+", idEditPage)) {
     incEditCellSize();
   }
   if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.02,
-             Window43Gap * 0.18, WindowHeightInch * 0.03, "-")) {
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "-", idEditPage)) {
     decEditCellSize();
   }
 
@@ -291,7 +292,7 @@ void drawEditPage() {
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
              WindowHeightInch * 0.90, Window43Gap * 0.8,
-             WindowHeightInch * 0.04, "Select")) {
+             WindowHeightInch * 0.04, "Select", idEditPage)) {
     editMode = Targeted;
   }
 
@@ -299,7 +300,7 @@ void drawEditPage() {
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
              WindowHeightInch * 0.85, Window43Gap * 0.8,
-             WindowHeightInch * 0.04, "Event")) {
+             WindowHeightInch * 0.04, "Event", idEditPage)) {
     editMode = SetLandEvent;
   }
 
@@ -307,7 +308,7 @@ void drawEditPage() {
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
              WindowHeightInch * 0.8, Window43Gap * 0.8, WindowHeightInch * 0.04,
-             "Flip")) {
+             "Flip", idEditPage)) {
     editMode = Flip;
   }
 
@@ -315,7 +316,7 @@ void drawEditPage() {
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
              WindowHeightInch * 0.75, Window43Gap * 0.8,
-             WindowHeightInch * 0.04, "Plain")) {
+             WindowHeightInch * 0.04, "Plain", idEditPage)) {
     editMode = SetPlain;
   }
 
@@ -323,7 +324,7 @@ void drawEditPage() {
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
              WindowHeightInch * 0.7, Window43Gap * 0.8, WindowHeightInch * 0.04,
-             "Block")) {
+             "Block", idEditPage)) {
     editMode = SetBlock;
   }
 
@@ -331,7 +332,7 @@ void drawEditPage() {
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
              WindowHeightInch * 0.65, Window43Gap * 0.8,
-             WindowHeightInch * 0.04, "Starts at")) {
+             WindowHeightInch * 0.04, "Starts at", idEditPage)) {
     editMode = PlaceStart;
   }
 
@@ -339,7 +340,7 @@ void drawEditPage() {
                   "White", 1);
   if (button(GenUIID(0), Window43Right + Window43Gap * 0.1,
              WindowHeightInch * 0.6, Window43Gap * 0.8, WindowHeightInch * 0.04,
-             "Ends at")) {
+             "Ends at", idEditPage)) {
     editMode = PlaceEnd;
   }
 
@@ -351,15 +352,16 @@ void drawEditPage() {
             &editDungeon.item[editCursor.x][editCursor.y], Window43Right, 0,
             "Orange",
             editDungeon.mp[editCursor.x][editCursor.y] != Start &&
-                editDungeon.mp[editCursor.x][editCursor.y] != End)) {
+                editDungeon.mp[editCursor.x][editCursor.y] != End,
+            idEditPage)) {
       modifiedSinceLastSave = 1;
     }
   } else if (editMode == SetLandEvent) {
     drawDungeonEventEdit(&editLandEvent, &editLandItem, Window43Right, 0,
-                         "Magenta", 1);
+                         "Magenta", 1, idEditPage);
   } else {
     drawDungeonEventEdit(&editDungeon.event[mx][my], &editDungeon.item[mx][my],
-                         Window43Right, 0, "White", 0);
+                         Window43Right, 0, "White", 0, idEditPage);
   }
 
   drawToolsBar();
@@ -368,85 +370,100 @@ void drawEditPage() {
 void stopEditPage() { isDungeonOpened = 0; }
 
 void uiEditPageGetKeyboard(int key, int event) {
+  if (smStateTop()->uid != idEditPage)
+    return;
+
   controlKeyboard(key, event);
   uiGetKeyboard(key, event);
 }
 
 void uiEditPageGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid != idEditPage)
+    return;
+
   if (event != ROLL_DOWN && event != ROLL_UP) {
     editMouseX = ScaleXInches(x);
     editMouseY = ScaleYInches(y);
   }
 
-  int mx, my;
-  getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
-                  editMouseX, editMouseY, &mx, &my);
-  if (event == MOUSEMOVE) {
-    if (isMouseDownEditPage && mx >= 0 && my >= 0) {
-      if (editMode == SetPlain && editDungeon.mp[mx][my] == Block) {
-        editDungeon.mp[mx][my] = Plain;
-        modifiedSinceLastSave = 1;
-      } else if (editMode == SetBlock && editDungeon.mp[mx][my] == Plain) {
-        editDungeon.mp[mx][my] = Block;
-        modifiedSinceLastSave = 1;
-      } else if (editMode == SetLandEvent) {
-        editDungeon.event[mx][my] = editLandEvent;
-        editDungeon.item[mx][my] = editLandItem;
-        modifiedSinceLastSave = 1;
+  if (notInMenu(editMouseX, editMouseY)) {
+    int mx, my;
+    getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
+                    editMouseX, editMouseY, &mx, &my);
+    if (event == MOUSEMOVE) {
+      if (isMouseDownEditPage && mx >= 0 && my >= 0) {
+        if (editMode == SetPlain && editDungeon.mp[mx][my] == Block) {
+          editDungeon.mp[mx][my] = Plain;
+          modifiedSinceLastSave = 1;
+        } else if (editMode == SetBlock && editDungeon.mp[mx][my] == Plain) {
+          editDungeon.mp[mx][my] = Block;
+          modifiedSinceLastSave = 1;
+        } else if (editMode == SetLandEvent) {
+          editDungeon.event[mx][my] = editLandEvent;
+          editDungeon.item[mx][my] = editLandItem;
+          modifiedSinceLastSave = 1;
+        }
       }
-    }
-  } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) {
-    isMouseDownEditPage = 1;
-    if (mx >= 0 && my >= 0) {
-      if (editMode == Flip && (editDungeon.mp[mx][my] == Plain ||
-                               editDungeon.mp[mx][my] == Block)) {
-        editDungeon.mp[mx][my] =
-            editDungeon.mp[mx][my] == Plain ? Block : Plain;
-        modifiedSinceLastSave = 1;
-      } else if (editMode == SetPlain && editDungeon.mp[mx][my] == Block) {
-        editDungeon.mp[mx][my] = Plain;
-        modifiedSinceLastSave = 1;
-      } else if (editMode == SetBlock && editDungeon.mp[mx][my] == Plain) {
-        editDungeon.mp[mx][my] = Block;
-        modifiedSinceLastSave = 1;
-      } else if (editMode == PlaceStart) {
-        setDungeonStart(&editDungeon, mx, my);
-        modifiedSinceLastSave = 1;
-      } else if (editMode == PlaceEnd) {
-        setDungeonEnd(&editDungeon, mx, my);
-        modifiedSinceLastSave = 1;
-      } else if (editMode == Targeted) {
-        editCursor.x = mx;
-        editCursor.y = my;
-      } else if (editMode == SetLandEvent && editDungeon.mp[mx][my] != Start &&
-                 editDungeon.mp[mx][my] != End) {
-        editDungeon.event[mx][my] = editLandEvent;
-        editDungeon.item[mx][my] = editLandItem;
-        modifiedSinceLastSave = 1;
+    } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) {
+      isMouseDownEditPage = 1;
+      if (mx >= 0 && my >= 0) {
+        if (editMode == Flip && (editDungeon.mp[mx][my] == Plain ||
+                                 editDungeon.mp[mx][my] == Block)) {
+          editDungeon.mp[mx][my] =
+              editDungeon.mp[mx][my] == Plain ? Block : Plain;
+          modifiedSinceLastSave = 1;
+        } else if (editMode == SetPlain && editDungeon.mp[mx][my] == Block) {
+          editDungeon.mp[mx][my] = Plain;
+          modifiedSinceLastSave = 1;
+        } else if (editMode == SetBlock && editDungeon.mp[mx][my] == Plain) {
+          editDungeon.mp[mx][my] = Block;
+          modifiedSinceLastSave = 1;
+        } else if (editMode == PlaceStart) {
+          setDungeonStart(&editDungeon, mx, my);
+          modifiedSinceLastSave = 1;
+        } else if (editMode == PlaceEnd) {
+          setDungeonEnd(&editDungeon, mx, my);
+          modifiedSinceLastSave = 1;
+        } else if (editMode == Targeted) {
+          editCursor.x = mx;
+          editCursor.y = my;
+        } else if (editMode == SetLandEvent &&
+                   editDungeon.mp[mx][my] != Start &&
+                   editDungeon.mp[mx][my] != End) {
+          editDungeon.event[mx][my] = editLandEvent;
+          editDungeon.item[mx][my] = editLandItem;
+          modifiedSinceLastSave = 1;
+        }
       }
+    } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
+      if (!isJumpedEditPage && mx >= 0 && my >= 0) {
+        editCamera.x = mx;
+        editCamera.y = my;
+        isJumpedEditPage = 1;
+      }
+    } else if (event == BUTTON_UP && button == LEFT_BUTTON) {
+      isMouseDownEditPage = 0;
+    } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
+      isJumpedEditPage = 0;
+    } else if (event == ROLL_DOWN) {
+      decEditCellSize();
+    } else if (event == ROLL_UP) {
+      incEditCellSize();
     }
-  } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
-    if (!isJumpedEditPage && mx >= 0 && my >= 0) {
-      editCamera.x = mx;
-      editCamera.y = my;
-      isJumpedEditPage = 1;
-    }
-  } else if (event == BUTTON_UP && button == LEFT_BUTTON) {
-    isMouseDownEditPage = 0;
-  } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
-    isJumpedEditPage = 0;
-  } else if (event == ROLL_DOWN) {
-    decEditCellSize();
-  } else if (event == ROLL_UP) {
-    incEditCellSize();
   }
 
   uiGetMouse(x, y, button, event);
 }
 
-AppState EditPage = {idEditPage,        initEditPage,          drawEditPage,
-                     stopEditPage,      uiEditPageGetKeyboard, uiGetChar,
-                     uiEditPageGetMouse};
+void uiEditPageGetChar(int ch) {
+  if (smStateTop()->uid == idEditPage)
+    uiGetChar(ch);
+}
+
+AppState EditPage = {
+    idEditPage,        initEditPage,          drawEditPage,
+    stopEditPage,      uiEditPageGetKeyboard, uiEditPageGetChar,
+    uiEditPageGetMouse};
 
 void gotoEditPage() {
   editHasReadDungeon = 0;
@@ -474,12 +491,12 @@ void drawSaveAsPage() {
             length, h, 0, fileNotExistAlert, 'C', "Red");
   }
   if (button(GenUIID(0), 1.5 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "Cancel")) {
+             0.15 * WindowWidthInch / 3, h, "Cancel", idSaveAsPage)) {
     smPopState();
   }
 
   if (button(GenUIID(1), 1.7 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "Confirm")) {
+             0.15 * WindowWidthInch / 3, h, "Confirm", idSaveAsPage)) {
     FILE *file = fopen(dialogFileName, "w");
     if (file == NULL) {
       isSaveAsPageFileExist = 0;
@@ -495,7 +512,27 @@ void drawSaveAsPage() {
   }
 }
 
-AppState SaveAsPage = {idSaveAsPage,  initSaveAsPage, drawSaveAsPage, NULL,
-                       uiGetKeyboard, uiGetChar,      uiGetMouse};
+void uiSaveAsPageGetKeyboard(int key, int event) {
+  if (smStateTop()->uid == idSaveAsPage)
+    uiGetKeyboard(key, event);
+}
+
+void uiSaveAsPageGetChar(int ch) {
+  if (smStateTop()->uid == idSaveAsPage)
+    uiGetChar(ch);
+}
+
+void uiSaveAsPageGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idSaveAsPage)
+    uiGetMouse(x, y, button, event);
+}
+
+AppState SaveAsPage = {idSaveAsPage,
+                       initSaveAsPage,
+                       drawSaveAsPage,
+                       NULL,
+                       uiSaveAsPageGetKeyboard,
+                       uiSaveAsPageGetChar,
+                       uiSaveAsPageGetMouse};
 
 void gotoSaveAsPage() { smPushState(&SaveAsPage); }

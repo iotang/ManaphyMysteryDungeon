@@ -12,7 +12,7 @@
 #define ItemBagLastPage (-2)
 #define ItemBagNextPage (-3)
 
-int drawItemBag(ItemBag *itemBag, double basex, double basey) {
+int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
   sortItemBag(itemBag);
 
   int _pointSize = GetPointSize();
@@ -29,7 +29,7 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey) {
   setButtonColors("White", "Blue", "Cyan", "Blue", 1);
   if (button(GenUIID(0), basex + Window43Gap * 0.05,
              basey + WindowHeightInch * 0.46, Window43Gap * 0.22,
-             WindowHeightInch * 0.03, "<")) {
+             WindowHeightInch * 0.03, "<", belong)) {
     itemBag->currentPage--;
   }
 
@@ -42,7 +42,7 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey) {
 
   if (button(GenUIID(0), basex + Window43Gap * 0.73,
              basey + WindowHeightInch * 0.46, Window43Gap * 0.22,
-             WindowHeightInch * 0.03, ">")) {
+             WindowHeightInch * 0.03, ">", belong)) {
     itemBag->currentPage++;
   }
 
@@ -72,7 +72,7 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey) {
 
     if (button(GenUIID(0), basex + Window43Gap * 0.05,
                baseHeight + WindowHeightInch * 0.003, Window43Gap * 0.9,
-               height - WindowHeightInch * 0.006, NULL)) {
+               height - WindowHeightInch * 0.006, NULL, belong)) {
       ret = num;
     }
 

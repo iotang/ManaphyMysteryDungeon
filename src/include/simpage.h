@@ -23,6 +23,8 @@
 
 #include "globalvalue.h"
 
+#define BaseSimulateSpeed (20000.00)
+
 Dungeon simDungeon;
 DungeonSolution simHistory;
 char simDungeonFileName[MaxFileNameLength + 1];
@@ -213,7 +215,7 @@ void initSimPage() {
 }
 
 void startAutoSimulating() {
-  startTimer(AutoRun, 20000.00 / simulateSpeed);
+  startTimer(AutoRun, BaseSimulateSpeed / simulateSpeed);
   isAutoSimulating = 1;
 }
 
@@ -226,7 +228,7 @@ void setSimulateSpeed(int speed) {
   if (speed != simulateSpeed) {
     if (isAutoSimulating) {
       cancelTimer(AutoRun);
-      startTimer(AutoRun, 20000.00 / speed);
+      startTimer(AutoRun, BaseSimulateSpeed / speed);
     }
     simulateSpeed = speed;
   }
@@ -269,7 +271,7 @@ void drawSimPage() {
 
   drawHelpList(0, WindowHeightInch * 0.9);
 
-  drawStatusBar(&cresselia, 0, WindowHeightInch * 0.01);
+  drawStatusBar(&cresselia, 0, WindowHeightInch * 0.01, idSimPage);
 
   char __buf[99];
   drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.42,
@@ -283,19 +285,19 @@ void drawSimPage() {
   setButtonColors("White", "Blue", "Blue", "White", 1);
   int nextSimulateSpeed = simulateSpeed;
   if (button(GenUIID(0), Window43Gap * 0.70, WindowHeightInch * 0.39,
-             Window43Gap * 0.1, WindowHeightInch * 0.03, "+")) {
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "+", idSimPage)) {
     nextSimulateSpeed += 10;
   }
   if (button(GenUIID(0), Window43Gap * 0.84, WindowHeightInch * 0.39,
-             Window43Gap * 0.11, WindowHeightInch * 0.03, "++")) {
+             Window43Gap * 0.11, WindowHeightInch * 0.03, "++", idSimPage)) {
     nextSimulateSpeed += 100;
   }
   if (button(GenUIID(0), Window43Gap * 0.20, WindowHeightInch * 0.39,
-             Window43Gap * 0.1, WindowHeightInch * 0.03, "-")) {
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "-", idSimPage)) {
     nextSimulateSpeed -= 10;
   }
   if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.39,
-             Window43Gap * 0.11, WindowHeightInch * 0.03, "--")) {
+             Window43Gap * 0.11, WindowHeightInch * 0.03, "--", idSimPage)) {
     nextSimulateSpeed -= 100;
   }
   if (nextSimulateSpeed < 20)
@@ -308,7 +310,8 @@ void drawSimPage() {
   setButtonColors(isAutoSimulating ? "Magenta" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.35,
-             Window43Gap * 0.9, WindowHeightInch * 0.03, "Auto Run")) {
+             Window43Gap * 0.9, WindowHeightInch * 0.03, "Auto Run",
+             idSimPage)) {
     if (isAutoSimulating) {
       endAutoSimulating();
     } else {
@@ -318,7 +321,8 @@ void drawSimPage() {
 
   setButtonColors("White", "Blue", "Blue", "White", 1);
   if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.31,
-             Window43Gap * 0.9, WindowHeightInch * 0.03, "Single Step")) {
+             Window43Gap * 0.9, WindowHeightInch * 0.03, "Single Step",
+             idSimPage)) {
     if (!isAutoSimulating) {
       cresseliaMove();
     }
@@ -327,7 +331,8 @@ void drawSimPage() {
   setButtonColors(isCameraFollowCresselia ? "Magenta" : "White", "Blue", "Blue",
                   "White", 1);
   if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.27,
-             Window43Gap * 0.9, WindowHeightInch * 0.03, "Lock Camera")) {
+             Window43Gap * 0.9, WindowHeightInch * 0.03, "Lock Camera",
+             idSimPage)) {
     isCameraFollowCresselia = !isCameraFollowCresselia;
   }
 
@@ -336,8 +341,9 @@ void drawSimPage() {
   SetPenColor("Light Yellow");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
 
-  drawItemBag(&cresseliaItemBag, Window43Right, WindowHeightInch * 0.5);
-  drawMoveList(&cresselia, Window43Right, 0);
+  drawItemBag(&cresseliaItemBag, Window43Right, WindowHeightInch * 0.5,
+              idSimPage);
+  drawMoveList(&cresselia, Window43Right, 0, idSimPage);
 
   // hint dialog
 
@@ -347,32 +353,37 @@ void drawSimPage() {
 }
 
 void uiSimPageGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid != idSimPage)
+    return;
+
   if (event != ROLL_DOWN && event != ROLL_UP) {
     simMouseX = ScaleXInches(x);
     simMouseY = ScaleYInches(y);
   }
 
-  int mx, my;
-  getCellLocation(&simDungeon, simCamera.x, simCamera.y, simCellSize, simMouseX,
-                  simMouseY, &mx, &my);
-  if (event == MOUSEMOVE) {
-  } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) {
-    isMouseDownSimPage = 1;
-  } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
-    if (!isJumpedSimPage && mx >= 0 && my >= 0) {
-      simCamera.x = mx;
-      simCamera.y = my;
-      isJumpedSimPage = 1;
-      isCameraFollowCresselia = 0;
+  if (notInMenu(simMouseX, simMouseY)) {
+    int mx, my;
+    getCellLocation(&simDungeon, simCamera.x, simCamera.y, simCellSize,
+                    simMouseX, simMouseY, &mx, &my);
+    if (event == MOUSEMOVE) {
+    } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) {
+      isMouseDownSimPage = 1;
+    } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
+      if (!isJumpedSimPage && mx >= 0 && my >= 0) {
+        simCamera.x = mx;
+        simCamera.y = my;
+        isJumpedSimPage = 1;
+        isCameraFollowCresselia = 0;
+      }
+    } else if (event == BUTTON_UP && button == LEFT_BUTTON) {
+      isMouseDownSimPage = 0;
+    } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
+      isJumpedSimPage = 0;
+    } else if (event == ROLL_DOWN) {
+      decSimCellSize();
+    } else if (event == ROLL_UP) {
+      incSimCellSize();
     }
-  } else if (event == BUTTON_UP && button == LEFT_BUTTON) {
-    isMouseDownSimPage = 0;
-  } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
-    isJumpedSimPage = 0;
-  } else if (event == ROLL_DOWN) {
-    decSimCellSize();
-  } else if (event == ROLL_UP) {
-    incSimCellSize();
   }
 
   uiGetMouse(x, y, button, event);
@@ -383,9 +394,14 @@ void uiSimPageGetKeyboard(int key, int event) {
   uiGetKeyboard(key, event);
 }
 
+void uiSimPageGetChar(int ch) {
+  if (smStateTop()->uid == idSimPage)
+    uiGetChar(ch);
+}
+
 AppState SimPage = {
-    idSimPage, initSimPage,      drawSimPage, NULL, uiSimPageGetKeyboard,
-    uiGetChar, uiSimPageGetMouse};
+    idSimPage,        initSimPage,      drawSimPage, NULL, uiSimPageGetKeyboard,
+    uiSimPageGetChar, uiSimPageGetMouse};
 
 void gotoSimPage() {
   simHasReadDungeon = 0;

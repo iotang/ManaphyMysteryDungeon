@@ -45,14 +45,34 @@ void drawAboutPage() {
 
   if (button(GenUIID(0), Window43Left + Window43Width * 0.4,
              WindowHeightInch * 0.2, Window43Width * 0.2,
-             WindowHeightInch * 0.05, "OK")) {
+             WindowHeightInch * 0.05, "OK", idAboutPage)) {
     smPopState();
   }
 
   SetPointSize(_pointSize);
 }
 
-AppState AboutPage = {idAboutPage,   NULL,      drawAboutPage, NULL,
-                      uiGetKeyboard, uiGetChar, uiGetMouse};
+void uiAboutPageGetKeyboard(int key, int event) {
+  if (smStateTop()->uid == idAboutPage)
+    uiGetKeyboard(key, event);
+}
+
+void uiAboutPageGetChar(int ch) {
+  if (smStateTop()->uid == idAboutPage)
+    uiGetChar(ch);
+}
+
+void uiAboutPageGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idAboutPage)
+    uiGetMouse(x, y, button, event);
+}
+
+AppState AboutPage = {idAboutPage,
+                      NULL,
+                      drawAboutPage,
+                      NULL,
+                      uiAboutPageGetKeyboard,
+                      uiAboutPageGetChar,
+                      uiAboutPageGetMouse};
 
 void gotoAboutPage() { smPushState(&AboutPage); }

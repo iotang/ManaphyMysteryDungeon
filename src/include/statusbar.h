@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "pokemon.h"
 
-void drawStatusBar(Pokemon *pokemon, double basex, double basey) {
+void drawStatusBar(Pokemon *pokemon, double basex, double basey, int belong) {
   SetPenColor("Black");
 
   double expRatio = 0.01 * pokemon->exp;
@@ -104,7 +104,7 @@ void drawStatusBar(Pokemon *pokemon, double basex, double basey) {
   SetPointSize(_pointSize);
 }
 
-int drawMoveList(Pokemon *pokemon, double basex, double basey) {
+int drawMoveList(Pokemon *pokemon, double basex, double basey, int belong) {
   SetPenColor("White");
   drawRectangle(basex + Window43Gap * 0.03, basey + WindowHeightInch * 0.005,
                 Window43Gap * 0.94, WindowHeightInch * 0.49, 1);
@@ -116,7 +116,7 @@ int drawMoveList(Pokemon *pokemon, double basex, double basey) {
 
     setButtonColors("White", "Blue", "Cyan", "Blue", 1);
     if (button(GenUIID(i), basex + Window43Gap * 0.05, baseHeight,
-               Window43Gap * 0.9, WindowHeightInch * 0.08, NULL)) {
+               Window43Gap * 0.9, WindowHeightInch * 0.08, NULL, belong)) {
       ret = i;
     }
 

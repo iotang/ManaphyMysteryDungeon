@@ -21,12 +21,14 @@ void setAlertDialog2(char *argv0, char *argv1) {
   alertArgv[0] = argv0;
   alertArgv[1] = argv1;
 }
+
 void setAlertDialog3(char *argv0, char *argv1, char *argv2) {
   alertArgc = 3;
   alertArgv[0] = argv0;
   alertArgv[1] = argv1;
   alertArgv[2] = argv2;
 }
+
 void setAlertDialog4(char *argv0, char *argv1, char *argv2, char *argv3) {
   alertArgc = 4;
   alertArgv[0] = argv0;
@@ -36,11 +38,15 @@ void setAlertDialog4(char *argv0, char *argv1, char *argv2, char *argv3) {
 }
 
 void drawAlertDialog() {
-  SetPenColor("Red");
+  smLastProc();
+
   double xlen = WindowWidthInch / 3;
   double ylen = WindowHeightInch / 3;
   double xstart = (WindowWidthInch - xlen) / 2;
   double ystart = (WindowHeightInch - ylen) / 2;
+  SetPenColor("White");
+  drawRectangle(xstart, ystart, xlen, ylen, 1);
+  SetPenColor("Red");
   drawRectangle(xstart, ystart, xlen, ylen, 0);
 
   double fontHeight = GetFontHeight();
@@ -53,12 +59,17 @@ void drawAlertDialog() {
   }
 
   if (button(GenUIID(0), 1.7 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "OK")) {
+             0.15 * WindowWidthInch / 3, h, "OK", idAlertDialog)) {
     smPopState();
   }
 }
 
-AppState AlertDialog = {idAlertDialog, NULL, drawAlertDialog, NULL,
-                        NULL,          NULL, uiGetMouse};
+void uiAlertDialogGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idAlertDialog)
+    uiGetMouse(x, y, button, event);
+}
+
+AppState AlertDialog = {idAlertDialog, NULL, drawAlertDialog,      NULL,
+                        NULL,          NULL, uiAlertDialogGetMouse};
 
 void gotoAlertDialog() { smPushState(&AlertDialog); }

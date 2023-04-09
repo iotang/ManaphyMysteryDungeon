@@ -21,15 +21,24 @@
 
 #include "globalvalue.h"
 
-int confirmedForceExit;
+void gotoNewPage();
+
+void gotoOpenPage();
+
+void callingExitWarning(voidFn nex) {
+  if (modifiedSinceLastSave) {
+    setConfirmDialog3(nex, "Warning", "Are you sure to exit?",
+                      "All unsaved changes will be lost!");
+    gotoConfirmDialog();
+  } else {
+    if (nex != NULL)
+      nex();
+  }
+}
+
+void smPopStateUntilMainMenu() { smPopStateUntil(idMainMenu); }
 
 void drawToolsBar() {
-  if (confirmedForceExit == 1) {
-    smPopStateUntil(idMainMenu);
-    confirmedForceExit = 0;
-    return;
-  }
-
   SetPointSize(16);
   double fontHeight = GetFontHeight();
   double x = 0, y = WindowHeightInch;
@@ -47,9 +56,9 @@ void drawToolsBar() {
                                  (isDungeonOpened ? 0 : 4));
 
     if (selection == 1) {
-      gotoNewPage();
+      callingExitWarning(gotoNewPage);
     } else if (selection == 2) {
-      gotoOpenPage();
+      callingExitWarning(gotoOpenPage);
     } else if (selection == 3) {
       if (saveDungeonEditPage() < 0) {
         setAlertDialog2("Error!", "Save failed");
@@ -61,14 +70,7 @@ void drawToolsBar() {
       randomizeDungeon(&editDungeon);
       modifiedSinceLastSave = 1;
     } else if (selection == 6) {
-      if (modifiedSinceLastSave) {
-        setConfirmDialog3(&confirmedForceExit, "Warning",
-                          "Are you sure to exit?",
-                          "All unsaved changes will be lost!");
-        gotoConfirmDialog();
-      } else {
-        smPopStateUntil(idMainMenu);
-      }
+      callingExitWarning(smPopStateUntilMainMenu);
     }
     x += w;
   } else if (smStateTop()->uid == idExplorer ||
@@ -208,6 +210,7 @@ void initOpenPage() {
 }
 
 void drawOpenPage() {
+  smLastProc();
   drawGetFileNameDialog();
 
   double fontHeight = GetFontHeight();
@@ -220,17 +223,19 @@ void drawOpenPage() {
             length, h, 0, fileNotExistAlert, 'C', "Red");
   }
   if (button(GenUIID(0), 1.5 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "Cancel")) {
+             0.15 * WindowWidthInch / 3, h, "Cancel", idOpenPage)) {
     smPopState();
   }
 
   if (button(GenUIID(1), 1.7 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "Confirm")) {
+             0.15 * WindowWidthInch / 3, h, "Confirm", idOpenPage)) {
     FILE *file = fopen(dialogFileName, "r");
     if (file == NULL) {
       isOpenPageFileExist = 0;
     } else {
       smPopState();
+      while (!smIsStateEmpty() && smStateTop()->uid == idEditPage)
+        smPopState();
       loadDungeon(&currentDungeon, file);
       sortDungeon(&currentDungeon);
       strcpy(editDungeonFileName, dialogFileName);
@@ -243,18 +248,19 @@ void drawOpenPage() {
 void initNewPage() { initGetFileNameDialog("dungeon.dun"); }
 
 void drawNewPage() {
+  smLastProc();
   drawGetFileNameDialog();
 
   double fontHeight = GetFontHeight();
   double h = fontHeight * 1.5;
 
   if (button(GenUIID(0), 1.5 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "Cancel")) {
+             0.15 * WindowWidthInch / 3, h, "Cancel", idNewPage)) {
     smPopState();
   }
 
   if (button(GenUIID(1), 1.7 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "Confirm")) {
+             0.15 * WindowWidthInch / 3, h, "Confirm", idNewPage)) {
     FILE *file = fopen(dialogFileName, "r");
     if (file == NULL) {
       setDefaultDungeon(&currentDungeon);
@@ -265,19 +271,77 @@ void drawNewPage() {
       modifiedSinceLastSave = 0;
     }
     smPopState();
+    while (!smIsStateEmpty() && smStateTop()->uid == idEditPage)
+      smPopState();
     strcpy(editDungeonFileName, dialogFileName);
     gotoEditPage();
   }
 }
 
-AppState MainMenu = {idMainMenu,    NULL,      drawMainMenu, NULL,
-                     uiGetKeyboard, uiGetChar, uiGetMouse};
+void uiMainMenuGetKeyboard(int key, int event) {
+  if (smStateTop()->uid == idMainMenu)
+    uiGetKeyboard(key, event);
+}
 
-AppState NewPage = {idNewPage,     initNewPage, drawNewPage, NULL,
-                    uiGetKeyboard, uiGetChar,   uiGetMouse};
+void uiMainMenuGetChar(int ch) {
+  if (smStateTop()->uid == idMainMenu)
+    uiGetChar(ch);
+}
 
-AppState OpenPage = {idOpenPage,    initOpenPage, drawOpenPage, NULL,
-                     uiGetKeyboard, uiGetChar,    uiGetMouse};
+void uiMainMenuGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idMainMenu)
+    uiGetMouse(x, y, button, event);
+}
+
+void uiNewPageGetKeyboard(int key, int event) {
+  if (smStateTop()->uid == idNewPage)
+    uiGetKeyboard(key, event);
+}
+
+void uiNewPageGetChar(int ch) {
+  if (smStateTop()->uid == idNewPage)
+    uiGetChar(ch);
+}
+
+void uiNewPageGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idNewPage)
+    uiGetMouse(x, y, button, event);
+}
+
+void uiOpenPageGetKeyboard(int key, int event) {
+  if (smStateTop()->uid == idOpenPage)
+    uiGetKeyboard(key, event);
+}
+
+void uiOpenPageGetChar(int ch) {
+  if (smStateTop()->uid == idOpenPage)
+    uiGetChar(ch);
+}
+
+void uiOpenPageGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idOpenPage)
+    uiGetMouse(x, y, button, event);
+}
+
+AppState MainMenu = {idMainMenu,
+                     NULL,
+                     drawMainMenu,
+                     NULL,
+                     uiMainMenuGetKeyboard,
+                     uiMainMenuGetChar,
+                     uiMainMenuGetMouse};
+
+AppState NewPage = {
+    idNewPage,        initNewPage,      drawNewPage, NULL, uiNewPageGetKeyboard,
+    uiNewPageGetChar, uiNewPageGetMouse};
+
+AppState OpenPage = {idOpenPage,
+                     initOpenPage,
+                     drawOpenPage,
+                     NULL,
+                     uiOpenPageGetKeyboard,
+                     uiOpenPageGetChar,
+                     uiOpenPageGetMouse};
 
 void gotoNewPage() { smPushState(&NewPage); }
 

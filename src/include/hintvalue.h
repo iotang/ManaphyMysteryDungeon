@@ -22,7 +22,7 @@ void setHint(char *s) {
 }
 
 void emplaceHint(char *s) {
-  static char _hintString[MaxHintLength];
+  static char _hintString[MaxHintLength - 1];
   strcpy(_hintString, hintString);
   sprintf(hintString, "%s\n%s", _hintString, s);
   cancelTimer(HintExpire);

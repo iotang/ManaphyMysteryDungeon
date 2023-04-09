@@ -28,7 +28,7 @@
 //
 // Generate a *fake* unique ID for gui controls at compiling/run time
 //
-#define GenUIID(N) (((__LINE__ << 16) | (N & 0xFFFF)) ^ ((long)&__FILE__))
+#define GenUIID(N) (((__LINE__ << 16) | (N & 0xFFFF)) ^ ((long long)&__FILE__))
 //
 // GenUIID(0) will give a unique ID at each source code line.
 // If you need one UI ID per line, just call GenUIID with 0
@@ -82,6 +82,8 @@ void uiGetMouse(int x, int y, int button, int event);
 void uiGetKeyboard(int key, int event);
 void uiGetChar(int ch);
 
+bool notInMenu(double x, double y);
+
 /*
  * 函数名：button
  *
@@ -100,7 +102,8 @@ void uiGetChar(int ch);
  *   0 - 用户没有点击（按下并释放）按钮
  *   1 - 点击了按钮
  */
-int button(int id, double x, double y, double w, double h, char *label);
+int button(int id, double x, double y, double w, double h, char *label,
+           int belong);
 
 /*
  * 函数名：menuList

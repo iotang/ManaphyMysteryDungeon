@@ -290,18 +290,18 @@ void drawExplorer() {
 
   drawHelpList(0, WindowHeightInch * 0.9);
 
-  drawStatusBar(&manaphy, 0, WindowHeightInch * 0.01);
+  drawStatusBar(&manaphy, 0, WindowHeightInch * 0.01, idExplorer);
 
   // tools bar
   SetPenColor("Light Pink");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
 
-  int useItem =
-      drawItemBag(&manaphyItemBag, Window43Right, WindowHeightInch * 0.5);
+  int useItem = drawItemBag(&manaphyItemBag, Window43Right,
+                            WindowHeightInch * 0.5, idExplorer);
   if (useItem >= 0) {
     manaphyMove(makeUseItemAttempt(useItem));
   }
-  int useMove = drawMoveList(&manaphy, Window43Right, 0);
+  int useMove = drawMoveList(&manaphy, Window43Right, 0, idExplorer);
   if (useMove >= 0) {
     manaphyMove(makeUseMoveAttempt(useMove));
   }
@@ -320,9 +320,20 @@ void uiExplorerGetKeyboard(int key, int event) {
   uiGetKeyboard(key, event);
 }
 
-AppState Explorer = {idExplorer,   initExplorer,          drawExplorer,
-                     stopExplorer, uiExplorerGetKeyboard, uiGetChar,
-                     uiGetMouse};
+void uiExplorerGetChar(int ch) {
+  if (smStateTop()->uid == idExplorer)
+    uiGetChar(ch);
+}
+
+void uiExplorerGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idExplorer)
+    uiGetMouse(x, y, button, event);
+}
+
+AppState Explorer = {
+    idExplorer,        initExplorer,          drawExplorer,
+    stopExplorer,      uiExplorerGetKeyboard, uiExplorerGetChar,
+    uiExplorerGetMouse};
 
 void gotoExplorer() {
   expHasReadDungeon = 0;

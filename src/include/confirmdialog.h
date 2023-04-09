@@ -10,34 +10,30 @@
 
 int confirmArgc;
 char *confirmArgv[99];
-int *confirmed;
+voidFn confirmed;
 
-void setConfirmDialog1(int *value, char *argv0) {
+void setConfirmDialog1(voidFn value, char *argv0) {
   confirmed = value;
-  *confirmed = -1;
   confirmArgc = 1;
   confirmArgv[0] = argv0;
 }
 
-void setConfirmDialog2(int *value, char *argv0, char *argv1) {
+void setConfirmDialog2(voidFn value, char *argv0, char *argv1) {
   confirmed = value;
-  *confirmed = -1;
   confirmArgc = 2;
   confirmArgv[0] = argv0;
   confirmArgv[1] = argv1;
 }
-void setConfirmDialog3(int *value, char *argv0, char *argv1, char *argv2) {
+void setConfirmDialog3(voidFn value, char *argv0, char *argv1, char *argv2) {
   confirmed = value;
-  *confirmed = -1;
   confirmArgc = 3;
   confirmArgv[0] = argv0;
   confirmArgv[1] = argv1;
   confirmArgv[2] = argv2;
 }
-void setConfirmDialog4(int *value, char *argv0, char *argv1, char *argv2,
+void setConfirmDialog4(voidFn value, char *argv0, char *argv1, char *argv2,
                        char *argv3) {
   confirmed = value;
-  *confirmed = -1;
   confirmArgc = 4;
   confirmArgv[0] = argv0;
   confirmArgv[1] = argv1;
@@ -46,11 +42,15 @@ void setConfirmDialog4(int *value, char *argv0, char *argv1, char *argv2,
 }
 
 void drawConfirmDialog() {
-  SetPenColor("Red");
+  smLastProc();
+
   double xlen = WindowWidthInch / 3;
   double ylen = WindowHeightInch / 3;
   double xstart = (WindowWidthInch - xlen) / 2;
   double ystart = (WindowHeightInch - ylen) / 2;
+  SetPenColor("White");
+  drawRectangle(xstart, ystart, xlen, ylen, 1);
+  SetPenColor("Red");
   drawRectangle(xstart, ystart, xlen, ylen, 0);
 
   double fontHeight = GetFontHeight();
@@ -63,19 +63,25 @@ void drawConfirmDialog() {
   }
 
   if (button(GenUIID(0), 1.4 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "No")) {
-    *confirmed = 0;
+             0.15 * WindowWidthInch / 3, h, "No", idConfirmDialog)) {
     smPopState();
   }
 
   if (button(GenUIID(0), 1.7 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
-             0.15 * WindowWidthInch / 3, h, "Yes")) {
-    *confirmed = 1;
+             0.15 * WindowWidthInch / 3, h, "Yes", idConfirmDialog)) {
     smPopState();
+    if (confirmed != NULL)
+      confirmed();
   }
 }
 
+void uiConfirmDialogGetMouse(int x, int y, int button, int event) {
+  if (smStateTop()->uid == idConfirmDialog)
+    uiGetMouse(x, y, button, event);
+}
+
 AppState ConfirmDialog = {
-    idConfirmDialog, NULL, drawConfirmDialog, NULL, NULL, NULL, uiGetMouse};
+    idConfirmDialog,        NULL, drawConfirmDialog, NULL, NULL, NULL,
+    uiConfirmDialogGetMouse};
 
 void gotoConfirmDialog() { smPushState(&ConfirmDialog); }

@@ -16,11 +16,13 @@ void initGetFileNameDialog(char *name) {
 }
 
 int drawGetFileNameDialog() {
-  SetPenColor("Blue");
   double xlen = WindowWidthInch / 3;
   double ylen = WindowHeightInch / 3;
   double xstart = (WindowWidthInch - xlen) / 2;
   double ystart = (WindowHeightInch - ylen) / 2;
+  SetPenColor("White");
+  drawRectangle(xstart, ystart, xlen, ylen, 1);
+  SetPenColor("Blue");
   drawRectangle(xstart, ystart, xlen, ylen, 0);
 
   SetPointSize(16);
