@@ -103,7 +103,7 @@ char solveVisited[SolveStateCount];
 int solveFrom[SolveStateCount];
 
 void makeDijkstra(Dungeon *dungeon, int sid, int tid, int allKey,
-                  lint hpPenalty) {
+                  lint hpPenalty, lint limit) {
   memset(solveDis, 0x3f, sizeof(solveDis));
   memset(solveVisited, 0, sizeof(solveVisited));
   memset(solveFrom, 0x3f, sizeof(solveFrom));
@@ -163,6 +163,8 @@ void makeDijkstra(Dungeon *dungeon, int sid, int tid, int allKey,
 
         if (solveDis[da] <= dis)
           continue;
+        if (dis > limit)
+          continue;
 
         solveDis[da] = dis;
         solveFrom[da] = a;
@@ -175,7 +177,8 @@ void makeDijkstra(Dungeon *dungeon, int sid, int tid, int allKey,
   }
 }
 
-int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
+int getDungeonSolutionWithLimit(Dungeon *dungeon, DungeonSolution *solution,
+                                lint limit, lint hpPenalty) {
   if (!isDungeonValid(dungeon))
     return -1;
 
@@ -202,12 +205,12 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   getDungeonEnd(dungeon, &tx, &ty);
   int sid = xy2a(sx, sy, h, 0, allKey);
   int tid = xy2a(tx, ty, h, 0, allKey);
-  makeDijkstra(dungeon, sid, tid, allKey, DefaultHPPenalty);
+  makeDijkstra(dungeon, sid, tid, allKey, hpPenalty, limit);
 
   for (int i = 0; i < w; i++) {
     for (int j = 0; j < h; j++) {
       for (int stat = 0; stat < (1 << allKey); stat++) {
-        solution->mp[i][j] = solveDis[xy2a(i, j, h, stat, allKey)] < linf;
+        solution->mp[i][j] = solveDis[xy2a(i, j, h, stat, allKey)] <= limit;
         if (solution->mp[i][j])
           break;
       }
@@ -243,6 +246,11 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
   return solution->routeValid;
 }
 
+int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
+  return getDungeonSolutionWithLimit(dungeon, solution, linf - 1,
+                                     DefaultHPPenalty);
+}
+
 lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
                         int ty, lint hpPenalty, int enableKey) {
   if (!isInDungeon(dungeon, sx, sy) || !isInDungeon(dungeon, tx, ty))
@@ -274,7 +282,7 @@ lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
 
   int sid = xy2a(sx, sy, dungeon->height, skey, allKey);
   int tid = xy2a(tx, ty, dungeon->height, 0, allKey);
-  makeDijkstra(dungeon, sid, tid, allKey, hpPenalty);
+  makeDijkstra(dungeon, sid, tid, allKey, hpPenalty, linf - 1);
 
   lint minDistan = linf;
   for (int stat = 0; stat < (1 << allKey); stat++) {

@@ -94,9 +94,10 @@ void drawToolsBar() {
   if (isDungeonOpened) {
     if (smStateTop()->uid == idEditPage) {
       static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run",
-                                    "Find Solution"};
+                                    "Limited Solution | Ctrl-Q",
+                                    "Find Solution | Ctrl-F"};
       double w = TextStringWidth(menuListRun[0]) * 1.5;
-      double wlist = TextStringWidth(menuListRun[1]) + 0.2;
+      double wlist = TextStringWidth(menuListRun[3]) + 0.2;
 
       int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListRun,
                                sizeof(menuListRun) / sizeof(menuListRun[0]));
@@ -118,6 +119,8 @@ void drawToolsBar() {
           gotoSimPage();
         }
       } else if (selection == 3) {
+        editGetSolutionWithLimit();
+      } else if (selection == 4) {
         editGetSolution();
       }
 

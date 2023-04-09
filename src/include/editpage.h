@@ -25,6 +25,8 @@ char editDungeonFileName[MaxFileNameLength + 1];
 
 int editHasSolution;
 DungeonSolution editDungeonSolution;
+lint editDungeonSolutionLimit;
+lint editDungeonSolutionHPPenalty;
 
 double editCellSize;
 Pokemon editCamera, editCursor;
@@ -131,6 +133,8 @@ void initEditPage() {
 
     editEventOverrideItem = 1;
     editEventOverrideLandEvent = 1;
+    editDungeonSolutionLimit = 1;
+    editDungeonSolutionHPPenalty = 0;
   }
 
   clearHelpList();
@@ -166,6 +170,23 @@ void editGetSolution() {
   } else {
     editHasSolution = 1;
   }
+}
+
+void editGetSolutionWithLimit() {
+  if (saveDungeonEditPage() < 0) {
+    setAlertDialog2("Error!", "Save failed");
+    gotoAlertDialog();
+    return;
+  }
+
+  int ret = getDungeonSolutionWithLimit(&editDungeon, &editDungeonSolution,
+                                        editDungeonSolutionLimit,
+                                        editDungeonSolutionHPPenalty);
+  if (ret < 0) {
+    setAlertDialog2("Error!", "Dungeon is invalid");
+    gotoAlertDialog();
+  }
+  editHasSolution = 1;
 }
 
 void drawEditPage() {
@@ -210,9 +231,103 @@ void drawEditPage() {
 
   drawHelpList(0, WindowHeightInch * 0.9);
 
+  char __buf[99];
+
+  sprintf(__buf, "%lld", editDungeonSolutionLimit);
+  drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.70,
+                       Window43Gap * 0.92, WindowHeightInch * 0.03, 1,
+                       "Solution Step", 'C', "Black");
+  SetPenColor("White");
+  drawBox(Window43Gap * 0.04, WindowHeightInch * 0.66, Window43Gap * 0.92,
+          WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
+  setButtonColors("White", "Blue", "Blue", "White", 1);
+  if (button(GenUIID(0), Window43Gap * 0.64, WindowHeightInch * 0.62,
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "+", idEditPage)) {
+    editDungeonSolutionLimit++;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.78, WindowHeightInch * 0.62,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "+10", idEditPage)) {
+    editDungeonSolutionLimit += 10;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.26, WindowHeightInch * 0.62,
+             Window43Gap * 0.1, WindowHeightInch * 0.03, "-", idEditPage)) {
+    editDungeonSolutionLimit--;
+    if (editDungeonSolutionLimit < 1)
+      editDungeonSolutionLimit = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.62,
+             Window43Gap * 0.18, WindowHeightInch * 0.03, "-10", idEditPage)) {
+    editDungeonSolutionLimit -= 10;
+    if (editDungeonSolutionLimit < 1)
+      editDungeonSolutionLimit = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.505, WindowHeightInch * 0.58,
+             Window43Gap * 0.195, WindowHeightInch * 0.03, "+100",
+             idEditPage)) {
+    editDungeonSolutionLimit += 100;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.71, WindowHeightInch * 0.58,
+             Window43Gap * 0.25, WindowHeightInch * 0.03, "+1000",
+             idEditPage)) {
+    editDungeonSolutionLimit += 1000;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.30, WindowHeightInch * 0.58,
+             Window43Gap * 0.195, WindowHeightInch * 0.03, "-100",
+             idEditPage)) {
+    editDungeonSolutionLimit -= 100;
+    if (editDungeonSolutionLimit < 0)
+      editDungeonSolutionLimit = 0;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.58,
+             Window43Gap * 0.25, WindowHeightInch * 0.03, "-1000",
+             idEditPage)) {
+    editDungeonSolutionLimit -= 1000;
+    if (editDungeonSolutionLimit < 0)
+      editDungeonSolutionLimit = 0;
+  }
+
+  sprintf(__buf, "%lld", editDungeonSolutionHPPenalty);
+  drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.54,
+                       Window43Gap * 0.92, WindowHeightInch * 0.03, 1,
+                       "HP Penalty", 'C', "Black");
+  SetPenColor("White");
+  drawBox(Window43Gap * 0.04, WindowHeightInch * 0.50, Window43Gap * 0.92,
+          WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
+  setButtonColors("White", "Blue", "Blue", "White", 1);
+  if (button(GenUIID(0), Window43Gap * 0.505, WindowHeightInch * 0.46,
+             Window43Gap * 0.195, WindowHeightInch * 0.03, "+10", idEditPage)) {
+    editDungeonSolutionHPPenalty += 10;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.71, WindowHeightInch * 0.46,
+             Window43Gap * 0.25, WindowHeightInch * 0.03, "+100", idEditPage)) {
+    editDungeonSolutionHPPenalty += 100;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.30, WindowHeightInch * 0.46,
+             Window43Gap * 0.195, WindowHeightInch * 0.03, "-10", idEditPage)) {
+    editDungeonSolutionHPPenalty -= 10;
+    if (editDungeonSolutionHPPenalty < 0)
+      editDungeonSolutionHPPenalty = 0;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.46,
+             Window43Gap * 0.25, WindowHeightInch * 0.03, "-100", idEditPage)) {
+    editDungeonSolutionHPPenalty -= 100;
+    if (editDungeonSolutionHPPenalty < 0)
+      editDungeonSolutionHPPenalty = 0;
+  }
+
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.40,
+             Window43Gap * 0.92, WindowHeightInch * 0.03, "Limited Solution",
+             idEditPage)) {
+    editGetSolutionWithLimit();
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.34,
+             Window43Gap * 0.92, WindowHeightInch * 0.03, "All Solution",
+             idEditPage)) {
+    editGetSolution();
+  }
+
   // width height adj
 
-  char __buf[99];
   sprintf(__buf, "%d", editDungeon.width);
   drawBoxWithoutBorder(Window43Gap * 0.4, WindowHeightInch * 0.23,
                        Window43Gap * 0.2, WindowHeightInch * 0.03, 1, "Width",
