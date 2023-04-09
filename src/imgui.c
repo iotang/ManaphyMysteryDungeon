@@ -51,11 +51,12 @@ typedef struct {
   double editMouseX;
   double editMouseY;
   int mousedown;
-  int clickedItem;  // item that was clicked
-  int actingMenu;   // acting menu list
-  int kbdItem;      // item that takes keyboard
-  int lastItem;     // item that had focus just before
-  int keyPress;     // input key
+  int clickedItem; // item that was clicked
+  int actingMenu;  // acting menu list
+  int kbdItem;     // item that takes keyboard
+  int lastItem;    // item that had focus just before
+  int keyPress;    // input key
+  int mousePress;
   int charInput;    // input char
   int keyModifiers; //  key modifier (shift, ctrl)
 } UIState;
@@ -217,7 +218,7 @@ void InitGUI() { memset(&gs_UIState, 0, sizeof(gs_UIState)); }
 void uiGetMouse(int x, int y, int button, int event) {
   gs_UIState.editMouseX = ScaleXInches(x); /*pixels --> inches*/
   gs_UIState.editMouseY = ScaleYInches(y); /*pixels --> inches*/
-
+  gs_UIState.mousePress = button;
   switch (event) {
   case BUTTON_DOWN:
     gs_UIState.mousedown = 1;
@@ -346,7 +347,7 @@ int button(int id, double x, double y, double w, double h, char *label,
     {
       gs_UIState.clickedItem = 0;
       gs_UIState.kbdItem = id;
-      return 1;
+      return gs_UIState.mousePress == LEFT_BUTTON ? 1 : -1;
     }
   }
 

@@ -14,6 +14,8 @@ void smInit() { stateStack.top = 0; }
 
 bool smIsStateEmpty() { return stateStack.top <= 0; }
 
+int smStateCount() { return stateStack.top; }
+
 AppState *smStateTop() {
   if (smIsStateEmpty())
     return NULL;

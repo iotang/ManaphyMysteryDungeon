@@ -27,7 +27,8 @@ typedef enum {
   idSaveAsPage,
   idEditPage,
   idSimPage,
-  idExplorer
+  idExplorer,
+  idPausePage
 } AppStateID;
 
 typedef enum TimeEvent {
@@ -40,8 +41,14 @@ typedef enum TimeEvent {
   FaceUp,
   FaceLeft,
   FaceDown,
+  UseMove1,
+  UseMove2,
+  UseMove3,
+  UseMove4,
+  UseMove5,
   HintExpire,
-  AutoRun
+  AutoRun,
+  ClearUsingMove
 } TimeEvent;
 
 typedef enum { Player, Enemy } Role;

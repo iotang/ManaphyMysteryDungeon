@@ -138,9 +138,10 @@ double calcDamage(int lv, double effect, double atk, double def) {
 }
 
 double calcExp(int aLv, int bLv) {
-  aLv += 10;
-  bLv += 10;
-  return 1.00 * bLv * bLv / (aLv * aLv * aLv);
+  int base = 30 + bLv - aLv;
+  if (base < 1)
+    base = 1;
+  return 20.00 * base / (aLv + 20);
 }
 
 void makePokemonStatBound(Pokemon *pokemon) {
@@ -218,11 +219,9 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species, int gender) {
   pokemon->belly = pokemon->maxbelly = 100.00;
 
   if (species == NManaphy) {
-    pokemon->moveCount = 3;
+    pokemon->moveCount = 2;
     pokemon->move[1] = MWaterGun;
     pokemon->pp[1] = movedex[MWaterGun].pp;
-    pokemon->move[2] = MBubbleBeam;
-    pokemon->pp[2] = movedex[MBubbleBeam].pp;
   } else if (species == NCresselia) {
     pokemon->moveCount = 2;
     pokemon->move[1] = MPsychic;

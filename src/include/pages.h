@@ -39,6 +39,9 @@ void callingExitWarning(voidFn nex) {
 void smPopStateUntilMainMenu() { smPopStateUntil(idMainMenu); }
 
 void drawToolsBar() {
+  if (smStateTop()->uid == idPausePage)
+    return;
+
   SetPointSize(16);
   double fontHeight = GetFontHeight();
   double x = 0, y = WindowHeightInch;

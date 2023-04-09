@@ -11,6 +11,7 @@
 
 void smInit();
 bool smIsStateEmpty();
+int smStateCount();
 AppState *smStateTop();
 void callCtor(AppState *now);
 void callProc(AppState *now);

@@ -6,11 +6,16 @@
 
 #include "utils.h"
 #include "pokemon.h"
+#include "attempt.h"
 
 void drawStatusBar(Pokemon *pokemon, double basex, double basey, int belong) {
   SetPenColor("Black");
 
   double expRatio = 0.01 * pokemon->exp;
+  if (expRatio > 1)
+    expRatio = 1;
+  if (expRatio < 0)
+    expRatio = 0;
   int _pointSize = GetPointSize();
   SetPointSize(16);
   drawBoxWithoutBorder(basex + Window43Gap * 0.05,
@@ -68,6 +73,10 @@ void drawStatusBar(Pokemon *pokemon, double basex, double basey, int belong) {
   char bellyTag[99];
   double bellyRatio = 1.00 * pokemon->belly / pokemon->maxbelly;
   sprintf(bellyTag, "%.0lf%%", pokemon->belly);
+  if (bellyRatio > 1)
+    bellyRatio = 1;
+  if (bellyRatio < 0)
+    bellyRatio = 0;
   SetPenColor("Light Gray");
   drawRectangle(basex + Window43Gap * 0.05, basey + WindowHeightInch * 0.063,
                 Window43Gap * 0.90, WindowHeightInch * 0.02, 1);
@@ -109,15 +118,17 @@ int drawMoveList(Pokemon *pokemon, double basex, double basey, int belong) {
   drawRectangle(basex + Window43Gap * 0.03, basey + WindowHeightInch * 0.005,
                 Window43Gap * 0.94, WindowHeightInch * 0.49, 1);
 
-  int ret = -1;
+  int ret = -1, retval = 0;
   for (int i = 0; i < pokemon->moveCount; i++) {
     double baseHeight = basey + WindowHeightInch * (0.40 - i * 0.10 + 0.01);
     SetPenColor("White");
 
     setButtonColors("White", "Blue", "Cyan", "Blue", 1);
-    if (button(GenUIID(i), basex + Window43Gap * 0.05, baseHeight,
-               Window43Gap * 0.9, WindowHeightInch * 0.08, NULL, belong)) {
+    int val = button(GenUIID(i), basex + Window43Gap * 0.05, baseHeight,
+                     Window43Gap * 0.9, WindowHeightInch * 0.08, NULL, belong);
+    if (val != 0) {
       ret = i;
+      retval = val;
     }
 
     SetPenColor("Black");
@@ -148,5 +159,9 @@ int drawMoveList(Pokemon *pokemon, double basex, double basey, int belong) {
     SetPointSize(_pointSize);
   }
 
-  return ret;
+  if (ret >= 0) {
+    return retval > 0 ? makeUseMoveAttempt(ret) : makeRemoveMoveAttempt(ret);
+  }
+
+  return 0;
 }

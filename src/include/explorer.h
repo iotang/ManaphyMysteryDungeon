@@ -17,12 +17,14 @@
 #include "controller.h"
 #include "itembag.h"
 #include "attempt.h"
+#include "enemylist.h"
 
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
 #include "hintvalue.h"
 #include "statusbar.h"
 #include "drawitembag.h"
+#include "pausepage.h"
 
 #include "globalvalue.h"
 
@@ -33,6 +35,8 @@ int expHasReadDungeon;
 #define runCellSize (1.00)
 Pokemon manaphy;
 ItemBag manaphyItemBag;
+
+EnemyList enemyList;
 
 void checkManaphyHealth() {
   while (updatePokemonStat(&manaphy))
@@ -99,6 +103,8 @@ int manaphyMove(int att) {
       }
     } else if (expDungeon.mp[dx][dy] == Block) {
       emplaceHint("You cannot move into a block.");
+    } else if (isOnEnemyList(&enemyList, dx, dy)) {
+      emplaceHint("Use moves to take the enemies down.");
     } else {
       successMove = 1;
     }
@@ -106,7 +112,7 @@ int manaphyMove(int att) {
     if (successMove) {
       manaphy.x = dx;
       manaphy.y = dy;
-      manaphy.belly -= 2.8;
+      manaphy.belly -= 0.1;
       if (manaphy.belly <= 0) {
         manaphy.belly = 0;
         manaphy.hp--;
@@ -130,7 +136,6 @@ int manaphyMove(int att) {
     int type = manaphyItemBag.items[index].type;
     int arg = manaphyItemBag.items[index].arg;
 
-    printf("%d %d\n", type, arg);
     static char _useItem[99];
 
     if (type == IKey) {
@@ -138,10 +143,37 @@ int manaphyMove(int att) {
       emplaceHint(_useItem);
       return 0;
     } else if (type == ITM) {
-      return 0;
+      for (int i = 1; i < manaphy.moveCount; i++) {
+        if (manaphy.move[i] == arg) {
+          sprintf(_useItem, "%s's PP is maxed out!", movedex[arg].name);
+          emplaceHint(_useItem);
+          manaphy.pp[i] = movedex[arg].pp;
+          removeOutItemBag(&manaphyItemBag, index);
+          return 1;
+        }
+      }
+
+      if (manaphy.moveCount < MaxMoveCount) {
+        sprintf(_useItem, "%s has learned %s!", manaphy.name,
+                movedex[arg].name);
+        emplaceHint(_useItem);
+        manaphy.move[manaphy.moveCount] = arg;
+        manaphy.pp[manaphy.moveCount] = movedex[arg].pp;
+        manaphy.moveCount++;
+        removeOutItemBag(&manaphyItemBag, index);
+        return 1;
+      } else {
+        sprintf(_useItem,
+                "%s cannot learn more moves. Unlearn some moves first.",
+                manaphy.name);
+        emplaceHint(_useItem);
+        return 0;
+      }
     } else {
       sprintf(_useItem, "%s uses %s.", manaphy.name, itemsData[type].name);
       emplaceHint(_useItem);
+
+      makePause(0.5);
 
       if (itemsData[type].dbelly != 0) {
         if (itemsData[type].dbelly > 49.5) {
@@ -155,6 +187,7 @@ int manaphyMove(int att) {
           emplaceHint(_useItem);
         }
         manaphy.belly += itemsData[type].dbelly;
+        makePause(0.2);
       }
 
       if (itemsData[type].dmaxhp) {
@@ -163,6 +196,7 @@ int manaphyMove(int att) {
                 abs(itemsData[type].dmaxhp));
         emplaceHint(_useItem);
         manaphy.maxhp += itemsData[type].dmaxhp;
+        makePause(0.2);
       }
 
       makePokemonStatBound(&manaphy);
@@ -181,6 +215,7 @@ int manaphyMove(int att) {
         }
         emplaceHint(_useItem);
         manaphy.hp += itemsData[type].dhp;
+        makePause(0.2);
       }
 
       if (itemsData[type].datk) {
@@ -189,6 +224,7 @@ int manaphyMove(int att) {
                 abs(itemsData[type].datk));
         emplaceHint(_useItem);
         manaphy.atk += itemsData[type].datk;
+        makePause(0.2);
       }
 
       if (itemsData[type].ddef) {
@@ -197,6 +233,7 @@ int manaphyMove(int att) {
                 abs(itemsData[type].ddef));
         emplaceHint(_useItem);
         manaphy.def += itemsData[type].ddef;
+        makePause(0.2);
       }
 
       if (itemsData[type].dexp != 0) {
@@ -205,6 +242,7 @@ int manaphyMove(int att) {
                 fabs(itemsData[type].dexp));
         emplaceHint(_useItem);
         manaphy.exp += itemsData[type].dexp;
+        makePause(0.2);
       }
 
       while (updatePokemonStat(&manaphy)) {
@@ -212,7 +250,122 @@ int manaphyMove(int att) {
         setHint(_useItem);
       }
 
+      makePause(0.3);
+
       removeOutItemBag(&manaphyItemBag, index);
+      return 1;
+    }
+  }
+
+  if (isUseMoveAttempt(att)) {
+    int index = argUseMoveAttempt(att);
+    if (manaphy.moveCount <= index)
+      return 0;
+
+    int move = manaphy.move[index];
+
+    static char _useMove[99];
+
+    if (movedex[move].pp > 0 && manaphy.pp[index] <= 0) {
+      sprintf(_useMove, "%s is too exhausted to use %s.", manaphy.name,
+              movedex[move].name);
+      emplaceHint(_useMove);
+      return 0;
+    }
+
+    sprintf(_useMove, "%s uses %s!", manaphy.name, movedex[move].name);
+    emplaceHint(_useMove);
+    manaphy.pp[index]--;
+    makePause(0.5);
+
+    int dx = manaphy.x + go[manaphy.direction][0];
+    int dy = manaphy.y + go[manaphy.direction][1];
+    int who = locationEnemyList(&enemyList, dx, dy);
+    if (who < 0) {
+      sprintf(_useMove, "But %s didn't hit anyone.",
+              manaphy.gender ? "he" : "she");
+      emplaceHint(_useMove);
+      return 1;
+    }
+
+    int dmg = calcDamage(manaphy.lv, movedex[move].effect, manaphy.atk,
+                         enemyList.enemy[who].def) *
+              RandomReal(0.85, 1);
+    if (dmg < 1)
+      dmg = 1;
+    sprintf(_useMove, "%s takes %d damage!", enemyList.enemy[who].name, dmg);
+    emplaceHint(_useMove);
+    enemyList.enemy[who].hp -= dmg;
+    makePokemonStatBound(&enemyList.enemy[who]);
+
+    if (enemyList.enemy[who].hp <= 0) {
+      sprintf(_useMove, "%s is fainted!", enemyList.enemy[who].name);
+      emplaceHint(_useMove);
+      double exp = calcExp(manaphy.lv, enemyList.enemy[who].lv);
+      Item getItem = enemyList.item[who];
+      removeAtEnemyList(&enemyList, who);
+      makePause(0.2);
+
+      sprintf(_useMove, "%s gets %.2lf EXP.", manaphy.name, exp);
+      emplaceHint(_useMove);
+      manaphy.exp += exp;
+      makePause(0.2);
+
+      while (updatePokemonStat(&manaphy)) {
+        sprintf(_useMove, "%s raises to level %d!", manaphy.name, manaphy.lv);
+        setHint(_useMove);
+      }
+
+      if (getItem.type != 0) {
+        sprintf(_useMove, "A %s drops down, and %s puts it into the bag.",
+                itemsData[getItem.type].name, manaphy.name);
+        emplaceHint(_useMove);
+        addIntoItemBag(&manaphyItemBag, getItem);
+        makePause(0.2);
+      }
+    }
+
+    return 1;
+  }
+
+  if (isRemoveItemAttempt(att)) {
+    int index = argRemoveItemAttempt(att);
+    int type = manaphyItemBag.items[index].type;
+    int arg = manaphyItemBag.items[index].arg;
+
+    static char _removeItem[99];
+    sprintf(_removeItem, "%s drops %s on the ground.", manaphy.name,
+            itemsData[type].name);
+    emplaceHint(_removeItem);
+
+    expDungeon.item[manaphy.x][manaphy.y].type = type;
+    expDungeon.item[manaphy.x][manaphy.y].arg = arg;
+    removeOutItemBag(&manaphyItemBag, index);
+
+    return 1;
+  }
+
+  if (isRemoveMoveAttempt(att)) {
+    int index = argRemoveMoveAttempt(att);
+    if (index >= manaphy.moveCount)
+      return 0;
+
+    int arg = manaphy.move[index];
+
+    static char _removeMove[99];
+    if (arg == MTackle) {
+      sprintf(_removeMove, "You cannot unlearn %s.", movedex[arg].name);
+      emplaceHint(_removeMove);
+      return 0;
+    } else {
+      sprintf(_removeMove, "%s has unlearned %s!", manaphy.name,
+              movedex[arg].name);
+      emplaceHint(_removeMove);
+      for (int i = index; i < manaphy.moveCount; i++) {
+        manaphy.move[i] = manaphy.move[i + 1];
+        manaphy.pp[i] = manaphy.pp[i + 1];
+      }
+      manaphy.moveCount--;
       return 1;
     }
   }
@@ -241,7 +394,7 @@ void manaphyMoveAttempt(int event) {
   if (isDungeonGameOver)
     return;
 
-  int att = makeFaceAttempt(DOWN);
+  int att = 0;
 
   if (event == FaceRight || event == FaceUp || event == FaceLeft ||
       event == FaceDown) {
@@ -265,6 +418,19 @@ void manaphyMoveAttempt(int event) {
     } else if (event == MoveDown) {
       att = makeMoveAttempt(DOWN);
     }
+  } else if (event == UseMove1 || event == UseMove2 || event == UseMove3 ||
+             event == UseMove4 || event == UseMove5) {
+    if (event == UseMove1) {
+      att = makeUseMoveAttempt(0);
+    } else if (event == UseMove2) {
+      att = makeUseMoveAttempt(1);
+    } else if (event == UseMove3) {
+      att = makeUseMoveAttempt(2);
+    } else if (event == UseMove4) {
+      att = makeUseMoveAttempt(3);
+    } else if (event == UseMove5) {
+      att = makeUseMoveAttempt(4);
+    }
   }
 
   return manaphyRound(att);
@@ -283,7 +449,7 @@ void giveCheat() {
       if (expDungeon.mp[dx][dy] == Block)
         continue;
       lint distan = getDungeonDistance(&expDungeon, dx, dy, key, tx, ty,
-                                       DefaultHPPenalty);
+                                       DefaultHPPenalty, 1);
       if (distan < minDistan || (distan == minDistan && RandomChance(0.5))) {
         ret = i;
         minDistan = distan;
@@ -334,6 +500,30 @@ void initExplorer() {
       smPopState();
     }
 
+    clearEnemyList(&enemyList);
+    for (int i = 0; i < 50; i++) {
+      int x = RandomInteger(0, expDungeon.width);
+      int y = RandomInteger(0, expDungeon.height);
+      if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
+          expDungeon.event[x][y].type == Lock)
+        continue;
+      if (isOnEnemyList(&enemyList, x, y))
+        continue;
+      Pokemon enemy;
+      spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
+      enemy.x = x;
+      enemy.y = y;
+      enemy.direction = RandomInteger(0, 3);
+      Item item;
+      item.type = RandomInteger(1, 3);
+      emplaceEnemyListWithItem(&enemyList, enemy, item);
+    }
+    Pokemon enemy;
+    spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
+    enemy.x = manaphy.x + 3;
+    enemy.y = manaphy.y;
+    emplaceEnemyList(&enemyList, enemy);
+
     isDungeonGameOver = 0;
     emptyBellyHintCount = 0;
     clearHint();
@@ -342,12 +532,20 @@ void initExplorer() {
   addHelpEntry("Move:", "Arrow or WASD");
   addHelpEntry("Change Direction:", "");
   addHelpEntry("", "Shift-Arrow or Shift-WASD");
+  addHelpEntry("Use Items:", "Click on list");
+  addHelpEntry("Use Moves:", "Number 1-5");
   bindPlayerMove(manaphyMoveAttempt);
 }
 
 void drawExplorer() {
+  makePokemonStatBound(&manaphy);
+
   drawDungeon(&expDungeon, manaphy.x, manaphy.y, runCellSize, 0, NULL, 0);
   drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize, &manaphy);
+  for (size_t i = 0; i < enemyList.count; i++) {
+    drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize,
+                       &enemyList.enemy[i]);
+  }
 
   // title
 
@@ -389,14 +587,15 @@ void drawExplorer() {
   SetPenColor("Light Pink");
   drawRectangle(Window43Right, 0, Window43Gap, WindowHeightInch, 1);
 
-  int useItem = drawItemBag(&manaphyItemBag, Window43Right,
+  int itemAtt = drawItemBag(&manaphyItemBag, Window43Right,
                             WindowHeightInch * 0.5, idExplorer);
-  if (useItem >= 0) {
-    manaphyMove(makeUseItemAttempt(useItem));
+  if (itemAtt != 0) {
+    manaphyMove(itemAtt);
   }
-  int useMove = drawMoveList(&manaphy, Window43Right, 0, idExplorer);
-  if (useMove >= 0) {
-    manaphyMove(makeUseMoveAttempt(useMove));
+
+  int moveAtt = drawMoveList(&manaphy, Window43Right, 0, idExplorer);
+  if (moveAtt != 0) {
+    manaphyMove(moveAtt);
   }
 
   // hint dialog

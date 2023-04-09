@@ -109,8 +109,7 @@ int cresseliaAttempt() {
       if (simDungeon.mp[dx][dy] == Block)
         continue;
       lint distan = getDungeonDistance(&simDungeon, dx, dy, key, tx, ty,
-                                       DefaultHPPenalty);
-      printf("%d %d %d: %lld\n", dx, dy, key, distan);
+                                       DefaultHPPenalty, 1);
       if (distan < minDistan || (distan == minDistan && RandomChance(0.5))) {
         ret = i;
         minDistan = distan;
@@ -387,6 +386,8 @@ void uiSimPageGetMouse(int x, int y, int button, int event) {
 }
 
 void uiSimPageGetKeyboard(int key, int event) {
+  if (smStateTop()->uid != idSimPage)
+    return;
   controlKeyboard(key, event);
   uiGetKeyboard(key, event);
 }

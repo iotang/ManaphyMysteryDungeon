@@ -244,7 +244,7 @@ int getDungeonSolution(Dungeon *dungeon, DungeonSolution *solution) {
 }
 
 lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
-                        int ty, lint hpPenalty) {
+                        int ty, lint hpPenalty, int enableKey) {
   if (!isInDungeon(dungeon, sx, sy) || !isInDungeon(dungeon, tx, ty))
     return linf;
 
@@ -255,11 +255,13 @@ lint getDungeonDistance(Dungeon *dungeon, int sx, int sy, int skey, int tx,
     return linf;
 
   int allKey = 0;
-  for (int i = 0; i < dungeon->width; i++) {
-    for (int j = 0; j < dungeon->height; j++) {
-      if (dungeon->event[i][j].type == Lock) {
-        if (dungeon->event[i][j].arg > allKey) {
-          allKey = dungeon->event[i][j].arg;
+  if (enableKey) {
+    for (int i = 0; i < dungeon->width; i++) {
+      for (int j = 0; j < dungeon->height; j++) {
+        if (dungeon->event[i][j].type == Lock) {
+          if (dungeon->event[i][j].arg > allKey) {
+            allKey = dungeon->event[i][j].arg;
+          }
         }
       }
     }
