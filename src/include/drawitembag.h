@@ -70,7 +70,7 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
       strcpy(_nameBuf, itemsData[type].name);
     }
 
-    if (button(GenUIID(0), basex + Window43Gap * 0.05,
+    if (button(GenUIID(i), basex + Window43Gap * 0.05,
                baseHeight + WindowHeightInch * 0.003, Window43Gap * 0.9,
                height - WindowHeightInch * 0.006, NULL, belong)) {
       ret = num;

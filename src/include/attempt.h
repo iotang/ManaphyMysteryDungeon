@@ -13,8 +13,8 @@
 
 int isFaceAttempt(int x) { return pick(x, PFace); }
 int isMoveAttempt(int x) { return pick(x, PMove); }
-int isUseItemAttempt(int x) { return pick(x, PMove); }
-int isUseMoveAttempt(int x) { return pick(x, PMove); }
+int isUseItemAttempt(int x) { return pick(x, PUseItem); }
+int isUseMoveAttempt(int x) { return pick(x, PUseMove); }
 
 int makeFaceAttempt(Direction dir) { return shl(PFace) | dir; }
 int makeMoveAttempt(Direction dir) { return shl(PMove) | dir; }

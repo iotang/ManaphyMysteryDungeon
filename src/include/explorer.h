@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 #include <time.h>
 
 #include "graphics.h"
@@ -114,7 +115,7 @@ int manaphyMove(int att) {
         } else if (emptyBellyHintCount == 1) {
           emplaceHint("Hurry up! You must have something to eat!");
         } else if (emptyBellyHintCount == 2) {
-          emplaceHint("Otherwise you will fall soon! ");
+          emplaceHint("Otherwise you will fall soon!");
         }
         emptyBellyHintCount++;
       } else
@@ -122,6 +123,98 @@ int manaphyMove(int att) {
     }
 
     return successMove;
+  }
+
+  if (isUseItemAttempt(att)) {
+    int index = argUseItemAttempt(att);
+    int type = manaphyItemBag.items[index].type;
+    int arg = manaphyItemBag.items[index].arg;
+
+    printf("%d %d\n", type, arg);
+    static char _useItem[99];
+
+    if (type == IKey) {
+      sprintf(_useItem, "Walk into the lock to use the key.");
+      emplaceHint(_useItem);
+      return 0;
+    } else if (type == ITM) {
+      return 0;
+    } else {
+      sprintf(_useItem, "%s uses %s.", manaphy.name, itemsData[type].name);
+      emplaceHint(_useItem);
+
+      if (itemsData[type].dbelly != 0) {
+        if (itemsData[type].dbelly > 49.5) {
+          sprintf(_useItem, "%s's belly is filled!", manaphy.name);
+          emplaceHint(_useItem);
+        } else if (itemsData[type].dbelly > 9.5) {
+          sprintf(_useItem, "%s's belly is slightly filled!", manaphy.name);
+          emplaceHint(_useItem);
+        } else if (itemsData[type].dbelly < 0) {
+          sprintf(_useItem, "%s's belly dropped!", manaphy.name);
+          emplaceHint(_useItem);
+        }
+        manaphy.belly += itemsData[type].dbelly;
+      }
+
+      if (itemsData[type].dmaxhp) {
+        sprintf(_useItem, "%s's max HP %s by %d!", manaphy.name,
+                itemsData[type].dmaxhp > 0 ? "raised" : "dropped",
+                abs(itemsData[type].dmaxhp));
+        emplaceHint(_useItem);
+        manaphy.maxhp += itemsData[type].dmaxhp;
+      }
+
+      makePokemonStatBound(&manaphy);
+
+      if (itemsData[type].dhp) {
+        if (itemsData[type].dhp > 0) {
+          int recover = min(manaphy.maxhp - manaphy.hp, itemsData[type].dhp);
+          if (recover > 0) {
+            sprintf(_useItem, "%s recovers %d HP!", manaphy.name, recover);
+          } else {
+            sprintf(_useItem, "%s's HP doesn't changed.", manaphy.name);
+          }
+        } else {
+          sprintf(_useItem, "%s receives %d damage!", manaphy.name,
+                  -itemsData[type].dhp);
+        }
+        emplaceHint(_useItem);
+        manaphy.hp += itemsData[type].dhp;
+      }
+
+      if (itemsData[type].datk) {
+        sprintf(_useItem, "%s's attack %s by %d!", manaphy.name,
+                itemsData[type].datk > 0 ? "raised" : "dropped",
+                abs(itemsData[type].datk));
+        emplaceHint(_useItem);
+        manaphy.atk += itemsData[type].datk;
+      }
+
+      if (itemsData[type].ddef) {
+        sprintf(_useItem, "%s's defense %s by %d!", manaphy.name,
+                itemsData[type].ddef > 0 ? "raised" : "dropped",
+                abs(itemsData[type].ddef));
+        emplaceHint(_useItem);
+        manaphy.def += itemsData[type].ddef;
+      }
+
+      if (itemsData[type].dexp != 0) {
+        sprintf(_useItem, "%s's %s %.0lf EXP!", manaphy.name,
+                itemsData[type].dexp > 0 ? "gains" : "loses",
+                fabs(itemsData[type].dexp));
+        emplaceHint(_useItem);
+        manaphy.exp += itemsData[type].dexp;
+      }
+
+      while (updatePokemonStat(&manaphy)) {
+        sprintf(_useItem, "%s raises to level %d!", manaphy.name, manaphy.lv);
+        setHint(_useItem);
+      }
+
+      removeOutItemBag(&manaphyItemBag, index);
+      return 1;
+    }
   }
 
   return 0;

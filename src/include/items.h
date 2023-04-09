@@ -3,24 +3,25 @@
 #include <string.h>
 #include "utils.h"
 
-#define MaxItemNumber (7)
+#define MaxItemNumber (8)
 #define MaxItemNameLength (16)
 
 #define INone (0)
 #define IApple (1)
 #define IGummi (2)
 #define IOranBerry (3)
-#define ISitrusBerry (4)
-#define IElixir (5)
-#define IKey (6)
-#define ITM (7)
+#define IOrenBerry (4)
+#define ISitrusBerry (5)
+#define IElixir (6)
+#define IKey (7)
+#define ITM (8)
 
 #define MaxKeyID (4)
 
 typedef struct ItemData {
   char name[MaxItemNameLength + 1];
   double dexp;
-  double dberry;
+  double dbelly;
   int dhp, dmaxhp;
   int datk, ddef;
   int dmove;
@@ -38,7 +39,7 @@ ItemData itemsData[MaxItemNumber + 1];
 void initItems() {
   strcpy(itemsData[INone].name, "No Item");
   itemsData[INone].dexp = 0;
-  itemsData[INone].dberry = 0;
+  itemsData[INone].dbelly = 0;
   itemsData[INone].dhp = 0;
   itemsData[INone].dmaxhp = 0;
   itemsData[INone].datk = 0;
@@ -49,7 +50,7 @@ void initItems() {
 
   strcpy(itemsData[IApple].name, "Apple");
   itemsData[IApple].dexp = 0;
-  itemsData[IApple].dberry = 50;
+  itemsData[IApple].dbelly = 50;
   itemsData[IApple].dhp = 0;
   itemsData[IApple].dmaxhp = 0;
   itemsData[IApple].datk = 0;
@@ -60,7 +61,7 @@ void initItems() {
 
   strcpy(itemsData[IGummi].name, "Gummi");
   itemsData[IGummi].dexp = 50;
-  itemsData[IGummi].dberry = 10;
+  itemsData[IGummi].dbelly = 10;
   itemsData[IGummi].dhp = 0;
   itemsData[IGummi].dmaxhp = 0;
   itemsData[IGummi].datk = 0;
@@ -71,7 +72,7 @@ void initItems() {
 
   strcpy(itemsData[IOranBerry].name, "Oran Berry");
   itemsData[IOranBerry].dexp = 0;
-  itemsData[IOranBerry].dberry = 5;
+  itemsData[IOranBerry].dbelly = 5;
   itemsData[IOranBerry].dhp = 100;
   itemsData[IOranBerry].dmaxhp = 0;
   itemsData[IOranBerry].datk = 0;
@@ -82,7 +83,7 @@ void initItems() {
 
   strcpy(itemsData[ISitrusBerry].name, "Sitrus Berry");
   itemsData[ISitrusBerry].dexp = 0;
-  itemsData[ISitrusBerry].dberry = 5;
+  itemsData[ISitrusBerry].dbelly = 5;
   itemsData[ISitrusBerry].dhp = 999999;
   itemsData[ISitrusBerry].dmaxhp = 5;
   itemsData[ISitrusBerry].datk = 0;
@@ -93,7 +94,7 @@ void initItems() {
 
   strcpy(itemsData[IElixir].name, "Elixir");
   itemsData[IElixir].dexp = 0;
-  itemsData[IElixir].dberry = 5;
+  itemsData[IElixir].dbelly = 5;
   itemsData[IElixir].dhp = 0;
   itemsData[IElixir].dmaxhp = 0;
   itemsData[IElixir].datk = 3;
@@ -104,7 +105,7 @@ void initItems() {
 
   strcpy(itemsData[IKey].name, "Key");
   itemsData[IKey].dexp = 0;
-  itemsData[IKey].dberry = 0;
+  itemsData[IKey].dbelly = 0;
   itemsData[IKey].dhp = 0;
   itemsData[IKey].dmaxhp = 0;
   itemsData[IKey].datk = 0;
@@ -115,7 +116,7 @@ void initItems() {
 
   strcpy(itemsData[ITM].name, "TM");
   itemsData[ITM].dexp = 0;
-  itemsData[ITM].dberry = 0;
+  itemsData[ITM].dbelly = 0;
   itemsData[ITM].dhp = 0;
   itemsData[ITM].dmaxhp = 0;
   itemsData[ITM].datk = 0;
@@ -123,6 +124,17 @@ void initItems() {
   itemsData[ITM].dmove = 1;
   itemsData[ITM].keyid = 0;
   itemsData[ITM].defaultArg = 1;
+
+  strcpy(itemsData[IOrenBerry].name, "Oren Berry");
+  itemsData[IOrenBerry].dexp = 0;
+  itemsData[IOrenBerry].dbelly = 5;
+  itemsData[IOrenBerry].dhp = -10;
+  itemsData[IOrenBerry].dmaxhp = 0;
+  itemsData[IOrenBerry].datk = 0;
+  itemsData[IOrenBerry].ddef = 0;
+  itemsData[IOrenBerry].dmove = 0;
+  itemsData[IOrenBerry].keyid = 0;
+  itemsData[IOrenBerry].defaultArg = 0;
 }
 
 int cmpItems(const void *lhs, const void *rhs) {

@@ -143,18 +143,33 @@ double calcExp(int aLv, int bLv) {
   return 1.00 * bLv * bLv / (aLv * aLv * aLv);
 }
 
-int updatePokemonStat(Pokemon *pokemon) {
-  if (pokemon->maxhp <= 0)
+void makePokemonStatBound(Pokemon *pokemon) {
+  if (pokemon->maxhp < 1)
     pokemon->maxhp = 1;
-  if (pokemon->hp <= 0)
+  if (pokemon->hp < 0)
     pokemon->hp = 0;
-  if (pokemon->atk <= 0)
+  if (pokemon->hp > pokemon->maxhp)
+    pokemon->hp = pokemon->maxhp;
+
+  if (pokemon->maxbelly < 1)
+    pokemon->maxbelly = 1;
+  if (pokemon->belly < 0)
+    pokemon->belly = 0;
+  if (pokemon->belly > pokemon->maxbelly)
+    pokemon->belly = pokemon->maxbelly;
+
+  if (pokemon->atk < 1)
     pokemon->atk = 1;
-  if (pokemon->def <= 0)
+  if (pokemon->def < 1)
     pokemon->def = 1;
+}
+
+int updatePokemonStat(Pokemon *pokemon) {
+  makePokemonStatBound(pokemon);
 
   if (pokemon->exp < 100)
     return 0;
+
   pokemon->exp -= 100;
   pokemon->hp -= getBaseStat(pokemon->lv, pokedex[pokemon->species].hpBase,
                              pokedex[pokemon->species].hpGrowth);
@@ -176,14 +191,7 @@ int updatePokemonStat(Pokemon *pokemon) {
   pokemon->def += getBaseStat(pokemon->lv, pokedex[pokemon->species].defBase,
                               pokedex[pokemon->species].defGrowth);
 
-  if (pokemon->maxhp <= 0)
-    pokemon->maxhp = 1;
-  if (pokemon->hp <= 0)
-    pokemon->hp = 0;
-  if (pokemon->atk <= 0)
-    pokemon->atk = 1;
-  if (pokemon->def <= 0)
-    pokemon->def = 1;
+  makePokemonStatBound(pokemon);
 
   return 1;
 }
