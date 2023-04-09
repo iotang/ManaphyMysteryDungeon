@@ -42,7 +42,7 @@ void drawToolsBar() {
   SetPointSize(16);
   double fontHeight = GetFontHeight();
   double x = 0, y = WindowHeightInch;
-  double h = fontHeight * 1.5;
+  double h = MenuHeight;
 
   if (smStateTop()->uid == idEditPage || smStateTop()->uid == idMainMenu) {
     static char *menuListEdit[] = {
@@ -189,6 +189,7 @@ void drawToolsBar() {
     if (selection == 1) {
       gotoAboutPage();
     }
+    x += w;
   }
 }
 

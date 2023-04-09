@@ -176,13 +176,17 @@ void drawEditPage() {
     editCamera.y = editDungeon.height - 1;
 
   int mx, my;
-  getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
-                  editMouseX, editMouseY, &mx, &my);
+  if (notInAllMenu(editMouseX, editMouseY)) {
+    getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
+                    editMouseX, editMouseY, &mx, &my);
+  }
   drawDungeon(&editDungeon, editCamera.x, editCamera.y, editCellSize, 1,
               &editDungeonSolution, editHasSolution && !modifiedSinceLastSave);
-  drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
-                             editCellSize, mx, my, editCellSize, 0, "Magenta",
-                             0, 0);
+  if (notInAllMenu(editMouseX, editMouseY)) {
+    drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
+                               editCellSize, mx, my, editCellSize, 0, "Magenta",
+                               0, 0);
+  }
   if (editMode == Targeted) {
     drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
                                editCellSize, editCursor.x, editCursor.y,
@@ -190,15 +194,10 @@ void drawEditPage() {
   }
 
   // title
-  /*
-  SetPenColor("White");
-  drawBox(Window43Left, WindowHeightInch * 0.97, WindowWindow43Width,
-          WindowHeightInch * 0.03, 1, NULL, 'L', "Black");
-  */
 
   SetPenColor(modifiedSinceLastSave ? "Yellow" : "White");
-  drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
-          WindowHeightInch * 0.03, 1, editDungeonFileName, 'L', "Black");
+  drawBox(Window43Left, WindowHeightInch - MenuHeight, Window43Width,
+          MenuHeight, 1, editDungeonFileName, 'L', "Black");
 
   SetPenColor("Cyan");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
@@ -386,7 +385,7 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
     editMouseY = ScaleYInches(y);
   }
 
-  if (notInMenu(editMouseX, editMouseY)) {
+  if (notInAllMenu(editMouseX, editMouseY)) {
     int mx, my;
     getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
                     editMouseX, editMouseY, &mx, &my);

@@ -267,11 +267,11 @@ void drawExplorer() {
   int emptyBelly = manaphy.belly <= 0;
   if (hpLow) {
     SetPenColor(colorType ? "Red" : "Light Pink");
-    drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
-            "Danger! HP Low!", 'L', colorType ? "White" : "Black");
+    drawBox(Window43Left, 0, Window43Width, MenuHeight, 1, "Danger! HP Low!",
+            'L', colorType ? "White" : "Black");
   } else if (emptyBelly) {
     SetPenColor(colorType ? "Yellow" : "Light Pink");
-    drawBox(Window43Left, 0, Window43Width, WindowHeightInch * 0.03, 1,
+    drawBox(Window43Left, 0, Window43Width, MenuHeight, 1,
             "Danger! Belly is Empty!", 'L', "Black");
   }
 

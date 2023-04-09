@@ -11,6 +11,8 @@
 #define Window43Width (12.00)
 #define WindowHeightInch (9.00)
 
+#define MenuHeight (WindowHeightInch * 0.03)
+
 #define MaxFileNameLength (20)
 
 typedef long long lint;

@@ -252,17 +252,14 @@ void drawSimPage() {
 
   drawDungeon(&simDungeon, simCamera.x, simCamera.y, simCellSize, 1,
               &simHistory, 1);
-  drawDungeonHighlightCell(&simDungeon, simCamera.x, simCamera.y, simCellSize,
-                           simMouseX, simMouseY, simCellSize, 0, "Magenta", 0,
-                           0);
   drawDungeonPokemon(&simDungeon, simCamera.x, simCamera.y, simCellSize,
                      &cresselia);
 
   // title
 
   SetPenColor("White");
-  drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
-          WindowHeightInch * 0.03, 1, simDungeonFileName, 'L', "Black");
+  drawBox(Window43Left, WindowHeightInch - MenuHeight, Window43Width,
+          MenuHeight, 1, simDungeonFileName, 'L', "Black");
 
   // status bar
 
@@ -361,7 +358,7 @@ void uiSimPageGetMouse(int x, int y, int button, int event) {
     simMouseY = ScaleYInches(y);
   }
 
-  if (notInMenu(simMouseX, simMouseY)) {
+  if (notInAllMenu(simMouseX, simMouseY)) {
     int mx, my;
     getCellLocation(&simDungeon, simCamera.x, simCamera.y, simCellSize,
                     simMouseX, simMouseY, &mx, &my);

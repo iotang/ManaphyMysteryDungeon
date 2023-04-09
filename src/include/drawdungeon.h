@@ -478,3 +478,9 @@ int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
 
   return modified;
 }
+
+bool notInAllMenu(double x, double y) {
+  if (y >= WindowHeightInch - MenuHeight)
+    return 0;
+  return notInMenu(x, y);
+}
