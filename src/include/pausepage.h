@@ -1,41 +1,19 @@
 #pragma once
 
-#include "utils.h"
 #include "appstate.h"
-#include "statemanager.h"
 
-void initPausePage() { smLastProc(); }
+void initPausePage();
 
-void drawPausePage() { smLastProc(); }
+void drawPausePage() ;
 
-void uiPausePageGetKeyboard(int key, int event) {
-  controlKeyboard(key, event);
-  uiGetKeyboard(key, event);
-}
+void uiPausePageGetKeyboard(int key, int event);
 
-void uiPausePageGetChar(int ch) { uiGetChar(ch); }
+void uiPausePageGetChar(int ch);
 
-void uiPausePageGetMouse(int x, int y, int button, int event) {
-  uiGetMouse(x, y, button, event);
-}
+void uiPausePageGetMouse(int x, int y, int button, int event);
 
-AppState PausePage = {idPausePage,
-                      initPausePage,
-                      drawPausePage,
-                      NULL,
-                      uiPausePageGetKeyboard,
-                      uiPausePageGetChar,
-                      uiPausePageGetMouse};
+extern AppState PausePage;
 
-void clearPause() {
-  if (smStateTop()->uid == idPausePage) {
-    smPopState();
-  }
-  setPauseBuffer();
-}
+void clearPause();
 
-void makePause(double seconds) {
-  smPushState(&PausePage);
-  Pause(seconds);
-  clearPause();
-}
+void makePause(double seconds);

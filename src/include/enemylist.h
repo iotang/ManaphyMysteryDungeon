@@ -4,11 +4,11 @@
 #include "items.h"
 #include "pokemon.h"
 
-#define MaxEnemyCount (200)
+#define MaxEnemyCount (100)
 
 typedef struct EnemyList {
-  Pokemon enemy[MaxEnemyCount];
-  Item item[MaxEnemyCount];
+  Pokemon enemy[MaxEnemyCount + 1];
+  Item item[MaxEnemyCount + 1];
   size_t count;
 } EnemyList;
 

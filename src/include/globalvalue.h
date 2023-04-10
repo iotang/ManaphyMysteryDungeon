@@ -2,8 +2,8 @@
 
 #include "dungeon.h"
 
-Dungeon currentDungeon;
-int isDungeonOpened = 0;
-int isDungeonGameOver = 0;
-int isDungeonSimTerminated = 0;
-int modifiedSinceLastSave = 0;
+extern Dungeon currentDungeon;
+extern int isDungeonOpened;
+extern int isDungeonGameOver;
+extern int isDungeonSimTerminated;
+extern int modifiedSinceLastSave;

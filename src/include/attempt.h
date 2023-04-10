@@ -1,10 +1,6 @@
 #pragma once
 
 #include "utils.h"
-#include "items.h"
-#include "itembag.h"
-#include "dungeon.h"
-#include "pokemon.h"
 
 #define PFace (10)
 #define PMove (11)
@@ -13,23 +9,23 @@
 #define PRemoveItem (14)
 #define PRemoveMove (15)
 
-int isFaceAttempt(int x) { return pick(x, PFace); }
-int isMoveAttempt(int x) { return pick(x, PMove); }
-int isUseItemAttempt(int x) { return pick(x, PUseItem); }
-int isUseMoveAttempt(int x) { return pick(x, PUseMove); }
-int isRemoveItemAttempt(int x) { return pick(x, PRemoveItem); }
-int isRemoveMoveAttempt(int x) { return pick(x, PRemoveMove); }
+int isFaceAttempt(int x);
+int isMoveAttempt(int x);
+int isUseItemAttempt(int x);
+int isUseMoveAttempt(int x);
+int isRemoveItemAttempt(int x);
+int isRemoveMoveAttempt(int x);
 
-int makeFaceAttempt(Direction dir) { return shl(PFace) | dir; }
-int makeMoveAttempt(Direction dir) { return shl(PMove) | dir; }
-int makeUseItemAttempt(int id) { return shl(PUseItem) | id; }
-int makeUseMoveAttempt(int id) { return shl(PUseMove) | id; }
-int makeRemoveItemAttempt(int id) { return shl(PRemoveItem) | id; }
-int makeRemoveMoveAttempt(int id) { return shl(PRemoveMove) | id; }
+int makeFaceAttempt(Direction dir);
+int makeMoveAttempt(Direction dir);
+int makeUseItemAttempt(int id);
+int makeUseMoveAttempt(int id);
+int makeRemoveItemAttempt(int id);
+int makeRemoveMoveAttempt(int id);
 
-int argFaceAttempt(int x) { return x & ((-1) ^ shl(PFace)); }
-int argMoveAttempt(int x) { return x & ((-1) ^ shl(PMove)); }
-int argUseItemAttempt(int x) { return x & ((-1) ^ shl(PUseItem)); }
-int argUseMoveAttempt(int x) { return x & ((-1) ^ shl(PUseMove)); }
-int argRemoveItemAttempt(int x) { return x & ((-1) ^ shl(PRemoveItem)); }
-int argRemoveMoveAttempt(int x) { return x & ((-1) ^ shl(PRemoveMove)); }
+int argFaceAttempt(int x);
+int argMoveAttempt(int x);
+int argUseItemAttempt(int x);
+int argUseMoveAttempt(int x);
+int argRemoveItemAttempt(int x);
+int argRemoveMoveAttempt(int x);
