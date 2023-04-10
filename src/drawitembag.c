@@ -57,7 +57,7 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
       break;
 
     double baseHeight = basey + WindowHeightInch * 0.455 - height * (i + 1);
-    char _nameBuf[99];
+    char _nameBuf[173];
     int type = itemBag->items[num].type;
     int arg = itemBag->items[num].arg;
     if (type == IKey) {
