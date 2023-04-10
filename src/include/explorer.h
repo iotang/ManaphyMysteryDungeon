@@ -38,6 +38,8 @@ ItemBag manaphyItemBag;
 
 EnemyList enemyList;
 int isEnemyMove;
+int spawnEnemyCount;
+int isAutoSpawnEnemy;
 
 void checkManaphyHealth() {
   while (updatePokemonStat(&manaphy))
@@ -165,6 +167,34 @@ void enemyRound() {
       i--;
     }
   }
+
+  if (isAutoSpawnEnemy) {
+    for (int i = 0; i < 10; i++) {
+      int x = RandomInteger(0, expDungeon.width);
+      int y = RandomInteger(0, expDungeon.height);
+      if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
+          expDungeon.event[x][y].type == Lock)
+        continue;
+      if (isOnEnemyList(&enemyList, x, y))
+        continue;
+      if (manhattanDistance(x, y, manaphy.x, manaphy.y) <= 11)
+        continue;
+      Pokemon enemy;
+      spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
+      enemy.x = x;
+      enemy.y = y;
+      enemy.exp = RandomInteger(0, 3) * 100;
+      while (updatePokemonStat(&enemy))
+        ;
+      enemy.direction = RandomInteger(0, 3);
+      Item item;
+      item.type = RandomInteger(0, 1) * IOranBerry;
+      item.arg = 0;
+      emplaceEnemyListWithItem(&enemyList, enemy, item);
+      break;
+    }
+  }
+
   isEnemyMove = 0;
 }
 
@@ -588,6 +618,31 @@ void giveCheat() {
   emplaceHint(_cheat);
 }
 
+void spawnEnemy() {
+  for (int i = 0; i < spawnEnemyCount; i++) {
+    int x = RandomInteger(0, expDungeon.width);
+    int y = RandomInteger(0, expDungeon.height);
+    if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
+        expDungeon.event[x][y].type == Lock)
+      continue;
+    if (isOnEnemyList(&enemyList, x, y))
+      continue;
+    if (x == manaphy.x && y == manaphy.y)
+      continue;
+    Pokemon enemy;
+    spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
+    enemy.x = x;
+    enemy.y = y;
+    enemy.exp = RandomInteger(0, 3) * 100;
+    while (updatePokemonStat(&enemy))
+      ;
+    enemy.direction = RandomInteger(0, 3);
+    Item item;
+    item.type = RandomInteger(0, 1) * IOranBerry;
+    emplaceEnemyListWithItem(&enemyList, enemy, item);
+  }
+}
+
 void initExplorer() {
   if (!expHasReadDungeon) {
     expDungeon = currentDungeon;
@@ -625,31 +680,11 @@ void initExplorer() {
     }
 
     clearEnemyList(&enemyList);
-    for (int i = 0; i < 50; i++) {
-      int x = RandomInteger(0, expDungeon.width);
-      int y = RandomInteger(0, expDungeon.height);
-      if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
-          expDungeon.event[x][y].type == Lock)
-        continue;
-      if (isOnEnemyList(&enemyList, x, y))
-        continue;
-      Pokemon enemy;
-      spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
-      enemy.x = x;
-      enemy.y = y;
-      enemy.direction = RandomInteger(0, 3);
-      Item item;
-      item.type = RandomInteger(1, 3);
-      emplaceEnemyListWithItem(&enemyList, enemy, item);
-    }
-    Pokemon enemy;
-    spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
-    enemy.x = manaphy.x + 3;
-    enemy.y = manaphy.y;
-    emplaceEnemyList(&enemyList, enemy);
 
     isDungeonGameOver = 0;
     emptyBellyHintCount = 0;
+    spawnEnemyCount = 1;
+    isAutoSpawnEnemy = 0;
     clearHint();
   }
   clearHelpList();
@@ -678,19 +713,6 @@ void drawExplorer() {
   drawBox(Window43Left, WindowHeightInch * 0.97, Window43Width,
           WindowHeightInch * 0.03, 1, expDungeonFileName, 'L', "Black");
 
-  int colorType = (clock() >> 8) & 1;
-  int hpLow = manaphy.hp * 5 <= manaphy.maxhp;
-  int emptyBelly = manaphy.belly <= 0;
-  if (hpLow) {
-    SetPenColor(colorType ? "Red" : "Light Pink");
-    drawBox(Window43Left, 0, Window43Width, MenuHeight, 1, "Danger! HP Low!",
-            'L', colorType ? "White" : "Black");
-  } else if (emptyBelly) {
-    SetPenColor(colorType ? "Yellow" : "Light Pink");
-    drawBox(Window43Left, 0, Window43Width, MenuHeight, 1,
-            "Danger! Belly is Empty!", 'L', "Black");
-  }
-
   // status bar
   /*
     if (hpLow) {
@@ -705,6 +727,67 @@ void drawExplorer() {
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
   drawHelpList(0, WindowHeightInch * 0.9);
+
+  char __buf[99];
+
+  sprintf(__buf, "%d", spawnEnemyCount);
+  drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.54,
+                       Window43Gap * 0.92, WindowHeightInch * 0.03, 1,
+                       "Spawn Enemy", 'C', "Black");
+  SetPenColor("White");
+  drawBox(Window43Gap * 0.04, WindowHeightInch * 0.50, Window43Gap * 0.92,
+          WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
+  setButtonColors("White", "Blue", "Blue", "White", 1);
+  if (button(GenUIID(0), Window43Gap * 0.505, WindowHeightInch * 0.46,
+             Window43Gap * 0.195, WindowHeightInch * 0.03, "+", idExplorer)) {
+    spawnEnemyCount++;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.71, WindowHeightInch * 0.46,
+             Window43Gap * 0.25, WindowHeightInch * 0.03, "+10", idExplorer)) {
+    spawnEnemyCount += 10;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.30, WindowHeightInch * 0.46,
+             Window43Gap * 0.195, WindowHeightInch * 0.03, "-", idExplorer)) {
+    spawnEnemyCount--;
+    if (spawnEnemyCount < 1)
+      spawnEnemyCount = 1;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.46,
+             Window43Gap * 0.25, WindowHeightInch * 0.03, "-10", idExplorer)) {
+    spawnEnemyCount -= 10;
+    if (spawnEnemyCount < 1)
+      spawnEnemyCount = 1;
+  }
+
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.40,
+             Window43Gap * 0.92, WindowHeightInch * 0.03, "Spawn",
+             idExplorer)) {
+    spawnEnemy();
+  }
+  if (isAutoSpawnEnemy) {
+    setButtonColors("Blue", "White", "White", "Blue", 1);
+  } else {
+    setButtonColors("White", "Blue", "Blue", "White", 1);
+  }
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.34,
+             Window43Gap * 0.92, WindowHeightInch * 0.03,
+             isAutoSpawnEnemy ? "Auto Spawn On" : "Auto Spawn Off",
+             idExplorer)) {
+    isAutoSpawnEnemy ^= 1;
+  }
+
+  int colorType = (clock() >> 8) & 1;
+  int hpLow = manaphy.hp * 5 <= manaphy.maxhp;
+  int emptyBelly = manaphy.belly <= 0;
+  if (hpLow) {
+    SetPenColor(colorType ? "Red" : "Light Pink");
+    drawBox(Window43Left, 0, Window43Width, MenuHeight, 1, "Danger! HP Low!",
+            'L', colorType ? "White" : "Black");
+  } else if (emptyBelly) {
+    SetPenColor(colorType ? "Yellow" : "Light Pink");
+    drawBox(Window43Left, 0, Window43Width, MenuHeight, 1,
+            "Danger! Belly is Empty!", 'L', "Black");
+  }
 
   drawStatusBar(&manaphy, 0, WindowHeightInch * 0.01, idExplorer);
 

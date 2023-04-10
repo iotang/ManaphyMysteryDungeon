@@ -202,7 +202,7 @@ void drawEditPage() {
   if (editCamera.y >= editDungeon.height)
     editCamera.y = editDungeon.height - 1;
 
-  int mx, my;
+  int mx = -1, my = -1;
   if (notInAllMenu(editMouseX, editMouseY)) {
     getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
                     editMouseX, editMouseY, &mx, &my);

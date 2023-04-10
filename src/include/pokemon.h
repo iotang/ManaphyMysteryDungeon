@@ -134,7 +134,7 @@ double getBaseStat(int lv, double base, double growth) {
 }
 
 double calcDamage(int lv, double effect, double atk, double def) {
-  return (effect * (lv + 5.00) / 105.00) * atk / def;
+  return (effect * (lv + 20.00) / 120.00) * atk / def;
 }
 
 double calcExp(int aLv, int bLv) {
@@ -218,7 +218,7 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species, int gender) {
 
   pokemon->belly = pokemon->maxbelly = 100.00;
 
-  if (species == NManaphy) {
+  if (species == NManaphy || species == NBasculin) {
     pokemon->moveCount = 2;
     pokemon->move[1] = MWaterGun;
     pokemon->pp[1] = movedex[MWaterGun].pp;

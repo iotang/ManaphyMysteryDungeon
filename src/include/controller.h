@@ -38,6 +38,23 @@ void (*autoMove)(void);
 void bindPlayerMove(void (*_playerMove)(int)) { playerMove = _playerMove; }
 void bindAutoMove(void (*_autoMove)(void)) { autoMove = _autoMove; }
 
+void clearTimers() {
+  timerStarted[MoveRight] = 0;
+  timerStarted[MoveUp] = 0;
+  timerStarted[MoveLeft] = 0;
+  timerStarted[MoveDown] = 0;
+  timerStarted[MoveNoDirection] = 0;
+  isUsingMove = 0;
+  controlPressed = 0;
+  shiftPressed = 0;
+  cancelTimer(MoveRight);
+  cancelTimer(MoveUp);
+  cancelTimer(MoveLeft);
+  cancelTimer(MoveDown);
+  cancelTimer(MoveNoDirection);
+  cancelTimer(ClearUsingMove);
+}
+
 void render(int id) {
   if (id == ScreenRend) {
     if (pauseBuffer) {
@@ -74,23 +91,6 @@ void render(int id) {
 void setPauseBuffer() {
   pauseBuffer = 1;
   startTimer(PauseBufferExpire, 100);
-}
-
-void clearTimers() {
-  timerStarted[MoveRight] = 0;
-  timerStarted[MoveUp] = 0;
-  timerStarted[MoveLeft] = 0;
-  timerStarted[MoveDown] = 0;
-  timerStarted[MoveNoDirection] = 0;
-  isUsingMove = 0;
-  controlPressed = 0;
-  shiftPressed = 0;
-  cancelTimer(MoveRight);
-  cancelTimer(MoveUp);
-  cancelTimer(MoveLeft);
-  cancelTimer(MoveDown);
-  cancelTimer(MoveNoDirection);
-  cancelTimer(ClearUsingMove);
 }
 
 void controlKeyboard(int key, int event) {
