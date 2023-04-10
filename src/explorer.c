@@ -819,6 +819,7 @@ void drawExplorer() {
 void stopExplorer() { clearHint(); }
 
 void uiExplorerGetKeyboard(int key, int event) {
+  printf("%d %d\n", key, event);
   controlKeyboard(key, event);
   if (smStateTop()->uid == idExplorer) {
     uiGetKeyboard(key, event);

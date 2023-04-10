@@ -1,41 +1,28 @@
 #include "pausepage.h"
 
+#include <windows.h>
+#include <time.h>
+
 #include "utils.h"
 #include "controller.h"
 #include "statemanager.h"
 
-void initPausePage() { smLastProc(); }
+AppState PausePage = {idPausePage, NULL, NULL, NULL, NULL, NULL, NULL};
 
-void drawPausePage() { smLastProc(); }
-
-void uiPausePageGetKeyboard(int key, int event) {
-  controlKeyboard(key, event);
-  uiGetKeyboard(key, event);
-}
-
-void uiPausePageGetChar(int ch) { uiGetChar(ch); }
-
-void uiPausePageGetMouse(int x, int y, int button, int event) {
-  uiGetMouse(x, y, button, event);
-}
-
-AppState PausePage = {idPausePage,
-                      initPausePage,
-                      drawPausePage,
-                      NULL,
-                      uiPausePageGetKeyboard,
-                      uiPausePageGetChar,
-                      uiPausePageGetMouse};
-
-void clearPause() {
-  if (smStateTop()->uid == idPausePage) {
-    smPopState();
-  }
-  setPauseBuffer();
+int isPausing() {
+  return !smIsStateEmpty() && smStateTop()->uid == idPausePage;
 }
 
 void makePause(double seconds) {
-  smPushState(&PausePage);
-  Pause(seconds);
-  clearPause();
+  double pausePageTimeFinish = (double)clock() / CLK_TCK + seconds;
+  smBarePushState(&PausePage);
+  smLastProc();
+  UpdateDisplay();
+  while (((double)clock() / CLK_TCK) < pausePageTimeFinish) {
+    smLastProc();
+    UpdateDisplay();
+    Sleep(10);
+  }
+  smBarePopState();
+  setPauseBuffer();
 }

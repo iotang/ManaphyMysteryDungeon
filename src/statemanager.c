@@ -73,6 +73,10 @@ void smPushState(AppState *state) {
   smRebuildTop();
 }
 
+void smBarePushState(AppState *state) {
+  stateStack.stk[stateStack.top++] = state;
+}
+
 void smPopState() {
   printf("smPopState\n");
   if (smIsStateEmpty())
@@ -83,6 +87,12 @@ void smPopState() {
   callDtor(now);
   stateStack.stk[--stateStack.top] = NULL;
   smRebuildTop();
+}
+
+void smBarePopState() {
+  if (smIsStateEmpty())
+    return;
+  stateStack.stk[--stateStack.top] = NULL;
 }
 
 void smPopStateUntil(int target) {

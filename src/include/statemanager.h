@@ -20,6 +20,8 @@ void smLastProc();
 void smTopChanging();
 void smRebuildTop();
 void smPushState(AppState *state);
+void smBarePushState(AppState *state);
 void smPopState();
+void smBarePopState();
 void smPopStateUntil(int target);
 void smClearState();
