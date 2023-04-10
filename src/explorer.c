@@ -181,7 +181,7 @@ void enemyRound() {
       if (manhattanDistance(x, y, manaphy.x, manaphy.y) <= 11)
         continue;
       Pokemon enemy;
-      spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
+      spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
       enemy.x = x;
       enemy.y = y;
       enemy.exp = RandomInteger(0, 3) * 100;
@@ -633,7 +633,7 @@ void spawnEnemy() {
     if (x == manaphy.x && y == manaphy.y)
       continue;
     Pokemon enemy;
-    spawnPokemon(&enemy, Enemy, NBasculin, RandomChance(0.5));
+    spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
     enemy.x = x;
     enemy.y = y;
     enemy.exp = RandomInteger(0, 3) * 100;

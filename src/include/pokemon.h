@@ -10,7 +10,7 @@
 #define NKate (0)
 #define NManaphy (490)
 #define NCresselia (488)
-#define NBasculin (550)
+#define NRemoraid (223)
 #define NSuicune (245)
 
 #define MoveNumber (999)

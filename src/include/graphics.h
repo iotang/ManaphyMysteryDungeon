@@ -12,6 +12,19 @@
 
 #ifndef _graphics_h
 #define _graphics_h
+
+#include <Windows.h>
+#include <conio.h>
+#include <ctype.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <wincon.h>
+#include <windows.h>
+#include <mmsystem.h>
+
 /*
  * Overview
  * --------
@@ -178,5 +191,7 @@ void startTimer(int id, int timeinterval);
 void cancelTimer(int id);
 
 void DisplayClear();
+
+void drawBmp(HBITMAP hbitmap, double midx, double midy, double w, double h);
 
 #endif

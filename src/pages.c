@@ -9,6 +9,7 @@
 #include "dungeon.h"
 #include "drawdungeon.h"
 #include "controller.h"
+#include "imagesupport.h"
 
 #include "alertdialog.h"
 #include "confirmdialog.h"
@@ -199,6 +200,9 @@ void drawMainMenu() {
   SetPenColor("Blue");
   MovePen((WindowWidthInch - TextStringWidth(title)) / 2, WindowHeightInch / 2);
   DrawTextString(title);
+
+  HBITMAP bitmap = readBmpImage("assets/sprites/0490D.bmp");
+  drawBmp(bitmap, WindowWidthInch / 2, WindowHeightInch / 2, 2, 2);
 
   drawToolsBar();
 }

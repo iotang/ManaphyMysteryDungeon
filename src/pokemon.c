@@ -22,13 +22,13 @@ void initPokedex() {
   pokedex[NManaphy].atkGrowth = 1.8;
   pokedex[NManaphy].defGrowth = 1.7;
 
-  strcpy(pokedex[NBasculin].name, "Basculin");
-  pokedex[NBasculin].hpBase = 20;
-  pokedex[NBasculin].atkBase = 5.5;
-  pokedex[NBasculin].defBase = 3;
-  pokedex[NBasculin].hpGrowth = 1.5;
-  pokedex[NBasculin].atkGrowth = 1.5;
-  pokedex[NBasculin].defGrowth = 1.0;
+  strcpy(pokedex[NRemoraid].name, "Remoraid");
+  pokedex[NRemoraid].hpBase = 18;
+  pokedex[NRemoraid].atkBase = 5;
+  pokedex[NRemoraid].defBase = 3;
+  pokedex[NRemoraid].hpGrowth = 1.2;
+  pokedex[NRemoraid].atkGrowth = 1.5;
+  pokedex[NRemoraid].defGrowth = 1.0;
 
   strcpy(pokedex[NSuicune].name, "Suicune");
   pokedex[NSuicune].hpBase = 30;
@@ -162,7 +162,7 @@ void spawnPokemon(Pokemon *pokemon, Role role, int species, int gender) {
 
   pokemon->belly = pokemon->maxbelly = 100.00;
 
-  if (species == NManaphy || species == NBasculin) {
+  if (species == NManaphy || species == NRemoraid) {
     pokemon->moveCount = 2;
     pokemon->move[1] = MWaterGun;
     pokemon->pp[1] = movedex[MWaterGun].pp;

@@ -7,17 +7,6 @@
  * for the Borland/Windows platform.
  */
 
-#include <Windows.h>
-#include <conio.h>
-#include <ctype.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <wincon.h>
-#include <windows.h>
-
 #include "extgraph.h"
 #include "gcalloc.h"
 #include "genlib.h"
@@ -65,6 +54,8 @@
 
 #define GWClassName "Graphics Window"
 #define DefaultFont "System"
+
+#define TransparentColor (0x114514)
 
 /*
  * Other constants
@@ -807,7 +798,8 @@ static void InitDisplay(void) {
   yResolution *= scaleFactor;
   SetRectFromSize(&graphicsRect, LeftMargin, TopMargin, PixelsX(windowWidth),
                   PixelsY(windowHeight));
-  style = (WS_OVERLAPPEDWINDOW & ~(WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) ^ WS_THICKFRAME;
+  style = (WS_OVERLAPPEDWINDOW & ~(WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) ^
+          WS_THICKFRAME;
 
   g_keyboard = NULL;
   g_mouse = NULL;
@@ -1870,4 +1862,25 @@ double ScaleXInches(int x) /*x coordinate from pixels to inches*/
 double ScaleYInches(int y) /*y coordinate from pixels to inches*/
 {
   return GetWindowHeight() - (double)y / GetYResolution();
+}
+
+void drawBmp(HBITMAP hbitmap, double midx, double midy, double w, double h) {
+  int pw = PixelsX(w), ph = PixelsY(h);
+  int pmidx = PixelsX(midx), pmidy = PixelsY(GetWindowHeight() - midy);
+
+  HDC stretchDC = CreateCompatibleDC(osdc);
+  HGDIOBJ hOldBmp = SelectObject(stretchDC, hbitmap);
+  BITMAP bmp;
+  GetObject(hbitmap, sizeof(BITMAP), &bmp);
+  double xsth = 1.00 * pw / bmp.bmWidth;
+  double ysth = 1.00 * ph / bmp.bmHeight;
+  double sth = xsth < ysth ? xsth : ysth;
+  int realw = bmp.bmWidth * sth;
+  int realh = bmp.bmHeight * sth;
+
+  StretchBlt(osdc, pmidx - (realw >> 1), pmidy - (realh >> 1), realw, realh,
+             stretchDC, 0, 0, bmp.bmWidth, bmp.bmHeight, SRCAND);
+  SelectObject(stretchDC, hOldBmp);
+  DeleteObject(hOldBmp);
+  DeleteDC(stretchDC);
 }
