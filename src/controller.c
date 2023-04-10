@@ -10,7 +10,7 @@
 
 #include "utils.h"
 #include "statemanager.h"
-#include "hintvalue.h"
+#include "messagedialog.h"
 #include "pausepage.h"
 
 #define MOVEGAP (150)
@@ -78,8 +78,8 @@ void render(int id) {
   if (id == MoveNoDirection)
     playerMoves(MoveNoDirection);
 
-  if (id == HintExpire)
-    clearHint();
+  if (id == MessageExpire)
+    clearMessage();
   if (id == AutoRun)
     autoMove();
 

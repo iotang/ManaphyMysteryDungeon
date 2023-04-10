@@ -21,7 +21,7 @@
 #include "editpage.h"
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
-#include "hintvalue.h"
+#include "messagedialog.h"
 #include "statusbar.h"
 #include "drawitembag.h"
 #include "pausepage.h"
@@ -46,11 +46,11 @@ void checkManaphyHealth() {
   while (updatePokemonStat(&manaphy))
     ;
   if (manaphy.hp <= 0) {
-    clearHint();
+    clearMessage();
     static char _failed[200];
     sprintf(_failed, "Oh no! %s is fainted!", manaphy.name);
-    setHint(_failed);
-    cancelTimer(HintExpire);
+    setMessage(_failed);
+    cancelTimer(MessageExpire);
     isDungeonGameOver = 1;
   }
 }
@@ -90,7 +90,7 @@ void enemyRound() {
         int move = who->move[index];
         static char _useMove[99];
         sprintf(_useMove, "%s uses %s!", who->name, movedex[move].name);
-        emplaceHint(_useMove);
+        emplaceMessage(_useMove);
         who->pp[index]--;
         makePause(0.5);
 
@@ -100,7 +100,7 @@ void enemyRound() {
         if (dmg < 1)
           dmg = 1;
         sprintf(_useMove, "%s takes %d damage!", manaphy.name, dmg);
-        emplaceHint(_useMove);
+        emplaceMessage(_useMove);
         manaphy.hp -= dmg;
         makePokemonStatBound(&manaphy);
         makePause(0.5);
@@ -157,7 +157,7 @@ void enemyRound() {
     if (who->hp <= 0) {
       static char _failed[200];
       sprintf(_failed, "%s is fainted.", who->name);
-      setHint(_failed);
+      setMessage(_failed);
       who->x = who->y = -1;
     }
   }
@@ -199,7 +199,7 @@ void enemyRound() {
   isEnemyMove = 0;
 }
 
-int emptyBellyHintCount;
+int emptyBellyMessageCount;
 
 int manaphyMove(int att) {
   if (isDungeonGameOver)
@@ -245,14 +245,14 @@ int manaphyMove(int att) {
     if (expDungeon.event[dx][dy].type == Lock) {
       int key = getKeyInItemBag(&manaphyItemBag);
       if (!((key >> (expDungeon.event[dx][dy].arg - 1)) & 1)) {
-        emplaceHint("You don't have the right key to open it.");
+        emplaceMessage("You don't have the right key to open it.");
       } else {
         successMove = 1;
       }
     } else if (expDungeon.mp[dx][dy] == Block) {
-      emplaceHint("You cannot move into a block.");
+      emplaceMessage("You cannot move into a block.");
     } else if (isOnEnemyList(&enemyList, dx, dy)) {
-      emplaceHint("Use moves to take the enemies down.");
+      emplaceMessage("Use moves to take the enemies down.");
     } else {
       successMove = 1;
     }
@@ -264,16 +264,16 @@ int manaphyMove(int att) {
       if (manaphy.belly <= 0) {
         manaphy.belly = 0;
         manaphy.hp--;
-        if (emptyBellyHintCount == 0) {
-          emplaceHint("Oh, no! Your belly is empty!");
-        } else if (emptyBellyHintCount == 1) {
-          emplaceHint("Hurry up! You must have something to eat!");
-        } else if (emptyBellyHintCount == 2) {
-          emplaceHint("Otherwise you will fall soon!");
+        if (emptyBellyMessageCount == 0) {
+          emplaceMessage("Oh, no! Your belly is empty!");
+        } else if (emptyBellyMessageCount == 1) {
+          emplaceMessage("Hurry up! You must have something to eat!");
+        } else if (emptyBellyMessageCount == 2) {
+          emplaceMessage("Otherwise you will fall soon!");
         }
-        emptyBellyHintCount++;
+        emptyBellyMessageCount++;
       } else
-        emptyBellyHintCount = 0;
+        emptyBellyMessageCount = 0;
     }
 
     return successMove;
@@ -288,13 +288,13 @@ int manaphyMove(int att) {
 
     if (type == IKey) {
       sprintf(_useItem, "Walk into the lock to use the key.");
-      emplaceHint(_useItem);
+      emplaceMessage(_useItem);
       return 0;
     } else if (type == ITM) {
       for (int i = 1; i < manaphy.moveCount; i++) {
         if (manaphy.move[i] == arg) {
           sprintf(_useItem, "%s's PP is maxed out!", movedex[arg].name);
-          emplaceHint(_useItem);
+          emplaceMessage(_useItem);
           manaphy.pp[i] = movedex[arg].pp;
           removeOutItemBag(&manaphyItemBag, index);
           return 1;
@@ -304,7 +304,7 @@ int manaphyMove(int att) {
       if (manaphy.moveCount < MaxMoveCount) {
         sprintf(_useItem, "%s has learned %s!", manaphy.name,
                 movedex[arg].name);
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
         manaphy.move[manaphy.moveCount] = arg;
         manaphy.pp[manaphy.moveCount] = movedex[arg].pp;
         manaphy.moveCount++;
@@ -314,25 +314,25 @@ int manaphyMove(int att) {
         sprintf(_useItem,
                 "%s cannot learn more moves. Unlearn some moves first.",
                 manaphy.name);
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
         return 0;
       }
     } else {
       sprintf(_useItem, "%s uses %s.", manaphy.name, itemsData[type].name);
-      emplaceHint(_useItem);
+      emplaceMessage(_useItem);
 
       makePause(0.5);
 
       if (itemsData[type].dbelly != 0) {
         if (itemsData[type].dbelly > 49.5) {
           sprintf(_useItem, "%s's belly is filled!", manaphy.name);
-          emplaceHint(_useItem);
+          emplaceMessage(_useItem);
         } else if (itemsData[type].dbelly > 9.5) {
           sprintf(_useItem, "%s's belly is slightly filled!", manaphy.name);
-          emplaceHint(_useItem);
+          emplaceMessage(_useItem);
         } else if (itemsData[type].dbelly < 0) {
           sprintf(_useItem, "%s's belly dropped!", manaphy.name);
-          emplaceHint(_useItem);
+          emplaceMessage(_useItem);
         }
         manaphy.belly += itemsData[type].dbelly;
         makePause(0.2);
@@ -342,7 +342,7 @@ int manaphyMove(int att) {
         sprintf(_useItem, "%s's max HP %s by %d!", manaphy.name,
                 itemsData[type].dmaxhp > 0 ? "raised" : "dropped",
                 abs(itemsData[type].dmaxhp));
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
         manaphy.maxhp += itemsData[type].dmaxhp;
         makePause(0.2);
       }
@@ -363,7 +363,7 @@ int manaphyMove(int att) {
           sprintf(_useItem, "%s receives %d damage!", manaphy.name,
                   -itemsData[type].dhp);
         }
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
         manaphy.hp += itemsData[type].dhp;
         makePause(0.2);
       }
@@ -372,7 +372,7 @@ int manaphyMove(int att) {
         sprintf(_useItem, "%s's attack %s by %d!", manaphy.name,
                 itemsData[type].datk > 0 ? "raised" : "dropped",
                 abs(itemsData[type].datk));
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
         manaphy.atk += itemsData[type].datk;
         makePause(0.2);
       }
@@ -381,7 +381,7 @@ int manaphyMove(int att) {
         sprintf(_useItem, "%s's defense %s by %d!", manaphy.name,
                 itemsData[type].ddef > 0 ? "raised" : "dropped",
                 abs(itemsData[type].ddef));
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
         manaphy.def += itemsData[type].ddef;
         makePause(0.2);
       }
@@ -390,14 +390,14 @@ int manaphyMove(int att) {
         sprintf(_useItem, "%s's %s %.0lf EXP!", manaphy.name,
                 itemsData[type].dexp > 0 ? "gains" : "loses",
                 fabs(itemsData[type].dexp));
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
         manaphy.exp += itemsData[type].dexp;
         makePause(0.2);
       }
 
       while (updatePokemonStat(&manaphy)) {
         sprintf(_useItem, "%s raises to level %d!", manaphy.name, manaphy.lv);
-        emplaceHint(_useItem);
+        emplaceMessage(_useItem);
       }
 
       makePause(0.3);
@@ -419,12 +419,12 @@ int manaphyMove(int att) {
     if (movedex[move].pp > 0 && manaphy.pp[index] <= 0) {
       sprintf(_useMove, "%s is too exhausted to use %s.", manaphy.name,
               movedex[move].name);
-      emplaceHint(_useMove);
+      emplaceMessage(_useMove);
       return 0;
     }
 
     sprintf(_useMove, "%s uses %s!", manaphy.name, movedex[move].name);
-    emplaceHint(_useMove);
+    emplaceMessage(_useMove);
     manaphy.pp[index]--;
     makePause(0.5);
 
@@ -434,7 +434,7 @@ int manaphyMove(int att) {
     if (who < 0) {
       sprintf(_useMove, "But %s didn't hit anyone.",
               manaphy.gender ? "he" : "she");
-      emplaceHint(_useMove);
+      emplaceMessage(_useMove);
       return 1;
     }
 
@@ -444,33 +444,33 @@ int manaphyMove(int att) {
     if (dmg < 1)
       dmg = 1;
     sprintf(_useMove, "%s takes %d damage!", enemyList.enemy[who].name, dmg);
-    emplaceHint(_useMove);
+    emplaceMessage(_useMove);
     enemyList.enemy[who].hp -= dmg;
     makePokemonStatBound(&enemyList.enemy[who]);
     makePause(0.5);
 
     if (enemyList.enemy[who].hp <= 0) {
       sprintf(_useMove, "%s is fainted!", enemyList.enemy[who].name);
-      emplaceHint(_useMove);
+      emplaceMessage(_useMove);
       double exp = calcExp(manaphy.lv, enemyList.enemy[who].lv);
       Item getItem = enemyList.item[who];
       removeAtEnemyList(&enemyList, who);
       makePause(0.2);
 
       sprintf(_useMove, "%s gets %.2lf EXP.", manaphy.name, exp);
-      emplaceHint(_useMove);
+      emplaceMessage(_useMove);
       manaphy.exp += exp;
       makePause(0.2);
 
       while (updatePokemonStat(&manaphy)) {
         sprintf(_useMove, "%s raises to level %d!", manaphy.name, manaphy.lv);
-        emplaceHint(_useMove);
+        emplaceMessage(_useMove);
       }
 
       if (getItem.type != 0) {
         sprintf(_useMove, "A %s drops down, and %s puts it into the bag.",
                 itemsData[getItem.type].name, manaphy.name);
-        emplaceHint(_useMove);
+        emplaceMessage(_useMove);
         addIntoItemBag(&manaphyItemBag, getItem);
         makePause(0.2);
       }
@@ -487,7 +487,7 @@ int manaphyMove(int att) {
     static char _removeItem[99];
     sprintf(_removeItem, "%s drops %s on the ground.", manaphy.name,
             itemsData[type].name);
-    emplaceHint(_removeItem);
+    emplaceMessage(_removeItem);
 
     expDungeon.item[manaphy.x][manaphy.y].type = type;
     expDungeon.item[manaphy.x][manaphy.y].arg = arg;
@@ -506,12 +506,12 @@ int manaphyMove(int att) {
     static char _removeMove[99];
     if (arg == MTackle) {
       sprintf(_removeMove, "You cannot unlearn %s.", movedex[arg].name);
-      emplaceHint(_removeMove);
+      emplaceMessage(_removeMove);
       return 0;
     } else {
       sprintf(_removeMove, "%s has unlearned %s!", manaphy.name,
               movedex[arg].name);
-      emplaceHint(_removeMove);
+      emplaceMessage(_removeMove);
       for (int i = index; i < manaphy.moveCount; i++) {
         manaphy.move[i] = manaphy.move[i + 1];
         manaphy.pp[i] = manaphy.pp[i + 1];
@@ -532,9 +532,9 @@ void manaphyRound(int att) {
 
   checkManaphyHealth();
   if (expDungeon.mp[manaphy.x][manaphy.y] == End) {
-    clearHint();
-    setHint("You have successfully conquered this dungeon!");
-    cancelTimer(HintExpire);
+    clearMessage();
+    setMessage("You have successfully conquered this dungeon!");
+    cancelTimer(MessageExpire);
     isDungeonGameOver = 1;
   }
 
@@ -618,7 +618,7 @@ void giveCheat() {
   sprintf(_cheat, "Walk %s may good for you.",
           ret == RIGHT ? "right"
                        : (ret == UP ? "up" : (ret == LEFT ? "left" : "down")));
-  emplaceHint(_cheat);
+  emplaceMessage(_cheat);
 }
 
 void spawnEnemy() {
@@ -685,10 +685,10 @@ void initExplorer() {
     clearEnemyList(&enemyList);
 
     isDungeonGameOver = 0;
-    emptyBellyHintCount = 0;
+    emptyBellyMessageCount = 0;
     spawnEnemyCount = 1;
     isAutoSpawnEnemy = 0;
-    clearHint();
+    clearMessage();
   }
   clearHelpList();
   addHelpEntry("Move:", "Arrow or WASD");
@@ -809,14 +809,14 @@ void drawExplorer() {
     manaphyRound(moveAtt);
   }
 
-  // hint dialog
+  // Message dialog
 
-  drawHintDialog();
+  drawMessageDialog();
 
   drawToolsBar();
 }
 
-void stopExplorer() { clearHint(); }
+void stopExplorer() { clearMessage(); }
 
 void uiExplorerGetKeyboard(int key, int event) {
   printf("%d %d\n", key, event);

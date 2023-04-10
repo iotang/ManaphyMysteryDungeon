@@ -13,7 +13,7 @@
 #include "drawdungeon.h"
 #include "solvemodel.h"
 #include "controller.h"
-#include "hintvalue.h"
+#include "messagedialog.h"
 
 #include "pages.h"
 #include "alertdialog.h"
@@ -137,7 +137,7 @@ void initEditPage() {
   addHelpEntry("Select Cell:", "Left Click");
   addHelpEntry("Jump to Cell:", "Right Click");
   addHelpEntry("Zoom:", "Mouse Wheel");
-  clearHint();
+  clearMessage();
 
   editMode = Flip;
   isDungeonOpened = 1;

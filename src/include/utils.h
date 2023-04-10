@@ -48,7 +48,7 @@ typedef enum TimeEvent {
   UseMove3,
   UseMove4,
   UseMove5,
-  HintExpire,
+  MessageExpire,
   AutoRun,
   ClearUsingMove,
   PauseBufferExpire

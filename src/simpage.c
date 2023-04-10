@@ -20,7 +20,7 @@
 #include "editpage.h"
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
-#include "hintvalue.h"
+#include "messagedialog.h"
 #include "drawitembag.h"
 #include "statusbar.h"
 
@@ -65,10 +65,10 @@ void checkCresseliaHealth() {
   while (updatePokemonStat(&cresselia))
     ;
   if (cresselia.hp <= 0) {
-    clearHint();
+    clearMessage();
     static char _failed[200];
     sprintf(_failed, "Oh no! %s is fainted!", cresselia.name);
-    setHint(_failed);
+    setMessage(_failed);
     isDungeonSimTerminated = 1;
   }
 }
@@ -147,22 +147,22 @@ void cresseliaMove() {
         cresselia.hp--;
       }
     } else if (dir == ERRORDIRECTION) {
-      clearHint();
+      clearMessage();
       static char _failed[200];
       sprintf(_failed, "%s: I cannot find a way to get out!", cresselia.name);
-      setHint(_failed);
+      setMessage(_failed);
     }
   }
 
   pokemonStepOn(&simDungeon, &cresselia, &cresseliaItemBag);
   checkCresseliaHealth();
   if (simDungeon.mp[cresselia.x][cresselia.y] == End) {
-    clearHint();
+    clearMessage();
     static char _success[200];
     sprintf(_success, "%s has successfully conquered this dungeon!",
             cresselia.name);
-    setHint(_success);
-    cancelTimer(HintExpire);
+    setMessage(_success);
+    cancelTimer(MessageExpire);
     endAutoSimulating();
     isDungeonSimTerminated = 1;
   }
@@ -200,7 +200,7 @@ void initSimPage() {
     simulateSpeed = 100;
     isCameraFollowCresselia = 0;
     isDungeonSimTerminated = 0;
-    clearHint();
+    clearMessage();
   }
   clearHelpList();
   addHelpEntry("Move Camera:", "");
@@ -342,9 +342,9 @@ void drawSimPage() {
               idSimPage);
   drawMoveList(&cresselia, Window43Right, 0, idSimPage);
 
-  // hint dialog
+  // Message dialog
 
-  drawHintDialog();
+  drawMessageDialog();
 
   drawToolsBar();
 }

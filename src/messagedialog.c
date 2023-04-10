@@ -1,4 +1,4 @@
-#include "hintvalue.h"
+#include "messagedialog.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -9,28 +9,28 @@
 
 #include "utils.h"
 
-char hintString[MaxHintLength] = {0};
+char MessageString[MaxMessageLength] = {0};
 
-void setHint(char *s) {
-  strcpy(hintString, s);
-  cancelTimer(HintExpire);
-  startTimer(HintExpire, HintExpireTime);
+void setMessage(char *s) {
+  strcpy(MessageString, s);
+  cancelTimer(MessageExpire);
+  startTimer(MessageExpire, MessageExpireTime);
 }
 
-void emplaceHint(char *s) {
-  static char _hintString[MaxHintLength - 1];
-  strcpy(_hintString, hintString);
-  sprintf(hintString, "%s\n%s", _hintString, s);
-  cancelTimer(HintExpire);
-  startTimer(HintExpire, HintExpireTime);
+void emplaceMessage(char *s) {
+  static char _MessageString[MaxMessageLength - 1];
+  strcpy(_MessageString, MessageString);
+  sprintf(MessageString, "%s\n%s", _MessageString, s);
+  cancelTimer(MessageExpire);
+  startTimer(MessageExpire, MessageExpireTime);
 }
 
-int isHintEmpty() { return hintString[0] == 0; }
+int isMessageEmpty() { return MessageString[0] == 0; }
 
-void clearHint() { hintString[0] = 0; }
+void clearMessage() { MessageString[0] = 0; }
 
-void drawHintDialog() {
-  if (!isHintEmpty()) {
+void drawMessageDialog() {
+  if (!isMessageEmpty()) {
     /*
     SetPenColor("White");
     drawRectangleDensity(Window43Left + Window43Width * 0.1,
@@ -46,10 +46,10 @@ void drawHintDialog() {
     SetPointSize(24);
     double h = GetFontHeight();
 
-    static char tmp[MaxHintLine][MaxHintLength];
+    static char tmp[MaxMessageLine][MaxMessageLength];
     int now = 0;
-    char *cur = hintString, *wr = tmp[now];
-    for (int i = 0; i < MaxHintLine; i++)
+    char *cur = MessageString, *wr = tmp[now];
+    for (int i = 0; i < MaxMessageLine; i++)
       tmp[i][0] = 0;
 
     while (*cur) {
@@ -57,21 +57,21 @@ void drawHintDialog() {
       if (*cur == '\n') {
         *wr = 0;
         now++;
-        if (now >= MaxHintLine)
+        if (now >= MaxMessageLine)
           now = 0;
         wr = tmp[now];
       }
     }
     *wr = 0;
-    for (int i = 0; i < MaxHintLine; i++) {
+    for (int i = 0; i < MaxMessageLine; i++) {
       now++;
-      if (now >= MaxHintLine)
+      if (now >= MaxMessageLine)
         now = 0;
       if (tmp[now][0] != 0)
         break;
     }
 
-    for (int i = 0; i < MaxHintLine; i++) {
+    for (int i = 0; i < MaxMessageLine; i++) {
       if (tmp[now][0]) {
         static double fuzz[8][2] = {
             {0.08, 0.00}, {-0.08, 0.00}, {0.00, 0.08},   {0.00, -0.08},
@@ -80,19 +80,19 @@ void drawHintDialog() {
           drawBoxWithoutBorder(
               Window43Left + Window43Width * 0.11 + h * fuzz[x][0],
               WindowHeightInch * 0.245 -
-                  WindowHeightInch * 0.19 / MaxHintLine * (i + 1) -
+                  WindowHeightInch * 0.19 / MaxMessageLine * (i + 1) -
                   h * fuzz[x][1],
-              Window43Width * 0.78, WindowHeightInch * 0.19 / MaxHintLine, 0,
+              Window43Width * 0.78, WindowHeightInch * 0.19 / MaxMessageLine, 0,
               tmp[now], 'L', "White");
         }
         drawBoxWithoutBorder(
             Window43Left + Window43Width * 0.11,
             WindowHeightInch * 0.245 -
-                WindowHeightInch * 0.19 / MaxHintLine * (i + 1),
-            Window43Width * 0.78, WindowHeightInch * 0.19 / MaxHintLine, 0,
+                WindowHeightInch * 0.19 / MaxMessageLine * (i + 1),
+            Window43Width * 0.78, WindowHeightInch * 0.19 / MaxMessageLine, 0,
             tmp[now], 'L', "Black");
         now++;
-        if (now >= MaxHintLine)
+        if (now >= MaxMessageLine)
           now = 0;
       }
     }
