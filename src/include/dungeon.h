@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "items.h"
-#include "landevent.h"
+#include "landevents.h"
 #include "random.h"
 
 #define MaxDungeonWidth (50)

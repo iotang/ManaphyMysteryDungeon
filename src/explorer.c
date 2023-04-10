@@ -7,9 +7,7 @@
 #include "extgraph.h"
 #include "imgui.h"
 
-#include "appstate.h"
 #include "statemanager.h"
-#include "utils.h"
 #include "pokemon.h"
 #include "dungeon.h"
 #include "drawdungeon.h"
@@ -19,6 +17,8 @@
 #include "attempt.h"
 #include "enemylist.h"
 
+#include "pages.h"
+#include "editpage.h"
 #include "alertdialog.h"
 #include "getfilenamedialog.h"
 #include "hintvalue.h"
@@ -645,8 +645,6 @@ void spawnEnemy() {
     emplaceEnemyListWithItem(&enemyList, enemy, item);
   }
 }
-
-extern char editDungeonFileName[MaxFileNameLength + 1];
 
 void initExplorer() {
   if (!expHasReadDungeon) {

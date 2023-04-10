@@ -4,13 +4,15 @@
 #include "graphics.h"
 #include "imgui.h"
 #include "mmsystem.h"
-#include "utils.h"
 
+#include "random.h"
+#include "utils.h"
 #include "controller.h"
 #include "statemanager.h"
 #include "pages.h"
+#include "pokemon.h"
 #include "items.h"
-#include "landevent.h"
+#include "landevents.h"
 
 extern AppState MainMenu;
 

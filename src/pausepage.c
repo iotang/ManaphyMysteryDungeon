@@ -1,6 +1,7 @@
 #include "pausepage.h"
 
 #include "utils.h"
+#include "controller.h"
 #include "statemanager.h"
 
 void initPausePage() { smLastProc(); }

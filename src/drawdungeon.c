@@ -378,7 +378,7 @@ int drawDungeonEventEditOverride(LandEvent *landEvent, Item *item, double basex,
     if (button(GenUIID(0), basex + Window43Gap * 0.06,
                basey + WindowHeightInch * 0.27, Window43Gap * 0.88,
                WindowHeightInch * 0.03,
-               *overrideItem ? "Override" : "Not Override", belong)) {
+               *overrideItem ? "Override" : "Don't Override", belong)) {
       *overrideItem ^= 1;
     }
   }
@@ -494,7 +494,7 @@ int drawDungeonEventEditOverride(LandEvent *landEvent, Item *item, double basex,
     if (button(GenUIID(0), basex + Window43Gap * 0.06,
                basey + WindowHeightInch * 0.025, Window43Gap * 0.88,
                WindowHeightInch * 0.03,
-               *overrideLandEvent ? "Override" : "Not Override", belong)) {
+               *overrideLandEvent ? "Override" : "Don't Override", belong)) {
       *overrideLandEvent ^= 1;
     }
   }
