@@ -66,6 +66,33 @@ int enemyCanStepIn(int dx, int dy) {
          !isOnEnemyList(&enemyList, dx, dy);
 }
 
+int spawnSingleEnemy(int distance) {
+  for (int i = 0; i < 10; i++) {
+    int x = RandomInteger(0, expDungeon.width);
+    int y = RandomInteger(0, expDungeon.height);
+    if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
+        expDungeon.event[x][y].type == Lock)
+      continue;
+    if (isOnEnemyList(&enemyList, x, y))
+      continue;
+    if (manhattanDistance(x, y, manaphy.x, manaphy.y) <= 11)
+      continue;
+    Pokemon enemy;
+    spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
+    enemy.x = x;
+    enemy.y = y;
+    enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100;
+    while (updatePokemonStat(&enemy))
+      ;
+    enemy.direction = RandomInteger(0, 3);
+    Item item;
+    item.type = RandomInteger(0, 1) * IOranBerry;
+    emplaceEnemyListWithItem(&enemyList, enemy, item);
+    return 1;
+  }
+  return 0;
+}
+
 void enemyRound() {
   isEnemyMove = 1;
   for (size_t i = 0; i < enemyList.count; i++) {
@@ -167,7 +194,7 @@ void enemyRound() {
       }
     }
 
-    pokemonOneItemStepOn(&expDungeon, who, item);
+    pokemonEnemyStepOn(&expDungeon, who, item);
     if (who->hp <= 0) {
       static char _failed[200];
       sprintf(_failed, "%s is fainted.", who->name);
@@ -183,31 +210,8 @@ void enemyRound() {
     }
   }
 
-  if (isAutoSpawnEnemy) {
-    for (int i = 0; i < 10; i++) {
-      int x = RandomInteger(0, expDungeon.width);
-      int y = RandomInteger(0, expDungeon.height);
-      if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
-          expDungeon.event[x][y].type == Lock)
-        continue;
-      if (isOnEnemyList(&enemyList, x, y))
-        continue;
-      if (manhattanDistance(x, y, manaphy.x, manaphy.y) <= 11)
-        continue;
-      Pokemon enemy;
-      spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
-      enemy.x = x;
-      enemy.y = y;
-      enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100;
-      while (updatePokemonStat(&enemy))
-        ;
-      enemy.direction = RandomInteger(0, 3);
-      Item item;
-      item.type = RandomInteger(0, 1) * IOranBerry;
-      item.arg = 0;
-      emplaceEnemyListWithItem(&enemyList, enemy, item);
-      break;
-    }
+  if (isAutoSpawnEnemy && RandomChance(1.00 / 5)) {
+    spawnSingleEnemy(11);
   }
 
   isEnemyMove = 0;
@@ -635,33 +639,38 @@ void giveCheat() {
                 ? "right"
                 : (ret == UP ? "up" : (ret == LEFT ? "left" : "down")));
   } else {
-    sprintf(_cheat, "Someone has stolen your key! Find it!");
+    for (int i = 0; i < enemyList.count; i++) {
+      if (enemyList.item[i].type == IKey) {
+        tx = enemyList.enemy[i].x;
+        ty = enemyList.enemy[i].y;
+        break;
+      }
+    }
+    for (int i = 0; i < 4; i++) {
+      int dx = manaphy.x + go[i][0], dy = manaphy.y + go[i][1];
+      if (dx >= 0 && dx < expDungeon.width && dy >= 0 &&
+          dy < expDungeon.height) {
+        if (expDungeon.mp[dx][dy] == Block)
+          continue;
+        lint distan = getDungeonDistance(&expDungeon, dx, dy, key, tx, ty,
+                                         DefaultHPPenalty, 1);
+        if (distan < minDistan || (distan == minDistan && RandomChance(0.5))) {
+          ret = i;
+          minDistan = distan;
+        }
+      }
+    }
+    sprintf(_cheat, "Someone has stolen your key! Walk %s to find it!",
+            ret == RIGHT
+                ? "right"
+                : (ret == UP ? "up" : (ret == LEFT ? "left" : "down")));
   }
   emplaceMessage(_cheat);
 }
 
 void spawnEnemy() {
   for (int i = 0; i < spawnEnemyCount; i++) {
-    int x = RandomInteger(0, expDungeon.width);
-    int y = RandomInteger(0, expDungeon.height);
-    if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
-        expDungeon.event[x][y].type == Lock)
-      continue;
-    if (isOnEnemyList(&enemyList, x, y))
-      continue;
-    if (x == manaphy.x && y == manaphy.y)
-      continue;
-    Pokemon enemy;
-    spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
-    enemy.x = x;
-    enemy.y = y;
-    enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100;
-    while (updatePokemonStat(&enemy))
-      ;
-    enemy.direction = RandomInteger(0, 3);
-    Item item;
-    item.type = RandomInteger(0, 1) * IOranBerry;
-    emplaceEnemyListWithItem(&enemyList, enemy, item);
+    spawnSingleEnemy(1);
   }
 }
 
@@ -737,6 +746,11 @@ void drawExplorer() {
   for (size_t i = 0; i < enemyList.count; i++) {
     drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize,
                        &enemyList.enemy[i]);
+    if (enemyList.item[i].type == IKey) {
+      drawDungeonHighlightCellAt(&expDungeon, manaphy.x, manaphy.y, runCellSize,
+                                 enemyList.enemy[i].x, enemyList.enemy[i].y,
+                                 runCellSize * 0.7, "Red", 0, 0);
+    }
   }
 
   // title

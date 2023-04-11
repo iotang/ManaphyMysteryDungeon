@@ -53,7 +53,7 @@ void pokemonStepOn(Dungeon *dungeon, Pokemon *pokemon, ItemBag *itemBag) {
     ;
 }
 
-void pokemonOneItemStepOn(Dungeon *dungeon, Pokemon *pokemon, Item *item) {
+void pokemonEnemyStepOn(Dungeon *dungeon, Pokemon *pokemon, Item *item) {
   int x = pokemon->x, y = pokemon->y;
   if (!isInDungeon(dungeon, x, y))
     return;
@@ -74,5 +74,5 @@ void pokemonOneItemStepOn(Dungeon *dungeon, Pokemon *pokemon, Item *item) {
     }
   }
 
-  landEventCalc(dungeon, pokemon);
+  // landEventCalc(dungeon, pokemon);
 }

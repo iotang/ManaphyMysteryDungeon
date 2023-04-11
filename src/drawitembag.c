@@ -29,7 +29,8 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
   if (button(GenUIID(0), basex + Window43Gap * 0.05,
              basey + WindowHeightInch * 0.46, Window43Gap * 0.22,
              WindowHeightInch * 0.03, "<", belong)) {
-    itemBag->currentPage--;
+    if (itemBag->currentPage > 0)
+      itemBag->currentPage--;
   }
 
   SetPenColor("White");
@@ -42,14 +43,9 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
   if (button(GenUIID(0), basex + Window43Gap * 0.73,
              basey + WindowHeightInch * 0.46, Window43Gap * 0.22,
              WindowHeightInch * 0.03, ">", belong)) {
-    itemBag->currentPage++;
+    if (itemBag->currentPage + 1 < maxPage)
+      itemBag->currentPage++;
   }
-
-  if (itemBag->currentPage <= 0)
-    itemBag->currentPage = 0;
-
-  if (itemBag->currentPage >= maxPage)
-    itemBag->currentPage = maxPage - 1;
 
   SetPointSize(12);
   for (int i = 0; i < ItemPerPage; i++) {
