@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include "utils.h"
+#include "imagesupport.h"
 
 #define MaxItemNumber (8)
 #define MaxItemNameLength (16)
@@ -27,6 +28,7 @@ typedef struct ItemData {
   int dmove;
   int keyid;
   int defaultArg;
+  HBITMAP sprite;
 } ItemData;
 
 typedef struct Item {

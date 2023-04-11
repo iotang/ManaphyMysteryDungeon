@@ -1,5 +1,7 @@
 #pragma once
 
+#include "imagesupport.h"
+
 #define MaxLandEventTypeNumber (4)
 #define MaxLandEventNameLength (16)
 
@@ -15,6 +17,7 @@ typedef struct LandEventData {
   char name[MaxLandEventNameLength + 1];
   int permanent;
   int defaultArg;
+  HBITMAP sprite;
 } LandEventData;
 
 typedef struct LandEvent {

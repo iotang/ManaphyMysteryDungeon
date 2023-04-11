@@ -13,6 +13,7 @@
 #include "pokemon.h"
 #include "items.h"
 #include "landevents.h"
+#include "drawdungeon.h"
 
 extern AppState MainMenu;
 
@@ -25,6 +26,7 @@ void Main() {
   initMovedex();
   initItems();
   initLandEvents();
+  initDungeonSprites();
 
   InitConsole();
 

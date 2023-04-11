@@ -661,3 +661,29 @@ void drawLabel(double x, double y, char *label) {
     DrawTextString(label);
   }
 }
+
+void drawLabelWithOutline(double x, double y, char *label, char *baseColor,
+                          char *extColor) {
+  if (label && strlen(label) > 0) {
+    static double fuzz[8][2] = {{0.08, 0.00},   {-0.08, 0.00}, {0.00, 0.08},
+                                {0.00, -0.08},  {0.08, 0.08},  {0.08, -0.08},
+                                {-0.08, -0.08}, {-0.08, 0.08}};
+    double h = GetFontHeight();
+    SetPenColor(extColor);
+    for (int i = 0; i < 8; i++) {
+      MovePen(x + h * fuzz[i][0], y + h * fuzz[i][1]);
+      DrawTextString(label);
+    }
+    SetPenColor(baseColor);
+    MovePen(x, y);
+    DrawTextString(label);
+  }
+}
+
+void drawBoldRectangle(double x, double y, double w, double h,
+                       double innerWidth) {
+  drawRectangle(x, y, w, innerWidth, 1);
+  drawRectangle(x, y, innerWidth, h, 1);
+  drawRectangle(x, y + h - innerWidth, w, innerWidth, 1);
+  drawRectangle(x + w - innerWidth, y, innerWidth, h, 1);
+}

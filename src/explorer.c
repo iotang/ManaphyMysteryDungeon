@@ -70,14 +70,15 @@ void enemyRound() {
     int madeDecision = 0;
 
     if (distan <= 1) {
-      if (who->x == manaphy.x - 1)
+      if (who->x == manaphy.x - 1) {
         who->direction = RIGHT;
-      if (who->x == manaphy.x + 1)
+      } else if (who->x == manaphy.x + 1) {
         who->direction = LEFT;
-      if (who->y == manaphy.y - 1)
+      } else if (who->y == manaphy.y - 1) {
         who->direction = UP;
-      if (who->y == manaphy.y + 1)
+      } else if (who->y == manaphy.y + 1) {
         who->direction = DOWN;
+      }
 
       int able[MaxMoveCount], ableCount = 0;
       for (int i = 0; i < who->moveCount; i++) {
@@ -86,6 +87,16 @@ void enemyRound() {
         }
       }
       if (ableCount > 0) {
+        if (who->direction == RIGHT) {
+          manaphy.direction = LEFT;
+        } else if (who->direction == LEFT) {
+          manaphy.direction = RIGHT;
+        } else if (who->direction == UP) {
+          manaphy.direction = DOWN;
+        } else if (who->direction == DOWN) {
+          manaphy.direction = UP;
+        }
+
         int index = able[RandomInteger(0, ableCount - 1)];
         int move = who->move[index];
         static char _useMove[99];
@@ -485,7 +496,7 @@ int manaphyMove(int att) {
     int arg = manaphyItemBag.items[index].arg;
 
     static char _removeItem[99];
-    sprintf(_removeItem, "%s drops %s on the ground.", manaphy.name,
+    sprintf(_removeItem, "%s drops the %s on the ground.", manaphy.name,
             itemsData[type].name);
     emplaceMessage(_removeItem);
 
@@ -493,7 +504,7 @@ int manaphyMove(int att) {
     expDungeon.item[manaphy.x][manaphy.y].arg = arg;
     removeOutItemBag(&manaphyItemBag, index);
 
-    return 1;
+    return 0;
   }
 
   if (isRemoveMoveAttempt(att)) {
@@ -517,7 +528,7 @@ int manaphyMove(int att) {
         manaphy.pp[i] = manaphy.pp[i + 1];
       }
       manaphy.moveCount--;
-      return 1;
+      return 0;
     }
   }
 
@@ -697,13 +708,17 @@ void initExplorer() {
   addHelpEntry("", "Shift-Arrow or Shift-WASD");
   addHelpEntry("Use Items:", "Click on list");
   addHelpEntry("Use Moves:", "Number 1-5");
+  addHelpEntry("Drop Items:", "");
+  addHelpEntry("", "Ctrl and Right-click on list");
+  addHelpEntry("Unlearn Moves:", "");
+  addHelpEntry("", "Ctrl and Right-click on list");
   bindPlayerMove(manaphyMoveAttempt);
 }
 
 void drawExplorer() {
   makePokemonStatBound(&manaphy);
 
-  drawDungeon(&expDungeon, manaphy.x, manaphy.y, runCellSize, 0, NULL, 0);
+  drawDungeon(&expDungeon, manaphy.x, manaphy.y, runCellSize, 0, 0, NULL, 0);
   drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize, &manaphy);
   for (size_t i = 0; i < enemyList.count; i++) {
     drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize,

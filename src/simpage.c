@@ -250,7 +250,7 @@ void drawSimPage() {
   if (simCamera.y >= simDungeon.height)
     simCamera.y = simDungeon.height - 1;
 
-  drawDungeon(&simDungeon, simCamera.x, simCamera.y, simCellSize, 1,
+  drawDungeon(&simDungeon, simCamera.x, simCamera.y, simCellSize, 1, 1,
               &simHistory, 1);
   drawDungeonPokemon(&simDungeon, simCamera.x, simCamera.y, simCellSize,
                      &cresselia);

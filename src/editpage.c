@@ -201,17 +201,17 @@ void drawEditPage() {
     getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
                     editMouseX, editMouseY, &mx, &my);
   }
-  drawDungeon(&editDungeon, editCamera.x, editCamera.y, editCellSize, 1,
+  drawDungeon(&editDungeon, editCamera.x, editCamera.y, editCellSize, 1, 1,
               &editDungeonSolution, editHasSolution && !modifiedSinceLastSave);
   if (notInAllMenu(editMouseX, editMouseY)) {
     drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
-                               editCellSize, mx, my, editCellSize, 0, "Magenta",
-                               0, 0);
+                               editCellSize, mx, my, editCellSize, "Magenta", 0,
+                               0);
   }
   if (editMode == Targeted) {
     drawDungeonHighlightCellAt(&editDungeon, editCamera.x, editCamera.y,
                                editCellSize, editCursor.x, editCursor.y,
-                               editCellSize * 0.2, 1, "Orange", 0.3, -0.3);
+                               editCellSize * 0.94, "Orange", 0, 0);
   }
 
   // title

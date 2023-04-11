@@ -38,10 +38,13 @@ void drawMessageDialog() {
                          WindowHeightInch * 0.2, 1, 0.5);
                          */
     SetPenColor("Pink");
-    drawRectangle(Window43Left + Window43Width * 0.1, WindowHeightInch * 0.05,
-                  Window43Width * 0.8, WindowHeightInch * 0.2, 0);
-    drawRectangle(Window43Left + Window43Width * 0.11, WindowHeightInch * 0.055,
-                  Window43Width * 0.78, WindowHeightInch * 0.19, 0);
+
+    drawBoldRectangle(Window43Left + Window43Width * 0.08,
+                      WindowHeightInch * 0.04, Window43Width * 0.84,
+                      WindowHeightInch * 0.21, Window43Width * 0.01);
+    drawBoldRectangle(Window43Left + Window43Width * 0.09,
+                      WindowHeightInch * 0.04, Window43Width * 0.82,
+                      WindowHeightInch * 0.21, Window43Width * 0.01);
     int _pointSize = GetPointSize();
     SetPointSize(24);
     double h = GetFontHeight();

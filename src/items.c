@@ -1,9 +1,16 @@
 #include "items.h"
 
+#include <stdio.h>
 #include <string.h>
 #include "utils.h"
 
 ItemData itemsData[MaxItemNumber + 1];
+
+void readItemSprites(int num) {
+  static char _fileName[99];
+  sprintf(_fileName, "assets/items/%s.bmp", itemsData[num].name);
+  itemsData[num].sprite = readBmpImage(_fileName);
+}
 
 void initItems() {
   strcpy(itemsData[INone].name, "No Item");
@@ -27,6 +34,7 @@ void initItems() {
   itemsData[IApple].dmove = 0;
   itemsData[IApple].keyid = 0;
   itemsData[IApple].defaultArg = 0;
+  readItemSprites(IApple);
 
   strcpy(itemsData[IGummi].name, "Gummi");
   itemsData[IGummi].dexp = 50;
@@ -38,6 +46,7 @@ void initItems() {
   itemsData[IGummi].dmove = 0;
   itemsData[IGummi].keyid = 0;
   itemsData[IGummi].defaultArg = 0;
+  readItemSprites(IGummi);
 
   strcpy(itemsData[IOranBerry].name, "Oran Berry");
   itemsData[IOranBerry].dexp = 0;
@@ -49,6 +58,7 @@ void initItems() {
   itemsData[IOranBerry].dmove = 0;
   itemsData[IOranBerry].keyid = 0;
   itemsData[IOranBerry].defaultArg = 0;
+  readItemSprites(IOranBerry);
 
   strcpy(itemsData[ISitrusBerry].name, "Sitrus Berry");
   itemsData[ISitrusBerry].dexp = 0;
@@ -60,6 +70,7 @@ void initItems() {
   itemsData[ISitrusBerry].dmove = 0;
   itemsData[ISitrusBerry].keyid = 0;
   itemsData[ISitrusBerry].defaultArg = 0;
+  readItemSprites(ISitrusBerry);
 
   strcpy(itemsData[IElixir].name, "Elixir");
   itemsData[IElixir].dexp = 0;
@@ -71,6 +82,7 @@ void initItems() {
   itemsData[IElixir].dmove = 0;
   itemsData[IElixir].keyid = 0;
   itemsData[IElixir].defaultArg = 0;
+  readItemSprites(IElixir);
 
   strcpy(itemsData[IKey].name, "Key");
   itemsData[IKey].dexp = 0;
@@ -82,6 +94,7 @@ void initItems() {
   itemsData[IKey].dmove = 0;
   itemsData[IKey].keyid = 1;
   itemsData[IKey].defaultArg = 1;
+  readItemSprites(IKey);
 
   strcpy(itemsData[ITM].name, "TM");
   itemsData[ITM].dexp = 0;
@@ -93,6 +106,7 @@ void initItems() {
   itemsData[ITM].dmove = 1;
   itemsData[ITM].keyid = 0;
   itemsData[ITM].defaultArg = 1;
+  readItemSprites(ITM);
 
   strcpy(itemsData[IOrenBerry].name, "Oren Berry");
   itemsData[IOrenBerry].dexp = 0;
@@ -104,6 +118,7 @@ void initItems() {
   itemsData[IOrenBerry].dmove = 0;
   itemsData[IOrenBerry].keyid = 0;
   itemsData[IOrenBerry].defaultArg = 0;
+  readItemSprites(IOrenBerry);
 }
 
 int cmpItems(const void *lhs, const void *rhs) {

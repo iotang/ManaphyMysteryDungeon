@@ -3,6 +3,9 @@
 #define MOVEGAP (150)
 #define USEMOVEGAP (500)
 
+extern int controlPressed;
+extern int shiftPressed;
+
 void ScreenRender();
 
 void bindPlayerMove(void (*_playerMove)(int));

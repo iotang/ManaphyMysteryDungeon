@@ -6,6 +6,7 @@
 
 #include "utils.h"
 #include "attempt.h"
+#include "controller.h"
 
 void drawStatusBar(Pokemon *pokemon, double basex, double basey, int belong) {
   SetPenColor("Black");
@@ -125,7 +126,7 @@ int drawMoveList(Pokemon *pokemon, double basex, double basey, int belong) {
     setButtonColors("White", "Blue", "Cyan", "Blue", 1);
     int val = button(GenUIID(i), basex + Window43Gap * 0.05, baseHeight,
                      Window43Gap * 0.9, WindowHeightInch * 0.08, NULL, belong);
-    if (val != 0) {
+    if (val > 0 || (val < 0 && controlPressed)) {
       ret = i;
       retval = val;
     }

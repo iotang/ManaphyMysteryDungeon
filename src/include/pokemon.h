@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.h"
+#include "imagesupport.h"
 
 #define MaxMoveCount (5)
 #define MaxPokemonNameLength (16)
@@ -55,6 +56,8 @@ typedef struct Pokedex {
   double atkBase, defBase;
   double hpGrowth;
   double atkGrowth, defGrowth;
+
+  HBITMAP sprites[4];
 } Pokedex;
 
 extern Pokedex pokedex[PokemonSpeciesNumber];

@@ -1,9 +1,18 @@
 #include "pokemon.h"
 
+#include <stdio.h>
 #include <string.h>
 
 Pokedex pokedex[PokemonSpeciesNumber];
 Move movedex[MoveNumber];
+
+void readPokemonSprites(int num) {
+  static char _fileName[99];
+  for (int i = 0; i < 4; i++) {
+    sprintf(_fileName, "assets/sprites/%04d%c.bmp", num, "RULD"[i]);
+    pokedex[num].sprites[i] = readBmpImage(_fileName);
+  }
+}
 
 void initPokedex() {
   strcpy(pokedex[NKate].name, "Kate");
@@ -21,6 +30,7 @@ void initPokedex() {
   pokedex[NManaphy].hpGrowth = 2.3;
   pokedex[NManaphy].atkGrowth = 1.8;
   pokedex[NManaphy].defGrowth = 1.7;
+  readPokemonSprites(NManaphy);
 
   strcpy(pokedex[NRemoraid].name, "Remoraid");
   pokedex[NRemoraid].hpBase = 18;
@@ -29,6 +39,7 @@ void initPokedex() {
   pokedex[NRemoraid].hpGrowth = 1.2;
   pokedex[NRemoraid].atkGrowth = 1.5;
   pokedex[NRemoraid].defGrowth = 1.0;
+  readPokemonSprites(NRemoraid);
 
   strcpy(pokedex[NSuicune].name, "Suicune");
   pokedex[NSuicune].hpBase = 30;
@@ -45,6 +56,7 @@ void initPokedex() {
   pokedex[NCresselia].hpGrowth = 3.1;
   pokedex[NCresselia].atkGrowth = 1.6;
   pokedex[NCresselia].defGrowth = 2.1;
+  readPokemonSprites(NCresselia);
 };
 
 void initMovedex() {

@@ -8,6 +8,7 @@
 #include "items.h"
 #include "attempt.h"
 #include "pokemon.h"
+#include "controller.h"
 
 int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
   sortItemBag(itemBag);
@@ -71,7 +72,7 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
     int val = button(GenUIID(i), basex + Window43Gap * 0.05,
                      baseHeight + WindowHeightInch * 0.003, Window43Gap * 0.9,
                      height - WindowHeightInch * 0.006, NULL, belong);
-    if (val != 0) {
+    if (val > 0 || (val < 0 && controlPressed)) {
       ret = num;
       retval = val;
     }

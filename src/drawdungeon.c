@@ -5,6 +5,17 @@
 #include "imgui.h"
 
 #include "utils.h"
+#include "pokemon.h"
+#include "imagesupport.h"
+
+HBITMAP spritePlain, spriteBlock, spriteStart, spriteEnd;
+
+void initDungeonSprites() {
+  spritePlain = readBmpImage("assets/dungeon/Plain.bmp");
+  spriteBlock = readBmpImage("assets/dungeon/Block.bmp");
+  spriteStart = readBmpImage("assets/dungeon/Start.bmp");
+  spriteEnd = readBmpImage("assets/dungeon/End.bmp");
+}
 
 static bool inBox(double x, double y, double x1, double x2, double y1,
                   double y2) {
@@ -47,21 +58,20 @@ void drawDungeonPokemon(Dungeon *dungeon, int basex, int basey, double size,
   if (yloc + size < 0 || yloc > WindowHeightInch)
     return;
 
-  static char *dirTag[5] = {">", "^", "<", "v", "x"};
-
   if (pokemon->role == Player) {
     SetPenColor("Blue");
-    drawBox(xloc + 0.15 * size, yloc + 0.15 * size, 0.7 * size, 0.7 * size, 0,
-            dirTag[pokemon->direction], 'C', "Blue");
   } else if (pokemon->role == Enemy) {
     SetPenColor("Red");
-    drawBox(xloc + 0.15 * size, yloc + 0.15 * size, 0.7 * size, 0.7 * size, 0,
-            dirTag[pokemon->direction], 'C', "Red");
   }
+  drawBoldRectangle(xloc + 0.1 * size, yloc + 0.1 * size, 0.8 * size,
+                    0.8 * size, 0.03 * size);
+  drawBmp(pokedex[pokemon->species].sprites[pokemon->direction],
+          xloc + 0.5 * size, yloc + 0.5 * size, 0.9 * size, 0.9 * size);
 }
 
 void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
-                 int showTag, DungeonSolution *solution, int enableSolution) {
+                 int showTag, int showName, DungeonSolution *solution,
+                 int enableSolution) {
   int _pointSize = GetPointSize();
   SetPointSize(4);
   for (int x = 0; x < dungeon->width; x++) {
@@ -73,29 +83,27 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
       if (yloc + size < 0 || yloc > WindowHeightInch)
         continue;
 
-      int isfill = 0;
       if (dungeon->mp[x][y] == Plain) {
-        SetPenColor("Gray");
+        drawBmp(spritePlain, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
       } else if (dungeon->mp[x][y] == Block) {
-        SetPenColor("Gray");
-        isfill = 1;
+        drawBmp(spriteBlock, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
       } else if (dungeon->mp[x][y] == Start) {
+        drawBmp(spriteStart, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
         SetPenColor("Cyan");
-        isfill = 1;
+        drawBoldRectangle(xloc, yloc, size, size, 0.1 * size);
       } else if (dungeon->mp[x][y] == End) {
+        drawBmp(spriteEnd, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
         SetPenColor("Green");
-        isfill = 1;
+        drawBoldRectangle(xloc, yloc, size, size, 0.1 * size);
       }
 
       if (enableSolution) {
         if (dungeon->mp[x][y] == Plain && solution->mp[x][y]) {
           SetPenColor("Yellow");
-          isfill = 1;
+          drawRectangle(xloc + 0.05 * size, yloc + 0.05 * size, 0.9 * size,
+                        0.9 * size, 1);
         }
       }
-
-      drawRectangle(xloc + 0.05 * size, yloc + 0.05 * size, 0.9 * size,
-                    0.9 * size, isfill);
 
       if (size >= 0.8 && showTag) {
         SetPenColor("Black");
@@ -116,51 +124,59 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
       if (yloc + size < 0 || yloc > WindowHeightInch)
         continue;
 
-      if (size > 0.2) {
-        _pointSize = GetPointSize();
-        if (size >= 0.8)
-          SetPointSize(8);
-        else if (size >= 0.6)
-          SetPointSize(4);
-        else
-          SetPointSize(2);
-        char _tag[133];
-        double h = GetFontHeight() * 0.7;
-        if (dungeon->item[x][y].type != INone) {
-          SetPenColor("Brown");
-          if (dungeon->item[x][y].type == IKey ||
-              dungeon->item[x][y].type == ITM) {
-            sprintf(_tag, "%s %d", itemsData[dungeon->item[x][y].type].name,
-                    dungeon->item[x][y].arg);
+      _pointSize = GetPointSize();
+      if (size >= 0.8)
+        SetPointSize(8);
+      else if (size >= 0.6)
+        SetPointSize(4);
+      else
+        SetPointSize(2);
+      char _tag[133];
+      double h = GetFontHeight() * 0.7;
+      if (dungeon->item[x][y].type != INone) {
+        if (dungeon->item[x][y].type == IKey ||
+            dungeon->item[x][y].type == ITM) {
+          sprintf(_tag, "%s %d", itemsData[dungeon->item[x][y].type].name,
+                  dungeon->item[x][y].arg);
+        } else {
+          sprintf(_tag, "%s", itemsData[dungeon->item[x][y].type].name);
+        }
+        drawBmp(itemsData[dungeon->item[x][y].type].sprite, xloc + 0.5 * size,
+                yloc + 0.3 * size, 0.4 * size, 0.4 * size);
+
+        if (showName) {
+          if (size > 0.2) {
+            drawLabelWithOutline(xloc + 0.1 * size, yloc + 0.9 * size - h, _tag,
+                                 "Brown", "White");
           } else {
-            sprintf(_tag, "%s", itemsData[dungeon->item[x][y].type].name);
+            SetPenColor("Brown");
+            drawRectangle(xloc + 0.15 * size, yloc + 0.75 * size, 0.1 * size,
+                          0.1 * size, 1);
           }
-          drawLabel(xloc + 0.1 * size, yloc + 0.9 * size - h, _tag);
-        }
-        if (dungeon->event[x][y].type != None) {
-          SetPenColor("Orange");
-          if (dungeon->event[x][y].type == Lock) {
-            sprintf(_tag, "%s %d",
-                    landEventsData[dungeon->event[x][y].type].name,
-                    dungeon->event[x][y].arg);
-          } else {
-            sprintf(_tag, "%s", landEventsData[dungeon->event[x][y].type].name);
-          }
-          drawLabel(xloc + 0.1 * size, yloc + 0.9 * size - h - h, _tag);
-        }
-        SetPointSize(_pointSize);
-      } else {
-        if (dungeon->item[x][y].type != INone) {
-          SetPenColor("Brown");
-          drawRectangle(xloc + 0.15 * size, yloc + 0.75 * size, 0.1 * size,
-                        0.1 * size, 1);
-        }
-        if (dungeon->event[x][y].type != None) {
-          SetPenColor("Orange");
-          drawRectangle(xloc + 0.35 * size, yloc + 0.75 * size, 0.1 * size,
-                        0.1 * size, 1);
         }
       }
+      if (dungeon->event[x][y].type != None) {
+        if (dungeon->event[x][y].type == Lock) {
+          sprintf(_tag, "%s %d", landEventsData[dungeon->event[x][y].type].name,
+                  dungeon->event[x][y].arg);
+        } else {
+          sprintf(_tag, "%s", landEventsData[dungeon->event[x][y].type].name);
+        }
+        drawBmp(landEventsData[dungeon->event[x][y].type].sprite,
+                xloc + 0.5 * size, yloc + 0.5 * size, size, size);
+
+        if (showName || dungeon->event[x][y].type == Lock) {
+          if (size > 0.2) {
+            drawLabelWithOutline(xloc + 0.1 * size, yloc + 0.9 * size - h - h,
+                                 _tag, "Orange", "Black");
+          } else {
+            SetPenColor("Orange");
+            drawRectangle(xloc + 0.35 * size, yloc + 0.75 * size, 0.1 * size,
+                          0.1 * size, 1);
+          }
+        }
+      }
+      SetPointSize(_pointSize);
     }
   }
 
@@ -181,32 +197,6 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
       }
 
       while (now) {
-        /*
-        int x = now->x, y = now->y;
-        if (lasx + 1 == x && lasy == y) {
-          dir = RIGHT;
-        } else if (lasx == x && lasy + 1 == y) {
-          dir = UP;
-        } else if (lasx - 1 == x && lasy == y) {
-          dir = LEFT;
-        } else if (lasx == x && lasy - 1 == y) {
-          dir = DOWN;
-        } else {
-          dir = 4;
-        }
-        if (lasx >= 0 && lasy >= 0) {
-          double xloc =
-              size * (lasx - basex) + (WindowWidthInch / 2 - size / 2);
-          double yloc =
-              size * (lasy - basey) + (WindowHeightInch / 2 - size / 2);
-          if (xloc + size >= Window43Left && xloc <= Window43Right &&
-              yloc + size >= 0 && yloc <= WindowHeightInch) {
-            drawBoxWithoutBorder(xloc + 0.05 * size, yloc + 0.05 * size, 0.9 *
-        size, 0.9 * size, 0, dirTag[dir], 'C', "Red");
-          }
-        }
-*/
-
         int x = now->x, y = now->y;
         static char _tag[12];
         sprintf(_tag, "%d", ++count);
@@ -219,10 +209,7 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
                                0.7 * size, h, 0, _tag, 'R', "Red");
           visitCount[x][y]++;
         }
-
         now = now->nex;
-        // lasx = x;
-        // lasy = y;
       }
       SetPointSize(_pointSize);
     }
@@ -231,28 +218,28 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
 
 void drawDungeonHighlightCellAt(Dungeon *dungeon, int basex, int basey,
                                 double size, int x, int y, double length,
-                                int fill, char *color, double dx, double dy) {
+                                char *color, double dx, double dy) {
   if (!isInDungeon(dungeon, x, y))
     return;
 
   double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
   double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
   SetPenColor(color);
-  drawBox(xloc + (size - length) / 2 + dx * size,
-          yloc + (size - length) / 2 + dy * size, length, length, fill, NULL,
-          'C', "Black");
+  drawBoldRectangle(xloc + (size - length) / 2 + dx * size,
+                    yloc + (size - length) / 2 + dy * size, length, length,
+                    0.03 * size);
   return;
 }
 
 void drawDungeonHighlightCell(Dungeon *dungeon, int basex, int basey,
                               double size, double lx, double ly, double length,
-                              int fill, char *color, double dx, double dy) {
+                              char *color, double dx, double dy) {
   int x = -1, y = -1;
   getCellLocation(dungeon, basex, basey, size, lx, ly, &x, &y);
   if (x < 0 || y < 0)
     return;
-  drawDungeonHighlightCellAt(dungeon, basex, basey, size, x, y, length, fill,
-                             color, dx, dy);
+  drawDungeonHighlightCellAt(dungeon, basex, basey, size, x, y, length, color,
+                             dx, dy);
 }
 
 int drawDungeonEventEditOverride(LandEvent *landEvent, Item *item, double basex,
@@ -507,6 +494,7 @@ int drawDungeonEventEditOverride(LandEvent *landEvent, Item *item, double basex,
 
   return modified;
 }
+
 int drawDungeonEventEdit(LandEvent *landEvent, Item *item, double basex,
                          double basey, char *bgcolor, int isEdit, int belong) {
   return drawDungeonEventEditOverride(landEvent, item, basex, basey, bgcolor,

@@ -197,6 +197,8 @@ void usePredefinedTexBoxColors(int k);
 
 /* 显示字符串标签 */
 void drawLabel(double x, double y, char *label);
+void drawLabelWithOutline(double x, double y, char *label, char *baseColor,
+                          char *extColor);
 
 /* 画一个矩形 */
 void drawRectangleDensity(double x, double y, double w, double h, int fillflag,
@@ -217,5 +219,8 @@ void drawBox(double x, double y, double w, double h, int fillflag, char *label,
              char xalignment, char *labelColor);
 void drawBoxWithoutBorder(double x, double y, double w, double h, int fillflag,
                           char *label, char xalignment, char *labelColor);
+
+void drawBoldRectangle(double x, double y, double w, double h,
+                       double innerWidth);
 
 #endif // define ____ui_button_h______
