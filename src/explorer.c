@@ -261,7 +261,7 @@ int manaphyMove(int att) {
         successMove = 1;
       }
     } else if (expDungeon.mp[dx][dy] == Block) {
-      emplaceMessage("You cannot move into a block.");
+      // emplaceMessage("You cannot move into a block.");
     } else if (isOnEnemyList(&enemyList, dx, dy)) {
       emplaceMessage("Use moves to take the enemies down.");
     } else {

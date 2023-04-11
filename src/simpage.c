@@ -145,6 +145,8 @@ void cresseliaMove() {
       if (cresselia.belly <= 0) {
         cresselia.belly = 0;
         cresselia.hp--;
+      } else {
+        cresselia.hp += cresselia.maxhp / 200;
       }
     } else if (dir == ERRORDIRECTION) {
       clearMessage();
