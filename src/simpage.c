@@ -252,6 +252,9 @@ void drawSimPage() {
   if (simCamera.y >= simDungeon.height)
     simCamera.y = simDungeon.height - 1;
 
+  SetPenColor("Gray");
+  drawRectangle(Window43Left, 0, Window43Width, WindowHeightInch, 1);
+
   drawDungeon(&simDungeon, simCamera.x, simCamera.y, simCellSize, 1, 1,
               &simHistory, 1);
   drawDungeonPokemon(&simDungeon, simCamera.x, simCamera.y, simCellSize,
@@ -268,34 +271,57 @@ void drawSimPage() {
   SetPenColor("Light Yellow");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
-  drawHelpList(0, WindowHeightInch * 0.9);
+  drawHelpList(0, WindowHeightInch * 0.97);
 
-  drawStatusBar(&cresselia, 0, WindowHeightInch * 0.01, idSimPage);
+  drawStatusBar(&cresselia, 0, WindowHeightInch * 0.01, 1, idSimPage);
+
+  if (button(GenUIID(0), Window43Gap * 0.03, WindowHeightInch * 0.75,
+             Window43Gap * 0.94, WindowHeightInch * 0.03, "Raise Level by 1",
+             idSimPage)) {
+    cresselia.exp += 100;
+    while (updatePokemonStat(&cresselia))
+      ;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.03, WindowHeightInch * 0.70,
+             Window43Gap * 0.94, WindowHeightInch * 0.03, "Raise Level by 10",
+             idSimPage)) {
+    cresselia.exp += 1000;
+    while (updatePokemonStat(&cresselia))
+      ;
+  }
+  if (button(GenUIID(0), Window43Gap * 0.03, WindowHeightInch * 0.65,
+             Window43Gap * 0.94, WindowHeightInch * 0.03, "Recover Cresselia",
+             idSimPage)) {
+    cresselia.hp = cresselia.maxhp;
+    cresselia.belly = cresselia.maxbelly;
+    while (updatePokemonStat(&cresselia))
+      ;
+  }
 
   char __buf[99];
-  drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.42,
+  drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.58,
                        Window43Gap * 0.92, WindowHeightInch * 0.03, 0,
                        "Simulate Speed", 'L', "Black");
 
   sprintf(__buf, "%d%%", simulateSpeed);
   SetPenColor("White");
-  drawBox(Window43Gap * 0.3, WindowHeightInch * 0.39, Window43Gap * 0.4,
+  drawBox(Window43Gap * 0.3, WindowHeightInch * 0.55, Window43Gap * 0.4,
           WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
   setButtonColors("White", "Blue", "Blue", "White", 1);
   int nextSimulateSpeed = simulateSpeed;
-  if (button(GenUIID(0), Window43Gap * 0.70, WindowHeightInch * 0.39,
+  if (button(GenUIID(0), Window43Gap * 0.70, WindowHeightInch * 0.55,
              Window43Gap * 0.1, WindowHeightInch * 0.03, "+", idSimPage)) {
     nextSimulateSpeed += 10;
   }
-  if (button(GenUIID(0), Window43Gap * 0.84, WindowHeightInch * 0.39,
+  if (button(GenUIID(0), Window43Gap * 0.84, WindowHeightInch * 0.55,
              Window43Gap * 0.11, WindowHeightInch * 0.03, "++", idSimPage)) {
     nextSimulateSpeed += 100;
   }
-  if (button(GenUIID(0), Window43Gap * 0.20, WindowHeightInch * 0.39,
+  if (button(GenUIID(0), Window43Gap * 0.20, WindowHeightInch * 0.55,
              Window43Gap * 0.1, WindowHeightInch * 0.03, "-", idSimPage)) {
     nextSimulateSpeed -= 10;
   }
-  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.39,
+  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.55,
              Window43Gap * 0.11, WindowHeightInch * 0.03, "--", idSimPage)) {
     nextSimulateSpeed -= 100;
   }
@@ -308,7 +334,7 @@ void drawSimPage() {
 
   setButtonColors(isAutoSimulating ? "Magenta" : "White", "Blue", "Blue",
                   "White", 1);
-  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.35,
+  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.51,
              Window43Gap * 0.9, WindowHeightInch * 0.03, "Auto Run",
              idSimPage)) {
     if (isAutoSimulating) {
@@ -319,7 +345,7 @@ void drawSimPage() {
   }
 
   setButtonColors("White", "Blue", "Blue", "White", 1);
-  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.31,
+  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.47,
              Window43Gap * 0.9, WindowHeightInch * 0.03, "Single Step",
              idSimPage)) {
     if (!isAutoSimulating) {
@@ -329,7 +355,7 @@ void drawSimPage() {
 
   setButtonColors(isCameraFollowCresselia ? "Magenta" : "White", "Blue", "Blue",
                   "White", 1);
-  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.27,
+  if (button(GenUIID(0), Window43Gap * 0.05, WindowHeightInch * 0.43,
              Window43Gap * 0.9, WindowHeightInch * 0.03, "Lock Camera",
              idSimPage)) {
     isCameraFollowCresselia = !isCameraFollowCresselia;

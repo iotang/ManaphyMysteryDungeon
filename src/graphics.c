@@ -809,7 +809,8 @@ static void InitDisplay(void) {
   wndcls.cbWndExtra = 0;
   wndcls.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
   wndcls.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wndcls.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+  wndcls.hIcon = LoadImage(NULL, "assets/icon/icon.ico", IMAGE_ICON, 0, 0,
+                           LR_DEFAULTSIZE | LR_LOADFROMFILE);
   wndcls.hInstance = NULL;
   wndcls.lpfnWndProc = GraphicsEventProc;
   wndcls.lpszClassName = "Graphics Window";
@@ -1866,7 +1867,8 @@ double ScaleYInches(int y) /*y coordinate from pixels to inches*/
   return GetWindowHeight() - (double)y / GetYResolution();
 }
 
-void drawBmp(HBITMAP hbitmap, double midx, double midy, double w, double h) {
+void drawBmp(HBITMAP hbitmap, double midx, double midy, double w, double h,
+             int method) {
   int pw = PixelsX(w), ph = PixelsY(h);
   int pmidx = PixelsX(midx), pmidy = PixelsY(GetWindowHeight() - midy);
 
@@ -1877,11 +1879,15 @@ void drawBmp(HBITMAP hbitmap, double midx, double midy, double w, double h) {
   double xsth = 1.00 * pw / bmp.bmWidth;
   double ysth = 1.00 * ph / bmp.bmHeight;
   double sth = xsth < ysth ? xsth : ysth;
-  int realw = bmp.bmWidth * sth;
-  int realh = bmp.bmHeight * sth;
+  int realw = ceil(bmp.bmWidth * sth + 0.000000001);
+  int realh = ceil(bmp.bmHeight * sth + 0.000000001);
+  if (realw & 1)
+    realw++;
+  if (realh & 1)
+    realh++;
 
   StretchBlt(osdc, pmidx - (realw >> 1), pmidy - (realh >> 1), realw, realh,
-             stretchDC, 0, 0, bmp.bmWidth, bmp.bmHeight, SRCAND);
+             stretchDC, 0, 0, bmp.bmWidth, bmp.bmHeight, method);
   SelectObject(stretchDC, hOldBmp);
   DeleteObject(hOldBmp);
   DeleteDC(stretchDC);

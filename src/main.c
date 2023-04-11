@@ -30,7 +30,7 @@ void Main() {
   initDungeonSprites();
   readHelpPageSprites();
 
-  InitConsole();
+  // InitConsole();
 
   InitGraphics();
   InitGUI();

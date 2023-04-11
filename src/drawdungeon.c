@@ -66,7 +66,7 @@ void drawDungeonPokemon(Dungeon *dungeon, int basex, int basey, double size,
   drawBoldRectangle(xloc + 0.1 * size, yloc + 0.1 * size, 0.8 * size,
                     0.8 * size, 0.03 * size);
   drawBmp(pokedex[pokemon->species].sprites[pokemon->direction],
-          xloc + 0.5 * size, yloc + 0.5 * size, 0.9 * size, 0.9 * size);
+          xloc + 0.5 * size, yloc + 0.5 * size, 0.9 * size, 0.9 * size, SRCAND);
 }
 
 void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
@@ -84,15 +84,19 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
         continue;
 
       if (dungeon->mp[x][y] == Plain) {
-        drawBmp(spritePlain, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
+        drawBmp(spritePlain, xloc + 0.5 * size, yloc + 0.5 * size, size, size,
+                SRCCOPY);
       } else if (dungeon->mp[x][y] == Block) {
-        drawBmp(spriteBlock, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
+        drawBmp(spriteBlock, xloc + 0.5 * size, yloc + 0.5 * size, size, size,
+                SRCCOPY);
       } else if (dungeon->mp[x][y] == Start) {
-        drawBmp(spriteStart, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
+        drawBmp(spriteStart, xloc + 0.5 * size, yloc + 0.5 * size, size, size,
+                SRCCOPY);
         SetPenColor("Cyan");
         drawBoldRectangle(xloc, yloc, size, size, 0.1 * size);
       } else if (dungeon->mp[x][y] == End) {
-        drawBmp(spriteEnd, xloc + 0.5 * size, yloc + 0.5 * size, size, size);
+        drawBmp(spriteEnd, xloc + 0.5 * size, yloc + 0.5 * size, size, size,
+                SRCCOPY);
         SetPenColor("Green");
         drawBoldRectangle(xloc, yloc, size, size, 0.1 * size);
       }
@@ -142,7 +146,7 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
           sprintf(_tag, "%s", itemsData[dungeon->item[x][y].type].name);
         }
         drawBmp(itemsData[dungeon->item[x][y].type].sprite, xloc + 0.5 * size,
-                yloc + 0.3 * size, 0.4 * size, 0.4 * size);
+                yloc + 0.3 * size, 0.4 * size, 0.4 * size, SRCAND);
 
         if (showName) {
           if (size > 0.2) {
@@ -163,7 +167,7 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
           sprintf(_tag, "%s", landEventsData[dungeon->event[x][y].type].name);
         }
         drawBmp(landEventsData[dungeon->event[x][y].type].sprite,
-                xloc + 0.5 * size, yloc + 0.5 * size, size, size);
+                xloc + 0.5 * size, yloc + 0.5 * size, size, size, SRCAND);
 
         if (showName || dungeon->event[x][y].type == Lock) {
           if (size > 0.2) {

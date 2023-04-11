@@ -196,6 +196,9 @@ void drawEditPage() {
   if (editCamera.y >= editDungeon.height)
     editCamera.y = editDungeon.height - 1;
 
+  SetPenColor("Gray");
+  drawRectangle(Window43Left, 0, Window43Width, WindowHeightInch, 1);
+
   int mx = -1, my = -1;
   if (notInAllMenu(editMouseX, editMouseY)) {
     getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
@@ -223,7 +226,7 @@ void drawEditPage() {
   SetPenColor("Cyan");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
-  drawHelpList(0, WindowHeightInch * 0.9);
+  drawHelpList(0, WindowHeightInch * 0.97);
 
   char __buf[99];
 

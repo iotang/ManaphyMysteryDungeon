@@ -8,8 +8,15 @@
 #include "attempt.h"
 #include "controller.h"
 
-void drawStatusBar(Pokemon *pokemon, double basex, double basey, int belong) {
+void drawStatusBar(Pokemon *pokemon, double basex, double basey, int portrait,
+                   int belong) {
   SetPenColor("Black");
+
+  if (portrait) {
+    drawBmp(pokedex[pokemon->species].portrait, basex + Window43Gap * 0.5,
+            basey + WindowHeightInch * 0.2 + Window43Gap * 0.5,
+            Window43Gap * 0.9, Window43Gap * 0.9, SRCCOPY);
+  }
 
   double expRatio = 0.01 * pokemon->exp;
   if (expRatio > 1)

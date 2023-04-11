@@ -59,6 +59,13 @@ int manhattanDistance(int x1, int y1, int x2, int y2) {
   return abs(x1 - x2) + abs(y1 - y2);
 }
 
+int enemyCanStepIn(int dx, int dy) {
+  return isInDungeon(&expDungeon, dx, dy) && expDungeon.mp[dx][dy] != Block &&
+         expDungeon.event[dx][dy].type != Lock &&
+         (dx != manaphy.x || dy != manaphy.y) &&
+         !isOnEnemyList(&enemyList, dx, dy);
+}
+
 void enemyRound() {
   isEnemyMove = 1;
   for (size_t i = 0; i < enemyList.count; i++) {
@@ -116,6 +123,8 @@ void enemyRound() {
         makePokemonStatBound(&manaphy);
         makePause(0.5);
         checkManaphyHealth();
+        if (isDungeonGameOver)
+          return;
         madeDecision = 1;
       }
     }
@@ -124,10 +133,7 @@ void enemyRound() {
       if (distan > 10) {
         int dx = who->x + go[who->direction][0],
             dy = who->y + go[who->direction][1];
-        if (isInDungeon(&expDungeon, dx, dy) &&
-            expDungeon.mp[dx][dy] == Plain && expDungeon.mp[dx][dy] != Lock &&
-            (dx != manaphy.x || dy != manaphy.y) &&
-            !isOnEnemyList(&enemyList, dx, dy)) {
+        if (enemyCanStepIn(dx, dy)) {
           who->x = dx;
           who->y = dy;
           madeDecision = 1;
@@ -153,10 +159,7 @@ void enemyRound() {
         }
         who->direction = ret;
         int dx = who->x + go[ret][0], dy = who->y + go[ret][1];
-        if (isInDungeon(&expDungeon, dx, dy) &&
-            expDungeon.mp[dx][dy] == Plain && expDungeon.mp[dx][dy] != Lock &&
-            (dx != manaphy.x || dy != manaphy.y) &&
-            !isOnEnemyList(&enemyList, dx, dy)) {
+        if (enemyCanStepIn(dx, dy)) {
           who->x = dx;
           who->y = dy;
         }
@@ -195,7 +198,7 @@ void enemyRound() {
       spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
       enemy.x = x;
       enemy.y = y;
-      enemy.exp = RandomInteger(0, 3) * 100;
+      enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100;
       while (updatePokemonStat(&enemy))
         ;
       enemy.direction = RandomInteger(0, 3);
@@ -626,9 +629,14 @@ void giveCheat() {
   }
 
   static char _cheat[99];
-  sprintf(_cheat, "Walk %s may good for you.",
-          ret == RIGHT ? "right"
-                       : (ret == UP ? "up" : (ret == LEFT ? "left" : "down")));
+  if (minDistan < linf - 1) {
+    sprintf(_cheat, "Walk %s may good for you.",
+            ret == RIGHT
+                ? "right"
+                : (ret == UP ? "up" : (ret == LEFT ? "left" : "down")));
+  } else {
+    sprintf(_cheat, "Someone has stolen your key! Find it!");
+  }
   emplaceMessage(_cheat);
 }
 
@@ -647,7 +655,7 @@ void spawnEnemy() {
     spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
     enemy.x = x;
     enemy.y = y;
-    enemy.exp = RandomInteger(0, 3) * 100;
+    enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100;
     while (updatePokemonStat(&enemy))
       ;
     enemy.direction = RandomInteger(0, 3);
@@ -718,8 +726,14 @@ void initExplorer() {
 void drawExplorer() {
   makePokemonStatBound(&manaphy);
 
+  SetPenColor("Gray");
+  drawRectangle(Window43Left, 0, Window43Width, WindowHeightInch, 1);
+
   drawDungeon(&expDungeon, manaphy.x, manaphy.y, runCellSize, 0, 0, NULL, 0);
-  drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize, &manaphy);
+  if (manaphy.hp > 0 || !isDungeonGameOver) {
+    drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize,
+                       &manaphy);
+  }
   for (size_t i = 0; i < enemyList.count; i++) {
     drawDungeonPokemon(&expDungeon, manaphy.x, manaphy.y, runCellSize,
                        &enemyList.enemy[i]);
@@ -744,40 +758,40 @@ void drawExplorer() {
   SetPenColor("Light Pink");
   drawRectangle(0, 0, Window43Left, WindowHeightInch, 1);
 
-  drawHelpList(0, WindowHeightInch * 0.9);
+  drawHelpList(0, WindowHeightInch * 0.97);
 
   char __buf[99];
 
   sprintf(__buf, "%d", spawnEnemyCount);
-  drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.54,
+  drawBoxWithoutBorder(Window43Gap * 0.04, WindowHeightInch * 0.63,
                        Window43Gap * 0.92, WindowHeightInch * 0.03, 1,
                        "Spawn Enemy", 'C', "Black");
   SetPenColor("White");
-  drawBox(Window43Gap * 0.04, WindowHeightInch * 0.50, Window43Gap * 0.92,
+  drawBox(Window43Gap * 0.04, WindowHeightInch * 0.59, Window43Gap * 0.92,
           WindowHeightInch * 0.03, 1, __buf, 'C', "Black");
   setButtonColors("White", "Blue", "Blue", "White", 1);
-  if (button(GenUIID(0), Window43Gap * 0.505, WindowHeightInch * 0.46,
+  if (button(GenUIID(0), Window43Gap * 0.505, WindowHeightInch * 0.55,
              Window43Gap * 0.195, WindowHeightInch * 0.03, "+", idExplorer)) {
     spawnEnemyCount++;
   }
-  if (button(GenUIID(0), Window43Gap * 0.71, WindowHeightInch * 0.46,
+  if (button(GenUIID(0), Window43Gap * 0.71, WindowHeightInch * 0.55,
              Window43Gap * 0.25, WindowHeightInch * 0.03, "+10", idExplorer)) {
     spawnEnemyCount += 10;
   }
-  if (button(GenUIID(0), Window43Gap * 0.30, WindowHeightInch * 0.46,
+  if (button(GenUIID(0), Window43Gap * 0.30, WindowHeightInch * 0.55,
              Window43Gap * 0.195, WindowHeightInch * 0.03, "-", idExplorer)) {
     spawnEnemyCount--;
     if (spawnEnemyCount < 1)
       spawnEnemyCount = 1;
   }
-  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.46,
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.55,
              Window43Gap * 0.25, WindowHeightInch * 0.03, "-10", idExplorer)) {
     spawnEnemyCount -= 10;
     if (spawnEnemyCount < 1)
       spawnEnemyCount = 1;
   }
 
-  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.40,
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.49,
              Window43Gap * 0.92, WindowHeightInch * 0.03, "Spawn",
              idExplorer)) {
     spawnEnemy();
@@ -787,7 +801,7 @@ void drawExplorer() {
   } else {
     setButtonColors("White", "Blue", "Blue", "White", 1);
   }
-  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.34,
+  if (button(GenUIID(0), Window43Gap * 0.04, WindowHeightInch * 0.43,
              Window43Gap * 0.92, WindowHeightInch * 0.03,
              isAutoSpawnEnemy ? "Auto Spawn On" : "Auto Spawn Off",
              idExplorer)) {
@@ -807,7 +821,7 @@ void drawExplorer() {
             "Danger! Belly is Empty!", 'L', "Black");
   }
 
-  drawStatusBar(&manaphy, 0, WindowHeightInch * 0.01, idExplorer);
+  drawStatusBar(&manaphy, 0, WindowHeightInch * 0.01, 1, idExplorer);
 
   // tools bar
   SetPenColor("Light Pink");
@@ -834,7 +848,6 @@ void drawExplorer() {
 void stopExplorer() { clearMessage(); }
 
 void uiExplorerGetKeyboard(int key, int event) {
-  printf("%d %d\n", key, event);
   controlKeyboard(key, event);
   if (smStateTop()->uid == idExplorer) {
     uiGetKeyboard(key, event);

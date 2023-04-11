@@ -58,6 +58,7 @@ typedef struct Pokedex {
   double atkGrowth, defGrowth;
 
   HBITMAP sprites[4];
+  HBITMAP portrait;
 } Pokedex;
 
 extern Pokedex pokedex[PokemonSpeciesNumber];

@@ -192,6 +192,7 @@ void cancelTimer(int id);
 
 void DisplayClear();
 
-void drawBmp(HBITMAP hbitmap, double midx, double midy, double w, double h);
+void drawBmp(HBITMAP hbitmap, double midx, double midy, double w, double h,
+             int method);
 
 #endif

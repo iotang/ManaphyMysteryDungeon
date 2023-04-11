@@ -205,7 +205,7 @@ void drawMainMenu() {
   DrawTextString(title);
 
   HBITMAP bitmap = readBmpImage("assets/sprites/0490D.bmp");
-  drawBmp(bitmap, WindowWidthInch / 2, WindowHeightInch / 2, 2, 2);
+  drawBmp(bitmap, WindowWidthInch / 2, WindowHeightInch / 2, 2, 2, SRCAND);
 
   drawToolsBar();
 }

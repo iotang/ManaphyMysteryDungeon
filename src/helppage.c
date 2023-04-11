@@ -23,7 +23,7 @@ void initHelpPage() { helpPageNumber = 0; }
 
 void drawHelpPage() {
   drawBmp(spriteHelpPages[helpPageNumber], WindowWidthInch / 2,
-          WindowHeightInch / 2, WindowWidthInch, WindowHeightInch);
+          WindowHeightInch / 2, WindowWidthInch, WindowHeightInch, SRCCOPY);
 
   setButtonColors("White", "Blue", "Blue", "White", 1);
   if (helpPageNumber > 0) {

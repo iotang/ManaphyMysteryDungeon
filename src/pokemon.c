@@ -12,6 +12,8 @@ void readPokemonSprites(int num) {
     sprintf(_fileName, "assets/sprites/%04d%c.bmp", num, "RULD"[i]);
     pokedex[num].sprites[i] = readBmpImage(_fileName);
   }
+  sprintf(_fileName, "assets/portraits/%04d.bmp", num);
+  pokedex[num].portrait = readBmpImage(_fileName);
 }
 
 void initPokedex() {

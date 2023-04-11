@@ -46,9 +46,6 @@ void smLastProc() {
 void smTopChanging() { currentStateProc = NULL; }
 
 void smRebuildTop() {
-  printf("sm: %llu\n", stateStack.top);
-
-  printf("smRebuildTop\n");
   if (smIsStateEmpty()) {
     registerKeyboardEvent(NULL);
     registerCharEvent(NULL);
@@ -67,7 +64,6 @@ void smRebuildTop() {
 }
 
 void smPushState(AppState *state) {
-  printf("smPushState\n");
   smTopChanging();
   stateStack.stk[stateStack.top++] = state;
   smRebuildTop();
@@ -78,7 +74,6 @@ void smBarePushState(AppState *state) {
 }
 
 void smPopState() {
-  printf("smPopState\n");
   if (smIsStateEmpty())
     return;
 
@@ -96,7 +91,6 @@ void smBarePopState() {
 }
 
 void smPopStateUntil(int target) {
-  printf("smPopStateUntil\n");
   if (smIsStateEmpty())
     return;
 
