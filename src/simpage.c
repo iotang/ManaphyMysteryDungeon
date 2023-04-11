@@ -193,7 +193,7 @@ void initSimPage() {
     spawnPokemon(&cresselia, Player, NCresselia, Female);
     cresselia.x = simCamera.x;
     cresselia.y = simCamera.y;
-    cresselia.exp = 4900;
+    cresselia.exp = 7900;
     while (updatePokemonStat(&cresselia))
       ;
     isAutoSimulating = 0;

@@ -20,6 +20,7 @@ typedef long long lint;
 
 typedef enum {
   idMainMenu,
+  idHelpPage,
   idAboutPage,
   idAlertDialog,
   idConfirmDialog,

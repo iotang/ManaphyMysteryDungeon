@@ -14,6 +14,7 @@
 #include "items.h"
 #include "landevents.h"
 #include "drawdungeon.h"
+#include "helppage.h"
 
 extern AppState MainMenu;
 
@@ -27,6 +28,7 @@ void Main() {
   initItems();
   initLandEvents();
   initDungeonSprites();
+  readHelpPageSprites();
 
   InitConsole();
 

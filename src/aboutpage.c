@@ -24,8 +24,7 @@ void drawAboutPage() {
                        WindowHeightInch * 0.05, 0, "Developer", 'L', "Black");
   drawBoxWithoutBorder(Window43Left + Window43Width * 0.3,
                        WindowHeightInch * 0.5, Window43Width * 0.4,
-                       WindowHeightInch * 0.05, 0, "Kate da Explorers of Sky",
-                       'R', "Black");
+                       WindowHeightInch * 0.05, 0, "iotang", 'R', "Black");
   drawBoxWithoutBorder(Window43Left + Window43Width * 0.3,
                        WindowHeightInch * 0.45, Window43Width * 0.4,
                        WindowHeightInch * 0.05, 0, "Designer", 'L', "Black");

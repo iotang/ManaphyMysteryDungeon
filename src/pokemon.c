@@ -53,7 +53,7 @@ void initPokedex() {
   pokedex[NCresselia].hpBase = 36;
   pokedex[NCresselia].atkBase = 5.5;
   pokedex[NCresselia].defBase = 7;
-  pokedex[NCresselia].hpGrowth = 3.1;
+  pokedex[NCresselia].hpGrowth = 3.3;
   pokedex[NCresselia].atkGrowth = 1.6;
   pokedex[NCresselia].defGrowth = 2.1;
   readPokemonSprites(NCresselia);

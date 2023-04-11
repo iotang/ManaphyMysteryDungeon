@@ -18,6 +18,7 @@
 #include "explorer.h"
 #include "simpage.h"
 #include "aboutpage.h"
+#include "helppage.h"
 
 #include "globalvalue.h"
 
@@ -88,7 +89,7 @@ void drawToolsBar() {
 
   if (isDungeonOpened) {
     if (smStateTop()->uid == idEditPage) {
-      static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run",
+      static char *menuListRun[] = {"Run", "Explore | Ctrl-H", "Auto Run",
                                     "Limited Solution | Ctrl-Q",
                                     "Find Solution | Ctrl-F"};
       double w = TextStringWidth(menuListRun[0]) * 1.5;
@@ -121,7 +122,7 @@ void drawToolsBar() {
 
       x += w;
     } else if (smStateTop()->uid == idSimPage) {
-      static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run"};
+      static char *menuListRun[] = {"Run", "Explore | Ctrl-H", "Auto Run"};
       double w = TextStringWidth(menuListRun[0]) * 1.5;
       double wlist = TextStringWidth(menuListRun[1]) + 0.2;
 
@@ -148,7 +149,7 @@ void drawToolsBar() {
 
       x += w;
     } else if (smStateTop()->uid == idExplorer) {
-      static char *menuListRun[] = {"Run", "New Run | Ctrl-H", "Auto Run",
+      static char *menuListRun[] = {"Run", "Explore | Ctrl-H", "Auto Run",
                                     "Cheat | Ctrl-P"};
       double w = TextStringWidth(menuListRun[0]) * 1.5;
       double wlist = TextStringWidth(menuListRun[1]) + 0.2;
@@ -181,13 +182,15 @@ void drawToolsBar() {
   }
 
   if (1) {
-    static char *menuListAbout[] = {"More", "About"};
+    static char *menuListAbout[] = {"More", "Help", "About"};
     double w = TextStringWidth(menuListAbout[0]) * 1.5;
-    double wlist = TextStringWidth(menuListAbout[1]) + 0.2;
+    double wlist = TextStringWidth(menuListAbout[2]) + 0.2;
 
     int selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListAbout,
                              sizeof(menuListAbout) / sizeof(menuListAbout[0]));
     if (selection == 1) {
+      gotoHelpPage();
+    } else if (selection == 2) {
       gotoAboutPage();
     }
     x += w;
