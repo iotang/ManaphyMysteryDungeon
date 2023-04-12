@@ -15,7 +15,7 @@
 #define NRemoraid (223)
 #define NSuicune (245)
 
-#define MoveNumber (999) // 招式的最大编号。
+#define MaxMoveNumber (5) // 招式的最大编号。
 // 招式的编号。
 #define MTackle (0)
 #define MWaterGun (1)
@@ -64,7 +64,7 @@ typedef struct Pokedex {
 } Pokedex; // 宝可梦的对应种族的基础数据，即宝可梦图鉴。
 
 extern Pokedex pokedex[PokemonSpeciesNumber + 1]; // 宝可梦图鉴。
-extern Move movedex[MoveNumber + 1];              // 招式图鉴。
+extern Move movedex[MaxMoveNumber + 1];           // 招式图鉴。
 
 void initPokedex();
 

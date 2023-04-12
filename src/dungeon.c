@@ -1,15 +1,70 @@
 #include "dungeon.h"
 
+#include "pokemon.h"
+#include "items.h"
+#include "landevents.h"
+
 #include <string.h>
 
 void sortDungeon(Dungeon *dungeon) {
+  int sx = -1, sy = -1, tx = -1, ty = -1;
+  if (dungeon->width < 2)
+    dungeon->width = 2;
+  if (dungeon->height < 2)
+    dungeon->height = 2;
+  if (dungeon->width > MaxDungeonWidth)
+    dungeon->width = MaxDungeonWidth;
+  if (dungeon->height > MaxDungeonHeight)
+    dungeon->height = MaxDungeonHeight;
+
   for (int x = 0; x < dungeon->width; x++) {
     for (int y = 0; y < dungeon->height; y++) {
       if (dungeon->mp[x][y] == Start || dungeon->mp[x][y] == End) {
-        dungeon->event[x][y].type = 0;
-        dungeon->item[x][y].type = 0;
+        if (dungeon->mp[x][y] == Start) {
+          if (sx < 0 || sy < 0) {
+            sx = x;
+            sy = y;
+          } else {
+            dungeon->mp[x][y] = Plain;
+          }
+        }
+        if (dungeon->mp[x][y] == End) {
+          if (tx < 0 || ty < 0) {
+            tx = x;
+            ty = y;
+          } else {
+            dungeon->mp[x][y] = Plain;
+          }
+        }
+        dungeon->event[x][y].type = dungeon->event[x][y].arg = 0;
+        dungeon->item[x][y].type = dungeon->item[x][y].arg = 0;
+      } else {
+        if (dungeon->event[x][y].type < 0 || dungeon->event[x][y].type > 4) {
+          dungeon->event[x][y].type = dungeon->event[x][y].arg = 0;
+        }
+
+        if (dungeon->item[x][y].type < 0 ||
+            dungeon->item[x][y].type > MaxItemNumber) {
+          dungeon->item[x][y].type = dungeon->item[x][y].arg = 0;
+        } else if (dungeon->item[x][y].type == IKey &&
+                   (dungeon->item[x][y].arg < 1 ||
+                    dungeon->item[x][y].arg > MaxKeyID)) {
+          dungeon->item[x][y].type = dungeon->item[x][y].arg = 0;
+        } else if (dungeon->item[x][y].type == ITM &&
+                   (dungeon->item[x][y].arg < 1 ||
+                    dungeon->item[x][y].arg > MaxMoveCount)) {
+          dungeon->item[x][y].type = dungeon->item[x][y].arg = 0;
+        }
       }
     }
+  }
+  if (sx < 0 || sy < 0 || tx < 0 || ty < 0) {
+    if (sx >= 0 && sy >= 0)
+      dungeon->mp[sx][sy] = Plain;
+    if (tx >= 0 && ty >= 0)
+      dungeon->mp[sx][sy] = Plain;
+    dungeon->mp[0][0] = Start;
+    dungeon->mp[dungeon->width - 1][dungeon->height - 1] = End;
   }
 }
 
@@ -165,10 +220,14 @@ void loadDungeon(Dungeon *dungeon, FILE *file) {
     }
   }
 
+  sortDungeon(dungeon);
+
   fclose(file);
 }
 
 void saveDungeon(Dungeon *dungeon, FILE *file) {
+  sortDungeon(dungeon);
+
   fprintf(file, "%d %d\n", dungeon->width, dungeon->height);
 
   for (int i = 0; i < dungeon->width; i++) {

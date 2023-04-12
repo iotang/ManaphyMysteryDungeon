@@ -107,7 +107,7 @@ void controlKeyboard(int key, int event) {
         playerMoves(FaceRight);
       } else if (!timerStarted[MoveRight]) {
         playerMoves(MoveRight);
-        startTimer(MoveRight, MOVEGAP);
+        startTimer(MoveRight, MoveGap);
         timerStarted[MoveRight] = 1;
       }
     }
@@ -116,7 +116,7 @@ void controlKeyboard(int key, int event) {
         playerMoves(FaceUp);
       } else if (!timerStarted[MoveUp]) {
         playerMoves(MoveUp);
-        startTimer(MoveUp, MOVEGAP);
+        startTimer(MoveUp, MoveGap);
         timerStarted[MoveUp] = 1;
       }
     }
@@ -125,7 +125,7 @@ void controlKeyboard(int key, int event) {
         playerMoves(FaceLeft);
       } else if (!timerStarted[MoveLeft]) {
         playerMoves(MoveLeft);
-        startTimer(MoveLeft, MOVEGAP);
+        startTimer(MoveLeft, MoveGap);
         timerStarted[MoveLeft] = 1;
       }
     }
@@ -134,14 +134,14 @@ void controlKeyboard(int key, int event) {
         playerMoves(FaceDown);
       } else if (!timerStarted[MoveDown]) {
         playerMoves(MoveDown);
-        startTimer(MoveDown, MOVEGAP);
+        startTimer(MoveDown, MoveGap);
         timerStarted[MoveDown] = 1;
       }
     }
     if (key == ' ') {
       if (!timerStarted[MoveNoDirection]) {
         playerMoves(MoveNoDirection);
-        startTimer(MoveNoDirection, MOVEGAP);
+        startTimer(MoveNoDirection, MoveGap);
         timerStarted[MoveNoDirection] = 1;
       }
     }
@@ -149,35 +149,35 @@ void controlKeyboard(int key, int event) {
       if (!isUsingMove) {
         playerMoves(UseMove1);
         isUsingMove = 1;
-        startTimer(ClearUsingMove, USEMOVEGAP);
+        startTimer(ClearUsingMove, UseMoveGap);
       }
     }
     if (key == '2') {
       if (!isUsingMove) {
         playerMoves(UseMove2);
         isUsingMove = 1;
-        startTimer(ClearUsingMove, USEMOVEGAP);
+        startTimer(ClearUsingMove, UseMoveGap);
       }
     }
     if (key == '3') {
       if (!isUsingMove) {
         playerMoves(UseMove3);
         isUsingMove = 1;
-        startTimer(ClearUsingMove, USEMOVEGAP);
+        startTimer(ClearUsingMove, UseMoveGap);
       }
     }
     if (key == '4') {
       if (!isUsingMove) {
         playerMoves(UseMove4);
         isUsingMove = 1;
-        startTimer(ClearUsingMove, USEMOVEGAP);
+        startTimer(ClearUsingMove, UseMoveGap);
       }
     }
     if (key == '5') {
       if (!isUsingMove) {
         playerMoves(UseMove5);
         isUsingMove = 1;
-        startTimer(ClearUsingMove, USEMOVEGAP);
+        startTimer(ClearUsingMove, UseMoveGap);
       }
     }
     if (key == VK_CONTROL) {

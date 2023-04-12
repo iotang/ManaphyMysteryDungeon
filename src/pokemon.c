@@ -4,7 +4,7 @@
 #include <string.h>
 
 Pokedex pokedex[PokemonSpeciesNumber + 1];
-Move movedex[MoveNumber + 1];
+Move movedex[MaxMoveNumber + 1];
 
 void readPokemonSprites(int num) {
   static char _fileName[99];
