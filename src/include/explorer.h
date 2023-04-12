@@ -2,7 +2,7 @@
 
 #include "appstate.h"
 
-#define runCellSize (1.00)
+#define runCellSize (1.00) // 游玩时的视角大小。这个值在游玩的时候是锁定的。
 
 void giveCheat();
 

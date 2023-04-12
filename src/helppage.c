@@ -1,3 +1,5 @@
+#include "helppage.h"
+
 #include "graphics.h"
 #include "extgraph.h"
 #include "imgui.h"
@@ -5,8 +7,6 @@
 #include "utils.h"
 #include "statemanager.h"
 #include "imagesupport.h"
-
-#define HelpPageCount (4)
 
 HBITMAP spriteHelpPages[HelpPageCount];
 int helpPageNumber;

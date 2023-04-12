@@ -6,16 +6,16 @@
 #include "landevents.h"
 #include "random.h"
 
-#define MaxDungeonWidth (50)
-#define MaxDungeonHeight (50)
+#define MaxDungeonWidth (50)  // 最大的迷宫宽度。
+#define MaxDungeonHeight (50) // 最大的迷宫高度。
 
-typedef enum LandType { Plain, Block, Start, End } LandType;
+typedef enum LandType { Plain, Block, Start, End } LandType; // 迷宫格子类型。
 
 typedef struct Dungeon {
   int width, height;
   int mp[MaxDungeonWidth][MaxDungeonHeight];
-  LandEvent event[MaxDungeonWidth][MaxDungeonHeight];
-  Item item[MaxDungeonWidth][MaxDungeonHeight];
+  LandEvent event[MaxDungeonWidth][MaxDungeonHeight]; // 场地事件。
+  Item item[MaxDungeonWidth][MaxDungeonHeight];       // 道具。
 } Dungeon;
 
 void sortDungeon(Dungeon *dungeon);

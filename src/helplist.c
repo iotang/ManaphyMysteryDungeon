@@ -7,12 +7,12 @@
 #include "utils.h"
 
 typedef struct HelpEntry {
-  char *fun;
-  char *key;
-} HelpEntry;
+  char *fun; // 左侧的字符串。
+  char *key; // 右侧的字符串。
+} HelpEntry; // 帮助栏的一个条目。
 
-HelpEntry helpList[MaxHelpListLength];
-int helpListLength;
+HelpEntry helpList[MaxHelpListLength]; // 帮助栏的条目。
+int helpListLength;                    // 帮助栏的条目数量。
 
 void clearHelpList() { helpListLength = 0; }
 

@@ -12,8 +12,7 @@ void drawAboutPage() {
 
   SetPointSize(64);
   drawBoxWithoutBorder(Window43Left, WindowHeightInch * 0.7, Window43Width,
-                       WindowHeightInch * 0.2, 0, "Manaphy's Mystery Dungeon",
-                       'C', "Blue");
+                       WindowHeightInch * 0.2, 0, ProjectName, 'C', "Blue");
   SetPointSize(24);
   drawBoxWithoutBorder(Window43Left, WindowHeightInch * 0.6, Window43Width,
                        WindowHeightInch * 0.1, 0, "A Simple Dungeon Editor",

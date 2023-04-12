@@ -13,17 +13,14 @@
 #include "messagedialog.h"
 #include "pausepage.h"
 
-#define MOVEGAP (150)
-#define USEMOVEGAP (500)
+extern void (*currentStateProc)(void); // 当前状态的运行函数。在每一帧调用。
 
-extern void (*currentStateProc)(void);
+int timerStarted[99] = {0}; // 定时器是否已经启动。
+int isUsingMove = 0;        // 是否有招式键被按下。
+int pauseBuffer = 0; // 用于优化暂停下的回调阻塞。克雷色利亚教我写的
 
-int timerStarted[99] = {0};
-int isUsingMove = 0;
-int pauseBuffer = 0;
-
-int controlPressed = 0;
-int shiftPressed = 0;
+int controlPressed = 0; // 是否按下了 Control。
+int shiftPressed = 0;   // 是否按下了 Shift。
 
 void ScreenRender() {
   DisplayClear();

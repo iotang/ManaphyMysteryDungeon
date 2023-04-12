@@ -21,23 +21,22 @@
 
 #include "globalvalue.h"
 
-int editHasReadDungeon;
-Dungeon editDungeon;
-char editDungeonFileName[MaxFileNameLength + 1];
+int editHasReadDungeon; // 是否已经读取了迷宫。
+Dungeon editDungeon; // 编辑页面的迷宫，和之前的 currentDungeon 独立。
+char editDungeonFileName[MaxFileNameLength + 1]; // 编辑页面的迷宫名字。
 
-int editHasSolution;
-DungeonSolution editDungeonSolution;
-lint editDungeonSolutionLimit;
-lint editDungeonSolutionHPPenalty;
+int editHasSolution;                 // 现在是否有解要显示。
+DungeonSolution editDungeonSolution; // 迷宫的解。
+lint editDungeonSolutionLimit;       // 迷宫的解的限制步数。
+lint editDungeonSolutionHPPenalty;   // 迷宫的解的 HP 损失惩罚。
 
-double editCellSize;
-Pokemon editCamera, editCursor;
-double editMouseX, editMouseY;
-LandEvent editLandEvent;
-Item editLandItem;
-
-int editEventOverrideItem;
-int editEventOverrideLandEvent;
+double editCellSize;            // 编辑页面的迷宫格子大小。
+Pokemon editCamera, editCursor; // 编辑页面的镜头位置和光标位置。
+double editMouseX, editMouseY; //  编辑页面的鼠标位置，单位是英寸。
+LandEvent editLandEvent; // 编辑页面事件模式下要覆盖成的场地事件。
+Item editLandItem;       // 编辑页面事件模式下要覆盖成的道具。
+int editEventOverrideItem; // 编辑页面事件模式下是否要覆盖场地事件。
+int editEventOverrideLandEvent; // 编辑页面事件模式下是否要覆盖道具。
 
 void decEditCellSize() {
   if (editCellSize > 0.15) {
@@ -59,10 +58,10 @@ void incEditCellSize() {
 
 void randomizeEditDungeon() { randomizeDungeon(&editDungeon); }
 
-EditMode editMode;
+EditMode editMode; // 编辑模式。
 
-int isMouseDownEditPage;
-int isJumpedEditPage;
+int isMouseDownEditPage; // 鼠标是否按下了。
+int isJumpedEditPage;    // 是否已经使用过右键跳转。
 
 void playerMoveEditPage(int event) {
   if (event == MoveRight) {
@@ -105,7 +104,6 @@ void initEditPage() {
   if (!editHasReadDungeon) {
     editCellSize = 1;
     editDungeon = currentDungeon;
-    editHasReadDungeon = 1;
 
     editCamera.x = editCamera.y = 0;
     for (int x = 0; x < editDungeon.width; x++) {
@@ -121,6 +119,8 @@ void initEditPage() {
     editCursor.x = editCamera.x;
     editCursor.y = editCamera.y;
 
+    sortDungeon(&editDungeon);
+
     editLandItem.type = INone;
     editLandEvent.type = None;
     editLandEvent.arg = 0;
@@ -129,6 +129,8 @@ void initEditPage() {
     editEventOverrideLandEvent = 1;
     editDungeonSolutionLimit = 1;
     editDungeonSolutionHPPenalty = 0;
+
+    editHasReadDungeon = 1;
   }
 
   clearHelpList();

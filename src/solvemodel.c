@@ -1,15 +1,15 @@
 #include "solvemodel.h"
 
-#define SolveHeapSize (2000000)
+#define SolveHeapSize (200000) // 用于跑迪科斯彻的堆的大小。
 
 typedef struct HeapNode {
   int stat;
   lint dis;
-} HeapNode;
+} HeapNode; // 堆的结点。
 
-HeapNode heapBuf[SolveHeapSize + 1];
+HeapNode heapBuf[SolveHeapSize + 1]; // 堆的结点集合。
 HeapNode infNode = {inf, linf};
-int heapSize;
+int heapSize; // 堆的目前大小。
 
 void clearHeap() { heapSize = 0; }
 

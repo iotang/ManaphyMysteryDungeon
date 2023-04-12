@@ -1,14 +1,14 @@
 #include "statemanager.h"
 
-#define MaxStateNumber 99
+#define MaxStateNumber (99) // 最大的状态堆栈数量。（实际上连 10 都不会超过。）
 
 typedef struct StateStack {
   AppState *stk[MaxStateNumber];
   size_t top;
-} StateStack;
+} StateStack; // 用于存放状态的栈数据结构。
 
-StateStack stateStack;
-void (*currentStateProc)(void);
+StateStack stateStack; // 用于存放状态的栈。对于其他模块不可见。
+void (*currentStateProc)(void); // 当前状态的运行函数。
 
 void smInit() { stateStack.top = 0; }
 

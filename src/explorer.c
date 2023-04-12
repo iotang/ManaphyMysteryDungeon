@@ -29,18 +29,17 @@
 
 #include "globalvalue.h"
 
-Dungeon expDungeon;
-char expDungeonFileName[MaxFileNameLength + 1];
-int expHasReadDungeon;
+int expHasReadDungeon; // 是否已经读取了迷宫。
+Dungeon expDungeon; // 游玩页面的迷宫，和之前的 editDungeon 独立。
+char expDungeonFileName[MaxFileNameLength + 1]; // 游玩页面的迷宫名字。
 
-#define runCellSize (1.00)
-Pokemon manaphy;
-ItemBag manaphyItemBag;
+Pokemon manaphy;        // 玛纳霏。
+ItemBag manaphyItemBag; // 玛纳霏的道具背包。
 
-EnemyList enemyList;
-int isEnemyMove;
-int spawnEnemyCount;
-int isAutoSpawnEnemy;
+EnemyList enemyList;  // 敌人列表。
+int isEnemyMove;      // 是否处于敌人的回合。
+int spawnEnemyCount;  // 生成敌人的数量。
+int isAutoSpawnEnemy; // 是否随回合自动生成敌人。
 
 void checkManaphyHealth() {
   while (updatePokemonStat(&manaphy))
@@ -156,6 +155,9 @@ void enemyRound() {
       }
     }
 
+    if (isDungeonGameOver)
+      return;
+
     if (!madeDecision) {
       if (distan > 10) {
         int dx = who->x + go[who->direction][0],
@@ -194,6 +196,9 @@ void enemyRound() {
       }
     }
 
+    if (isDungeonGameOver)
+      return;
+
     pokemonEnemyStepOn(&expDungeon, who, item);
     if (who->hp <= 0) {
       static char _failed[200];
@@ -201,6 +206,9 @@ void enemyRound() {
       setMessage(_failed);
       who->x = who->y = -1;
     }
+
+    if (isDungeonGameOver)
+      return;
   }
 
   for (int i = 0; i < enemyList.count; i++) {
@@ -217,7 +225,7 @@ void enemyRound() {
   isEnemyMove = 0;
 }
 
-int emptyBellyMessageCount;
+int emptyBellyMessageCount; // 饱腹度空时提示语的播报顺序。
 
 void decreaseManaphyBelly(double val) {
   manaphy.belly -= val;
@@ -683,13 +691,7 @@ void spawnEnemy() {
 void initExplorer() {
   if (!expHasReadDungeon) {
     expDungeon = currentDungeon;
-    expHasReadDungeon = 1;
     strcpy(expDungeonFileName, editDungeonFileName);
-    spawnPokemon(&manaphy, Player, NManaphy, Male);
-    manaphy.exp = 400;
-    while (updatePokemonStat(&manaphy))
-      ;
-    clearItemBag(&manaphyItemBag);
 
     int gotEnd = 0;
     for (int x = 0; x < expDungeon.width; x++) {
@@ -716,13 +718,22 @@ void initExplorer() {
       smPopState();
     }
 
+    spawnPokemon(&manaphy, Player, NManaphy, Male);
+    manaphy.exp = 400;
+    while (updatePokemonStat(&manaphy))
+      ;
+    clearItemBag(&manaphyItemBag);
+
     clearEnemyList(&enemyList);
 
     isDungeonGameOver = 0;
     emptyBellyMessageCount = 0;
-    spawnEnemyCount = 1;
+    spawnEnemyCount = 5;
     isAutoSpawnEnemy = 0;
+    isEnemyMove = 0;
     clearMessage();
+
+    expHasReadDungeon = 1;
   }
   clearHelpList();
   addHelpEntry("Move:", "Arrow or WASD");

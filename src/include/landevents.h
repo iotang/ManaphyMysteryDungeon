@@ -2,8 +2,8 @@
 
 #include "imagesupport.h"
 
-#define MaxLandEventTypeNumber (4)
-#define MaxLandEventNameLength (16)
+#define MaxLandEventTypeNumber (4)  // 最大场地事件编号。
+#define MaxLandEventNameLength (16) // 场地事件名字的最大长度。
 
 typedef enum LandEventType {
   None,
@@ -11,20 +11,21 @@ typedef enum LandEventType {
   Damage,
   DamageOT,
   HealOT
-} LandEventType;
+} LandEventType; // 场地事件编号定义。
 
 typedef struct LandEventData {
   char name[MaxLandEventNameLength + 1];
   int permanent;
   int defaultArg;
   HBITMAP sprite;
-} LandEventData;
+} LandEventData; // 场地事件数据。
 
 typedef struct LandEvent {
   int type;
   int arg;
-} LandEvent;
+} LandEvent; // 具体的场地事件。
 
-extern LandEventData landEventsData[MaxLandEventTypeNumber + 1];
+extern LandEventData
+    landEventsData[MaxLandEventTypeNumber + 1]; // 场地事件图鉴。
 
 void initLandEvents();

@@ -26,15 +26,15 @@
 
 #include "globalvalue.h"
 
-Dungeon simDungeon;
-DungeonSolution simHistory;
-char simDungeonFileName[MaxFileNameLength + 1];
-int simHasReadDungeon;
+int simHasReadDungeon; // 是否已经读取了迷宫。
+Dungeon simDungeon; // 自动执行页面的迷宫，和之前的 editDungeon 独立。
+char simDungeonFileName[MaxFileNameLength + 1]; // 自动执行页面的迷宫名字。
+DungeonSolution simHistory; // 记录克雷色利亚走过的位置。
 
-double simCellSize;
-Pokemon simCamera, cresselia;
-ItemBag cresseliaItemBag;
-double simMouseX, simMouseY;
+double simCellSize;           // 自动执行页面的迷宫格子大小。
+Pokemon simCamera, cresselia; // 自动执行页面的镜头位置和克雷色利亚。
+ItemBag cresseliaItemBag; // 克雷色利亚的道具背包。
+double simMouseX, simMouseY; //  自动执行页面的鼠标位置，单位是英寸。
 
 void decSimCellSize() {
   if (simCellSize > 0.15) {
@@ -54,12 +54,12 @@ void incSimCellSize() {
   }
 }
 
-int isMouseDownSimPage;
-int isJumpedSimPage;
+int isMouseDownSimPage; // 鼠标是否按下了。
+int isJumpedSimPage;    // 是否已经使用过右键跳转。
 
-int simulateSpeed;
-int isAutoSimulating;
-int isCameraFollowCresselia;
+int simulateSpeed;           // 自动执行的速度。
+int isAutoSimulating;        // 是否正在自动执行。
+int isCameraFollowCresselia; // 镜头是否锁在克雷色利亚身上。
 
 void checkCresseliaHealth() {
   while (updatePokemonStat(&cresselia))
@@ -176,12 +176,9 @@ void initSimPage() {
   if (!simHasReadDungeon) {
     simCellSize = 1;
     simDungeon = currentDungeon;
-    simHasReadDungeon = 1;
     strcpy(simDungeonFileName, editDungeonFileName);
     clearDungeonSolution(&simHistory);
     simHistory.routeValid = 1;
-
-    clearItemBag(&cresseliaItemBag);
 
     simCamera.x = simCamera.y = 0;
     for (int x = 0; x < simDungeon.width; x++) {
@@ -192,18 +189,22 @@ void initSimPage() {
         }
       }
     }
-
     simDungeon.mp[simCamera.x][simCamera.y] = Start;
+
     spawnPokemon(&cresselia, Player, NCresselia, Female);
     cresselia.x = simCamera.x;
     cresselia.y = simCamera.y;
     cresselia.exp = 7900;
     while (updatePokemonStat(&cresselia))
       ;
+    clearItemBag(&cresseliaItemBag);
+
     simulateSpeed = 100;
     isCameraFollowCresselia = 0;
     isDungeonSimTerminated = 0;
     clearMessage();
+
+    simHasReadDungeon = 1;
   }
   clearHelpList();
   addHelpEntry("Move Camera:", "");

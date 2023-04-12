@@ -34,7 +34,7 @@ void Main() {
 
   InitGraphics();
   InitGUI();
-  SetWindowTitle("Manaphy's Mystery Dungeon");
+  SetWindowTitle(ProjectName);
 
   smPushState(&MainMenu);
   registerTimerEvent(render);

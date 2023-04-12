@@ -1,6 +1,6 @@
 #pragma once
 
-#define MaxHelpListLength (20)
+#define MaxHelpListLength (20) // 帮助栏最长条目数。
 
 void clearHelpList();
 

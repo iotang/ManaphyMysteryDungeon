@@ -198,11 +198,11 @@ void drawToolsBar() {
 }
 
 void drawMainMenu() {
-  static char *title = "Manaphy's Mystery Dungeon";
   SetPointSize(64);
   SetPenColor("Blue");
-  MovePen((WindowWidthInch - TextStringWidth(title)) / 2, WindowHeightInch / 2);
-  DrawTextString(title);
+  MovePen((WindowWidthInch - TextStringWidth(ProjectName)) / 2,
+          WindowHeightInch / 2);
+  DrawTextString(ProjectName);
 
   HBITMAP bitmap = readBmpImage("assets/sprites/0490D.bmp");
   drawBmp(bitmap, WindowWidthInch / 2, WindowHeightInch / 2, 2, 2, SRCAND);

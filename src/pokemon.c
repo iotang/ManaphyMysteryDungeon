@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-Pokedex pokedex[PokemonSpeciesNumber];
-Move movedex[MoveNumber];
+Pokedex pokedex[PokemonSpeciesNumber + 1];
+Move movedex[MoveNumber + 1];
 
 void readPokemonSprites(int num) {
   static char _fileName[99];

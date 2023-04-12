@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "appstate.h"
 
-extern char editDungeonFileName[MaxFileNameLength + 1];
+extern char editDungeonFileName[MaxFileNameLength + 1]; // 编辑页面的文件名。
 
 typedef enum EditMode {
   Targeted,
@@ -13,7 +13,7 @@ typedef enum EditMode {
   SetBlock,
   PlaceStart,
   PlaceEnd
-} EditMode;
+} EditMode; // 编辑模式。
 
 int saveDungeonEditPage();
 

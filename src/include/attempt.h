@@ -2,12 +2,12 @@
 
 #include "utils.h"
 
-#define PFace (10)
-#define PMove (11)
-#define PUseItem (12)
-#define PUseMove (13)
-#define PRemoveItem (14)
-#define PRemoveMove (15)
+#define PFace (10)       // 改变朝向的指令的这一位为 1。
+#define PMove (11)       // 移动指令的这一位为 1。
+#define PUseItem (12)    // 使用道具指令的这一位为 1。
+#define PUseMove (13)    // 使用招式指令的这一位为 1。
+#define PRemoveItem (14) // 丢弃道具指令的这一位为 1。
+#define PRemoveMove (15) // 遗忘招式指令的这一位为 1。
 
 int isFaceAttempt(int x);
 int isMoveAttempt(int x);

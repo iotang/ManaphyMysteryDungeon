@@ -2,7 +2,7 @@
 
 #include "appstate.h"
 
-#define BaseSimulateSpeed (20000.00)
+#define BaseSimulateSpeed (20000.00) // 用于计算克雷色利亚自动演示速度的基准值。
 
 void initSimPage();
 
