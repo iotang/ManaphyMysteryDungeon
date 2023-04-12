@@ -219,6 +219,25 @@ void enemyRound() {
 
 int emptyBellyMessageCount;
 
+void decreaseManaphyBelly(double val) {
+  manaphy.belly -= val;
+  if (manaphy.belly <= 0) {
+    manaphy.belly = 0;
+    manaphy.hp--;
+    if (emptyBellyMessageCount == 0) {
+      emplaceMessage("Oh, no! Your belly is empty!");
+    } else if (emptyBellyMessageCount == 1) {
+      emplaceMessage("Hurry up! You must have something to eat!");
+    } else if (emptyBellyMessageCount == 2) {
+      emplaceMessage("Otherwise you will fall soon!");
+    }
+    emptyBellyMessageCount++;
+  } else {
+    emptyBellyMessageCount = 0;
+  }
+  makePokemonStatBound(&manaphy);
+}
+
 int manaphyMove(int att) {
   if (isDungeonGameOver)
     return 0;
@@ -278,20 +297,6 @@ int manaphyMove(int att) {
     if (successMove) {
       manaphy.x = dx;
       manaphy.y = dy;
-      manaphy.belly -= 0.1;
-      if (manaphy.belly <= 0) {
-        manaphy.belly = 0;
-        manaphy.hp--;
-        if (emptyBellyMessageCount == 0) {
-          emplaceMessage("Oh, no! Your belly is empty!");
-        } else if (emptyBellyMessageCount == 1) {
-          emplaceMessage("Hurry up! You must have something to eat!");
-        } else if (emptyBellyMessageCount == 2) {
-          emplaceMessage("Otherwise you will fall soon!");
-        }
-        emptyBellyMessageCount++;
-      } else
-        emptyBellyMessageCount = 0;
     }
 
     return successMove;
@@ -547,6 +552,7 @@ void manaphyRound(int att) {
     return;
 
   pokemonStepOn(&expDungeon, &manaphy, &manaphyItemBag);
+  decreaseManaphyBelly(0.1);
 
   checkManaphyHealth();
   if (expDungeon.mp[manaphy.x][manaphy.y] == End) {

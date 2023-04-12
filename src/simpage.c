@@ -124,6 +124,8 @@ int cresseliaAttempt() {
 void cresseliaMove() {
   if (isDungeonSimTerminated)
     return;
+  if (smStateTop()->uid != idSimPage)
+    return;
   int att = cresseliaAttempt();
   if (isMoveAttempt(att)) {
     int dir = argMoveAttempt(att);
@@ -198,7 +200,6 @@ void initSimPage() {
     cresselia.exp = 7900;
     while (updatePokemonStat(&cresselia))
       ;
-    isAutoSimulating = 0;
     simulateSpeed = 100;
     isCameraFollowCresselia = 0;
     isDungeonSimTerminated = 0;
@@ -210,6 +211,7 @@ void initSimPage() {
   addHelpEntry("Jump to Cell:", "Right Click");
   addHelpEntry("Zoom:", "Mouse Wheel");
 
+  endAutoSimulating();
   isMouseDownSimPage = 0;
   isJumpedSimPage = 0;
   bindPlayerMove(playerMoveSimPage);
@@ -278,24 +280,30 @@ void drawSimPage() {
   if (button(GenUIID(0), Window43Gap * 0.03, WindowHeightInch * 0.75,
              Window43Gap * 0.94, WindowHeightInch * 0.03, "Raise Level by 1",
              idSimPage)) {
-    cresselia.exp += 100;
-    while (updatePokemonStat(&cresselia))
-      ;
+    if (!isDungeonSimTerminated) {
+      cresselia.exp += 100;
+      while (updatePokemonStat(&cresselia))
+        ;
+    }
   }
   if (button(GenUIID(0), Window43Gap * 0.03, WindowHeightInch * 0.70,
              Window43Gap * 0.94, WindowHeightInch * 0.03, "Raise Level by 10",
              idSimPage)) {
-    cresselia.exp += 1000;
-    while (updatePokemonStat(&cresselia))
-      ;
+    if (!isDungeonSimTerminated) {
+      cresselia.exp += 1000;
+      while (updatePokemonStat(&cresselia))
+        ;
+    }
   }
   if (button(GenUIID(0), Window43Gap * 0.03, WindowHeightInch * 0.65,
              Window43Gap * 0.94, WindowHeightInch * 0.03, "Recover Cresselia",
              idSimPage)) {
-    cresselia.hp = cresselia.maxhp;
-    cresselia.belly = cresselia.maxbelly;
-    while (updatePokemonStat(&cresselia))
-      ;
+    if (!isDungeonSimTerminated) {
+      cresselia.hp = cresselia.maxhp;
+      cresselia.belly = cresselia.maxbelly;
+      while (updatePokemonStat(&cresselia))
+        ;
+    }
   }
 
   char __buf[99];

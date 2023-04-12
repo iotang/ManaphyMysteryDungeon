@@ -135,7 +135,7 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
         SetPointSize(4);
       else
         SetPointSize(2);
-      char _tag[133];
+      char _tag[200];
       double h = GetFontHeight() * 0.7;
       if (dungeon->item[x][y].type != INone) {
         if (dungeon->item[x][y].type == IKey ||
