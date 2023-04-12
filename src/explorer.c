@@ -218,7 +218,7 @@ void enemyRound() {
     }
   }
 
-  if (isAutoSpawnEnemy && RandomChance(1.00 / 5)) {
+  if (isAutoSpawnEnemy && RandomChance(1.00 / 8)) {
     spawnSingleEnemy(11);
   }
 
@@ -693,6 +693,12 @@ void initExplorer() {
     expDungeon = currentDungeon;
     strcpy(expDungeonFileName, editDungeonFileName);
 
+    spawnPokemon(&manaphy, Player, NManaphy, Male);
+    manaphy.exp = 400;
+    while (updatePokemonStat(&manaphy))
+      ;
+    clearItemBag(&manaphyItemBag);
+
     int gotEnd = 0;
     for (int x = 0; x < expDungeon.width; x++) {
       for (int y = 0; y < expDungeon.height; y++) {
@@ -717,12 +723,6 @@ void initExplorer() {
       gotoAlertDialog();
       smPopState();
     }
-
-    spawnPokemon(&manaphy, Player, NManaphy, Male);
-    manaphy.exp = 400;
-    while (updatePokemonStat(&manaphy))
-      ;
-    clearItemBag(&manaphyItemBag);
 
     clearEnemyList(&enemyList);
 

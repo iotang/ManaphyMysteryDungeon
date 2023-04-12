@@ -4,7 +4,7 @@
 
 #define ProjectName ("Manaphy's Mystery Dungeon") // 这个项目的全名。
 
-#define FrameLength (5) // 每一帧的时间长度。
+#define FrameLength (10) // 每一帧的时间长度。
 
 #define WindowWidthInch (16.00) // 窗口的宽度。
 #define Window43Gap (2.00)  // 16:9 相比 4:3 左右分别多出来的长度。

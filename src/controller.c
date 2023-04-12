@@ -58,10 +58,10 @@ void clearTimers() {
 }
 
 void render(int id) {
+  if (pauseBuffer) {
+    clearTimers();
+  }
   if (id == ScreenRend) {
-    if (pauseBuffer) {
-      clearTimers();
-    }
     ScreenRender();
   }
   if (id == MoveRight)
