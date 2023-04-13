@@ -96,7 +96,7 @@ double calcDamage(int lv, double effect, double atk, double def) {
 }
 
 double calcExp(int aLv, int bLv) {
-  int base = 30 + (bLv - aLv) * 6;
+  int base = 30 + bLv + (bLv - aLv) * 3;
   if (base < 1)
     base = 1;
   return 20.00 * base / (aLv + 20);

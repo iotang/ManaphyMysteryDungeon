@@ -27,11 +27,26 @@ void getCellLocation(Dungeon *dungeon, int basex, int basey, double size,
   *_x = *_y = -1;
   if (lx < Window43Left || lx > Window43Right)
     return;
-  for (int x = 0; x < dungeon->width; x++) {
+
+  int xl = (Window43Left - (WindowWidthInch / 2 - size / 2)) / size + basex - 2;
+  if (xl < 0)
+    xl = 0;
+  int xr = (Window43Right - (Window43Right / 2 - size / 2)) / size + basex;
+  if (xr >= dungeon->width)
+    xr = dungeon->width - 1;
+  int yl = (0 - (WindowHeightInch / 2 - size / 2)) / size + basey - 2;
+  if (yl < 0)
+    yl = 0;
+  int yr =
+      (WindowHeightInch - (WindowHeightInch / 2 - size / 2)) / size + basey;
+  if (yr >= dungeon->height)
+    yr = dungeon->height - 1;
+
+  for (int x = xl; x <= xr; x++) {
     double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
     if (xloc + size < Window43Left || xloc > Window43Right)
       continue;
-    for (int y = 0; y < dungeon->height; y++) {
+    for (int y = yl; y <= yr; y++) {
       double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
       if (yloc + size < 0 || yloc > WindowHeightInch)
         continue;
@@ -76,12 +91,16 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
   SetPointSize(4);
   for (int x = 0; x < dungeon->width; x++) {
     double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
-    if (xloc + size < Window43Left || xloc > Window43Right)
+    if (xloc + size < Window43Left)
       continue;
+    if (xloc > Window43Right)
+      break;
     for (int y = 0; y < dungeon->height; y++) {
       double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
-      if (yloc + size < 0 || yloc > WindowHeightInch)
+      if (yloc + size < 0)
         continue;
+      if (yloc > WindowHeightInch)
+        break;
 
       if (dungeon->mp[x][y] == Plain) {
         drawBmp(spritePlain, xloc + 0.5 * size, yloc + 0.5 * size, size, size,
@@ -121,12 +140,16 @@ void drawDungeon(Dungeon *dungeon, int basex, int basey, double size,
 
   for (int x = 0; x < dungeon->width; x++) {
     double xloc = size * (x - basex) + (WindowWidthInch / 2 - size / 2);
-    if (xloc + size < Window43Left || xloc > Window43Right)
+    if (xloc + size < Window43Left)
       continue;
+    if (xloc > Window43Right)
+      break;
     for (int y = 0; y < dungeon->height; y++) {
       double yloc = size * (y - basey) + (WindowHeightInch / 2 - size / 2);
-      if (yloc + size < 0 || yloc > WindowHeightInch)
+      if (yloc + size < 0)
         continue;
+      if (yloc > WindowHeightInch)
+        break;
 
       _pointSize = GetPointSize();
       if (size >= 0.8)

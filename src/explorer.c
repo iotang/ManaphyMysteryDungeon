@@ -80,7 +80,9 @@ int spawnSingleEnemy(int distance) {
     spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
     enemy.x = x;
     enemy.y = y;
-    enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100;
+    enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100.00;
+    if (enemy.exp < 0)
+      enemy.exp = 0;
     while (updatePokemonStat(&enemy))
       ;
     enemy.direction = RandomInteger(0, 3);
@@ -653,13 +655,22 @@ void giveCheat() {
                 ? "right"
                 : (ret == UP ? "up" : (ret == LEFT ? "left" : "down")));
   } else {
+    int gotKey = 0;
     for (int i = 0; i < enemyList.count; i++) {
       if (enemyList.item[i].type == IKey) {
+        gotKey = 1;
         tx = enemyList.enemy[i].x;
         ty = enemyList.enemy[i].y;
         break;
       }
     }
+
+    if (!gotKey) {
+      emplaceMessage("Something went wrong in this dungeon.");
+      emplaceMessage("Is it really solvable?");
+      return;
+    }
+
     for (int i = 0; i < 4; i++) {
       int dx = manaphy.x + go[i][0], dy = manaphy.y + go[i][1];
       if (dx >= 0 && dx < expDungeon.width && dy >= 0 &&

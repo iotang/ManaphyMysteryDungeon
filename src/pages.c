@@ -269,11 +269,16 @@ void drawNewPage() {
 
   if (button(GenUIID(1), 1.7 * WindowWidthInch / 3, 1.2 * WindowHeightInch / 3,
              0.15 * WindowWidthInch / 3, h, "Confirm", idNewPage)) {
+    if (strlen(dialogFileName) <= 0)
+      return;
+
     FILE *file = fopen(dialogFileName, "r");
+    int isFileAlreadyExists = 0;
     if (file == NULL) {
       setDefaultDungeon(&currentDungeon);
       modifiedSinceLastSave = 1;
     } else {
+      isFileAlreadyExists = 1;
       loadDungeon(&currentDungeon, file);
       sortDungeon(&currentDungeon);
       modifiedSinceLastSave = 0;
@@ -283,6 +288,10 @@ void drawNewPage() {
       smPopState();
     strcpy(editDungeonFileName, dialogFileName);
     gotoEditPage();
+    if (isFileAlreadyExists) {
+      setAlertDialog2("Warning", "File already exists");
+      gotoAlertDialog();
+    }
   }
 }
 

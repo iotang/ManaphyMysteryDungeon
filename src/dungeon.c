@@ -173,9 +173,9 @@ void setDefaultDungeon(Dungeon *dungeon) {
     }
   }
 
-  dungeon->width = dungeon->height = 2;
+  dungeon->width = dungeon->height = 10;
   setDungeonStart(dungeon, 0, 0);
-  setDungeonEnd(dungeon, 1, 1);
+  setDungeonEnd(dungeon, 9, 9);
 }
 
 void randomizeDungeon(Dungeon *dungeon) {
