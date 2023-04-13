@@ -220,7 +220,7 @@ void enemyRound() {
     }
   }
 
-  if (isAutoSpawnEnemy && RandomChance(1.00 / 8)) {
+  if (isAutoSpawnEnemy && RandomChance(1.00 / (8 + 0.5 * enemyList.count))) {
     spawnSingleEnemy(11);
   }
 
