@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 Pokedex pokedex[PokemonSpeciesNumber + 1];
 Move movedex[MaxMoveNumber + 1];
@@ -99,7 +100,7 @@ double calcExp(int aLv, int bLv) {
   int base = 30 + bLv + (bLv - aLv) * 3;
   if (base < 1)
     base = 1;
-  return 20.00 * base / (aLv + 20);
+  return 100.00 * base / pow(aLv + 20, 1.5);
 }
 
 void makePokemonStatBound(Pokemon *pokemon) {
