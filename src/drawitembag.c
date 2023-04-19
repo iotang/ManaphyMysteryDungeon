@@ -24,6 +24,11 @@ int drawItemBag(ItemBag *itemBag, double basex, double basey, int belong) {
   if (maxPage <= 0)
     maxPage = 1;
 
+  if (itemBag->currentPage < 0)
+    itemBag->currentPage = 0;
+  if (itemBag->currentPage >= maxPage)
+    itemBag->currentPage = maxPage - 1;
+
   SetPointSize(16);
   setButtonColors("White", "Blue", "Cyan", "Blue", 1);
   if (button(GenUIID(0), basex + Window43Gap * 0.05,
