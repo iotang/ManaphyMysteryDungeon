@@ -33,7 +33,10 @@ void callingExitWarning(voidFn nex) {
   }
 }
 
-void smPopStateUntilMainMenu() { smPopStateUntil(idMainMenu); }
+void smPopStateUntilMainMenu() {
+  modifiedSinceLastSave = 0;
+  smPopStateUntil(idMainMenu);
+}
 
 void drawToolsBar() {
   if (smStateTop()->uid == idPausePage)
@@ -360,6 +363,12 @@ AppState OpenPage = {idOpenPage,
                      uiOpenPageGetChar,
                      uiOpenPageGetMouse};
 
-void gotoNewPage() { smPushState(&NewPage); }
+void gotoNewPage() {
+  modifiedSinceLastSave = 0;
+  smPushState(&NewPage);
+}
 
-void gotoOpenPage() { smPushState(&OpenPage); }
+void gotoOpenPage() {
+  modifiedSinceLastSave = 0;
+  smPushState(&OpenPage);
+}
