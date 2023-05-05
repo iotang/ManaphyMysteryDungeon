@@ -222,6 +222,9 @@ int getDungeonSolutionWithLimit(Dungeon *dungeon, DungeonSolution *solution,
       solution->route = v;
       a2xy(solveFrom[xy2a(x, y, h, key, allKey)], h, allKey, &x, &y, &key);
     } while (x != sx || y != sy || key != 0);
+    RouteNode *v = newRouteNode(sx, sy);
+    v->nex = solution->route;
+    solution->route = v;
 
   } else {
     solution->routeValid = 0;
