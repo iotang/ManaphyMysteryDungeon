@@ -506,11 +506,11 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
     editMouseY = ScaleYInches(y);
   }
 
-  if (notInAllMenu(editMouseX, editMouseY)) {
+  if (notInAllMenu(editMouseX, editMouseY)) { // 不在菜单栏中
     int mx, my;
     getCellLocation(&editDungeon, editCamera.x, editCamera.y, editCellSize,
-                    editMouseX, editMouseY, &mx, &my);
-    if (event == MOUSEMOVE) {
+                    editMouseX, editMouseY, &mx, &my); // 鼠标所指格子坐标
+    if (event == MOUSEMOVE) {                          // 鼠标移动
       if (isMouseDownEditPage && mx >= 0 && my >= 0) {
         if (editMode == SetPlain && editDungeon.mp[mx][my] == Block) {
           editDungeon.mp[mx][my] = Plain;
@@ -526,7 +526,7 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
           modifiedSinceLastSave = 1;
         }
       }
-    } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) {
+    } else if (event == BUTTON_DOWN && button == LEFT_BUTTON) { // 左键按下
       isMouseDownEditPage = 1;
       if (mx >= 0 && my >= 0) {
         if (editMode == Flip && (editDungeon.mp[mx][my] == Plain ||
@@ -559,19 +559,19 @@ void uiEditPageGetMouse(int x, int y, int button, int event) {
           modifiedSinceLastSave = 1;
         }
       }
-    } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) {
+    } else if (event == BUTTON_DOWN && button == RIGHT_BUTTON) { // 右键按下
       if (!isJumpedEditPage && mx >= 0 && my >= 0) {
         editCamera.x = mx;
         editCamera.y = my;
         isJumpedEditPage = 1;
       }
-    } else if (event == BUTTON_UP && button == LEFT_BUTTON) {
+    } else if (event == BUTTON_UP && button == LEFT_BUTTON) { // 左键松开
       isMouseDownEditPage = 0;
-    } else if (event == BUTTON_UP && button == RIGHT_BUTTON) {
+    } else if (event == BUTTON_UP && button == RIGHT_BUTTON) { // 右键松开
       isJumpedEditPage = 0;
-    } else if (event == ROLL_DOWN) {
+    } else if (event == ROLL_DOWN) { // 滚轮下
       decEditCellSize();
-    } else if (event == ROLL_UP) {
+    } else if (event == ROLL_UP) { // 滚轮上
       incEditCellSize();
     }
   }

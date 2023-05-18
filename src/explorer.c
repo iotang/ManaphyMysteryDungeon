@@ -62,32 +62,33 @@ int enemyCanStepIn(int dx, int dy) {
   return isInDungeon(&expDungeon, dx, dy) && expDungeon.mp[dx][dy] != Block &&
          expDungeon.event[dx][dy].type != Lock &&
          (dx != manaphy.x || dy != manaphy.y) &&
-         !isOnEnemyList(&enemyList, dx, dy);
+         !isOnEnemyList(&enemyList, dx, dy); // 不是墙，没上锁，并且没人在上面
 }
 
 int spawnSingleEnemy(int distance) {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10; i++) { // 尝试十次
     int x = RandomInteger(0, expDungeon.width);
     int y = RandomInteger(0, expDungeon.height);
     if (expDungeon.mp[x][y] == Block || expDungeon.mp[x][y] == Start ||
         expDungeon.event[x][y].type == Lock)
       continue;
-    if (isOnEnemyList(&enemyList, x, y))
+    if (isOnEnemyList(&enemyList, x, y)) // 相同位置生成过
       continue;
-    if (manhattanDistance(x, y, manaphy.x, manaphy.y) <= 11)
+    if (manhattanDistance(x, y, manaphy.x, manaphy.y) <= 11) // 距离玛纳霏太近
       continue;
     Pokemon enemy;
     spawnPokemon(&enemy, Enemy, NRemoraid, RandomChance(0.5));
     enemy.x = x;
     enemy.y = y;
-    enemy.exp = (manaphy.lv - RandomInteger(2, 4)) * 100.00;
+    enemy.exp =
+        (manaphy.lv - RandomInteger(2, 4)) * 100.00; // 根据玛纳霏等级生成
     if (enemy.exp < 0)
       enemy.exp = 0;
     while (updatePokemonStat(&enemy))
       ;
     enemy.direction = RandomInteger(0, 3);
     Item item;
-    item.type = RandomInteger(0, 1) * IOranBerry;
+    item.type = RandomInteger(0, 1) * IOranBerry; // 随机带一个橙橙果
     emplaceEnemyListWithItem(&enemyList, enemy, item);
     return 1;
   }
@@ -104,7 +105,7 @@ void enemyRound() {
 
     int madeDecision = 0;
 
-    if (distan <= 1) {
+    if (distan <= 1) { // 准备攻击
       if (who->x == manaphy.x - 1) {
         who->direction = RIGHT;
       } else if (who->x == manaphy.x + 1) {
@@ -118,7 +119,7 @@ void enemyRound() {
       int able[MaxMoveCount], ableCount = 0;
       for (int i = 0; i < who->moveCount; i++) {
         if (movedex[who->move[i]].pp < 0 || who->pp[i] > 0) {
-          able[ableCount++] = i;
+          able[ableCount++] = i; // 能用的招式
         }
       }
       if (ableCount > 0) {
@@ -130,9 +131,9 @@ void enemyRound() {
           manaphy.direction = DOWN;
         } else if (who->direction == DOWN) {
           manaphy.direction = UP;
-        }
+        } // 玛纳霏面对敌方
 
-        int index = able[RandomInteger(0, ableCount - 1)];
+        int index = able[RandomInteger(0, ableCount - 1)]; // 选一个招式
         int move = who->move[index];
         static char _useMove[99];
         sprintf(_useMove, "%s uses %s!", who->name, movedex[move].name);
@@ -161,7 +162,7 @@ void enemyRound() {
       return;
 
     if (!madeDecision) {
-      if (distan > 10) {
+      if (distan > 10) { // 无法索敌，朝当前朝向走
         int dx = who->x + go[who->direction][0],
             dy = who->y + go[who->direction][1];
         if (enemyCanStepIn(dx, dy)) {
@@ -171,7 +172,7 @@ void enemyRound() {
         }
       }
 
-      if (!madeDecision) {
+      if (!madeDecision) { // 没走，换个方向
         Direction ret = who->direction;
         lint minDistan = linf - 1;
         for (int j = 0; j < 4; j++) {
@@ -183,7 +184,7 @@ void enemyRound() {
                                              manaphy.y, DefaultHPPenalty, 0);
             if (distan < minDistan ||
                 (distan == minDistan && RandomChance(0.5))) {
-              ret = j;
+              ret = j; // 自瞄
               minDistan = distan;
             }
           }
@@ -214,14 +215,14 @@ void enemyRound() {
   }
 
   for (int i = 0; i < enemyList.count; i++) {
-    if (enemyList.enemy[i].hp <= 0) {
+    if (enemyList.enemy[i].hp <= 0) { // 被打倒的敌人
       removeAtEnemyList(&enemyList, i);
       i--;
     }
   }
 
   if (isAutoSpawnEnemy && RandomChance(1.00 / (8 + 0.5 * enemyList.count))) {
-    spawnSingleEnemy(11);
+    spawnSingleEnemy(11); // 随机生成敌人
   }
 
   isEnemyMove = 0;
@@ -254,7 +255,7 @@ int manaphyMove(int att) {
   if (isEnemyMove)
     return 0;
 
-  if (isFaceAttempt(att)) {
+  if (isFaceAttempt(att)) { // 朝向
     Direction dir = argFaceAttempt(att);
     if (dir == RIGHT) {
       manaphy.direction = RIGHT;
@@ -268,7 +269,7 @@ int manaphyMove(int att) {
     return 0;
   }
 
-  if (isMoveAttempt(att)) {
+  if (isMoveAttempt(att)) { // 移动
     Direction dir = argMoveAttempt(att);
     int dx = manaphy.x, dy = manaphy.y;
     if (dir == RIGHT) {
@@ -312,7 +313,7 @@ int manaphyMove(int att) {
     return successMove;
   }
 
-  if (isUseItemAttempt(att)) {
+  if (isUseItemAttempt(att)) { // 使用道具
     int index = argUseItemAttempt(att);
     int type = manaphyItemBag.items[index].type;
     int arg = manaphyItemBag.items[index].arg;
@@ -440,7 +441,7 @@ int manaphyMove(int att) {
     }
   }
 
-  if (isUseMoveAttempt(att)) {
+  if (isUseMoveAttempt(att)) { // 使用招式
     int index = argUseMoveAttempt(att);
     if (manaphy.moveCount <= index)
       return 0;
@@ -512,7 +513,7 @@ int manaphyMove(int att) {
     return 1;
   }
 
-  if (isRemoveItemAttempt(att)) {
+  if (isRemoveItemAttempt(att)) { // 丢掉道具
     int index = argRemoveItemAttempt(att);
     int type = manaphyItemBag.items[index].type;
     int arg = manaphyItemBag.items[index].arg;
@@ -529,7 +530,7 @@ int manaphyMove(int att) {
     return 0;
   }
 
-  if (isRemoveMoveAttempt(att)) {
+  if (isRemoveMoveAttempt(att)) { // 遗忘招式
     int index = argRemoveMoveAttempt(att);
     if (index >= manaphy.moveCount)
       return 0;
@@ -557,7 +558,7 @@ int manaphyMove(int att) {
   return 0;
 }
 
-void manaphyRound(int att) {
+void manaphyRound(int att) { // 玛纳霏回合
   if (!manaphyMove(att))
     return;
 
@@ -575,7 +576,7 @@ void manaphyRound(int att) {
   enemyRound();
 }
 
-void manaphyMoveAttempt(int event) {
+void manaphyMoveAttempt(int event) { // 尝试解码玛纳霏的行动
   if (isDungeonGameOver)
     return;
   if (isEnemyMove)
@@ -658,7 +659,7 @@ void giveCheat() {
     int gotKey = 0;
     for (int i = 0; i < enemyList.count; i++) {
       if (enemyList.item[i].type == IKey) {
-        gotKey = 1;
+        gotKey = 1; // 有人抢了钥匙导致无解
         tx = enemyList.enemy[i].x;
         ty = enemyList.enemy[i].y;
         break;
@@ -705,7 +706,7 @@ void initExplorer() {
     strcpy(expDungeonFileName, editDungeonFileName);
 
     spawnPokemon(&manaphy, Player, NManaphy, Male);
-    manaphy.exp = 400;
+    manaphy.exp = 400; // 5 级
     while (updatePokemonStat(&manaphy))
       ;
     clearItemBag(&manaphyItemBag);

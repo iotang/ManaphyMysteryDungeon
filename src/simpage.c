@@ -150,7 +150,7 @@ void cresseliaMove() {
       } else {
         cresselia.hp += cresselia.maxhp / 200;
       }
-    } else if (dir == ERRORDIRECTION) {
+    } else if (dir == ERRORDIRECTION) { // 无路可走
       clearMessage();
       static char _failed[200];
       sprintf(_failed, "%s: I cannot find a way to get out!", cresselia.name);
